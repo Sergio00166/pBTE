@@ -1,6 +1,8 @@
 #Code by Sergio1260
 
+
 if not __name__=="__main__":
+
     from msvcrt import getch
     from os import get_terminal_size, getcwd
     from sys import argv
@@ -8,7 +10,7 @@ if not __name__=="__main__":
     from functions1 import *
     from functions2 import *
 
-    version="v0.1.8"
+    version="v0.2.0"
 
     #Check if we have arguments via cli, if not ask the user for a file to open
     if not len(argv)==1: filename=" ".join(argv[1:])
@@ -37,3 +39,34 @@ if not __name__=="__main__":
 
     p_offset=0; columns=get_terminal_size()[0]-2
 
+def special_keys(pointer,p_offset,text,columns,offset,line,banoff,arr,rows,oldptr):
+    special_key=getch()
+    if special_key==b'H': #Up
+        pointer, oldptr, text, offset, line, p_offset =\
+        up(line,offset,arr,text,banoff,oldptr,rows,pointer,p_offset)
+
+    elif special_key==b'P': #Down
+        pointer, oldptr, text, offset, line, p_offset =\
+        down(line,offset,arr,text,banoff,oldptr,rows,pointer,p_offset)
+
+    elif special_key==b'M': #Right
+        text, pointer, p_offset, oldptr, line, offset =\
+        right(pointer,p_offset,text,columns,offset,line,banoff,arr,rows,oldptr)
+            
+    elif special_key==b'K': #Left
+        pointer, oldptr, p_offset, text, line, offset =\
+        left(pointer,oldptr,line,offset,banoff,columns,p_offset,text,arr)
+        
+    elif special_key==b'S': #Supr
+        text, arr = supr(pointer,max_len,text,offset,banoff,arr,line,p_offset)
+
+    elif special_key==b'G': #Start
+        pointer=1; p_offset=0
+        oldptr=pointer
+    
+    elif special_key==b'O': #End
+        if len(text)>columns+1: p_offset=len(text)-columns+2; pointer=columns
+        else: pointer=len(text)+1
+        oldptr=pointer
+
+    return text, pointer, p_offset, oldptr, line, offset

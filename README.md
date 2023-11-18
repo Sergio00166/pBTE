@@ -1,9 +1,11 @@
 # pBTE
-python-based Basic Text Editor<br>
+python-based Basic Text Editor
 
-Nowadays it is in development stage, then it can be expected to be a little broken
+A a "clone" of GNU/NANO with some changes
 
-Basic functionalities currently available such as copy, cut, paste lines, and the basic for a text editor<br>
+Nowadays it is in development stage, then it can be expected to be broken
+
+Basic functionalities currently available such as copy, cut, paste lines, and the basic for a text editor
 
 Requirements:<br>
 Python 3 (tested under python 3.12)<br>
