@@ -25,7 +25,8 @@ def open_file(filename,black,reset,rows,banoff,arr,columns,tab_len,tabchr):
                 tmp=open(openfile, "r", encoding="UTF-8").readlines(); arr=[]
                 for x in tmp: arr.append(x.replace("\r","").replace("\n","").replace("\f",""))
                 arr=fix_read_tab(arr,tab_len,tabchr)
-                arr.append(""); filename=openfile; break
+                arr.append(""); filename=openfile
+                break
             except: pass
             
         #Ctrl + Q (cancel)

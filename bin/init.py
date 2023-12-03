@@ -58,7 +58,7 @@ if not __name__=="__main__":
     #Define a lot of stuff
     text=arr[0]; pointer=offset=0; line=banoff=1
     banner=black+" "*3+"pBTE "+version+reset
-    bottom="\n\n    "+black+"^Q"+reset+" EXIT  "+black+"^S"+reset+" SAVE  "
+    bottom="    "+black+"^Q"+reset+" EXIT  "+black+"^S"+reset+" SAVE  "
     bottom+=black+"^A"+reset+" Save as  "+black+"^O"+reset+" OPEN  "
     bottom+=black+"^C"+reset+" COPY  "+black+"^X"+reset+" CUT  "
     bottom+=black+"^P"+reset+" PASTE  "+black+"^G"+reset+" GOTO  "
