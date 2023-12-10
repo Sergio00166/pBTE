@@ -1,19 +1,19 @@
 #Code by Sergio1260
 
 from msvcrt import getch
-from fixes import decode,fix_read_tab
+from functions import decode
 
-def open_file(filename,black,reset,rows,banoff,arr,columns,tab_len,tabchr):
+def open_file(filename,black,reset,rows,banoff,arr,columns):
     
-    saveastxt="Open: "; lenght=len(saveastxt)+2; openfile=filename; wrtptr=lenght+len(openfile)
+    saveastxt=" Open: "; lenght=len(saveastxt)+2; openfile=filename; wrtptr=lenght+len(openfile)
     bottom="\n            "+black+"^Q"+reset+" CANCEL                "
     bottom+=black+"^O"+reset+" OPEN                "
     bottom+=black+"^N"+reset+" NEW FILE                "
     
     while True:
-        out=saveastxt+openfile; full=columns-len(out)
+        out=saveastxt+openfile; full=columns-len(out)+2
         print("\r\033[%d;%dH"%(rows+banoff+2, 1),end="")
-        print("\r"+" "*(len(openfile)+lenght+1), end="")
+        print("\r"+" "*(len(openfile)+lenght), end="")
         print("\r"+black+out+(" "*full)+reset+bottom,end="")
         print("\r\033[%d;%dH"%(rows+banoff+2, wrtptr-1),end="")
         
@@ -24,7 +24,6 @@ def open_file(filename,black,reset,rows,banoff,arr,columns,tab_len,tabchr):
             try:
                 tmp=open(openfile, "r", encoding="UTF-8").readlines(); arr=[]
                 for x in tmp: arr.append(x.replace("\r","").replace("\n","").replace("\f",""))
-                arr=fix_read_tab(arr,tab_len,tabchr)
                 arr.append(""); filename=openfile
                 break
             except: pass

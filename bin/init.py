@@ -5,11 +5,13 @@ if not __name__=="__main__":
 
     from msvcrt import getch
     from os import getcwd
-    from sys import argv
+    from sys import argv, path
     from os.path import exists
-    from fixes import *
+    from screenmgr import update_scr
+    from functions import get_size
     from keys import keys
     from subprocess import check_output
+    path.append(path[0]+"\\lib.zip")
     from colorama import init, Fore, Back, Style
     from threading import Thread
     from time import sleep as delay
@@ -17,11 +19,10 @@ if not __name__=="__main__":
     init(autoreset=False,convert=True); reset=Style.RESET_ALL
     black=Back.WHITE+Style.DIM+Fore.BLACK+Style.DIM
     
-    version="v0.3.0"
+    version="β v0.4.0"
     
     rows,columns=get_size()
 
-    tab_len=8; tabchr=b'\xc2\xa0'.decode("UTF-8")
     ch_T_SP=False
     
     # FIXES WHEN USING LEGACY CMD
@@ -38,7 +39,6 @@ if not __name__=="__main__":
         if exists(filename): 
             tmp=open(filename, "r", encoding="UTF-8").readlines(); arr=[]
             for x in tmp: arr.append(x.replace("\r","").replace("\n","").replace("\f",""))
-            arr=fix_read_tab(arr,tab_len,tabchr)
             arr.append("")
         else: arr=[""]
         
@@ -63,7 +63,7 @@ if not __name__=="__main__":
     bottom+=black+"^C"+reset+" COPY  "+black+"^X"+reset+" CUT  "
     bottom+=black+"^P"+reset+" PASTE  "+black+"^G"+reset+" GOTO  "
     bottom+=black+"^T"+reset+" T/SP    "
-    copy_buffer=""; fix=False; oldptr=0; p_offset=0
+    copy_buffer=""; fix=False; oldptr=p_offset=0
 
     #Flag to show after saving the file
     saved_txt=black+"SAVED"+reset; status=saved_df=black+" "*5+reset; status_st=0

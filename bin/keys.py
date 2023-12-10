@@ -1,38 +1,35 @@
 #Code by Sergio1260
 
 from special_keys import special_keys
-from fixes import *
+from functions import *
 from functions1 import *
 from functions2 import *
 from saveas import save_as
 from openfile import open_file
 
-def keys(key,text,pointer,p_offset,oldptr,line,offset,columns,banoff,arr,rows,max_len,filename,\
-         status,status_st,copy_buffer,fixstr,fix,black,reset,saved_txt,tab_len,tabchr,ch_T_SP):
+def keys(key,text,pointer,oldptr,line,offset,columns,banoff,arr,rows,max_len,filename,\
+         status,status_st,copy_buffer,fixstr,fix,black,reset,saved_txt,ch_T_SP):
         
     if key==b'\xe0': #Special Keys
-        text, pointer, p_offset, oldptr, line, offset, status_st =\
-        special_keys(pointer,p_offset,text,columns,offset,line,banoff,\
-                     arr,rows,oldptr,max_len,status_st,tabchr,tab_len)
+        text, pointer, oldptr, line, offset, status_st =\
+        special_keys(pointer,text,columns,offset,line,banoff,\
+                     arr,rows,oldptr,max_len,status_st)
         
     elif key==b'\x08': #Backspace (removes char)
-        line, offset, text, arr, pointer, p_offset =\
-        backspace(pointer,text,offset,line,arr,banoff,p_offset,tabchr,tab_len)
+        line, offset, text, arr, pointer =\
+        backspace(pointer,text,offset,line,arr,banoff)
         status_st=False
 
     elif key==b'\r': #Return (adds new lines or moves text)
         line, offset, arr, pointer, text =\
-        newline(text,pointer,offset,banoff,line,arr,rows,p_offset)
+        newline(text,pointer,offset,banoff,line,arr,rows)
         status_st=False
 
     elif key==b'\x13': #Ctrl + S (SAVE)
         out=open(filename,"w",encoding="UTF-8")
-        arr1=fix_out_tab(arr,tabchr,tab_len)
-        out.write("\n".join(arr1)); out.close()
+        out.write("\n".join(arr)); out.close()
         status=saved_txt; status_st=True
         out=open(filename,"r",encoding="UTF-8")
-        arr=out.readlines()+[""]
-        arr=fix_read_tab(arr,tab_len,tabchr)
         
     elif key==b'\x18': #Ctrl + X (CUT LINE)
         if not line+offset>len(arr)-1:
@@ -54,13 +51,13 @@ def keys(key,text,pointer,p_offset,oldptr,line,offset,columns,banoff,arr,rows,ma
         line,offset,text = goto(rows,banoff,line,arr,offset,black,reset)
 
     elif key==b'\x01': #Ctrl + A (Save as)
-        arr, status_st, filename, status =\
-        save_as(filename,black,reset,rows,banoff,arr,saved_txt,\
-                status_st,columns,status,tabchr,tab_len)
+        status_st, filename, status =\
+        save_as(filename,black,reset,rows,banoff,\
+        arr,saved_txt,status_st,columns,status)
 
     elif key==b'\x0f': #Ctlr + O (Open file)
         arr,filename = open_file(filename,black,\
-        reset,rows,banoff,arr,columns,tab_len,tabchr)
+        reset,rows,banoff,arr,columns)
 
     elif key==b'\x14': #Ctrl + T (Use 4 spaces instead of tabs)
         if ch_T_SP: ch_T_SP=False
@@ -69,22 +66,14 @@ def keys(key,text,pointer,p_offset,oldptr,line,offset,columns,banoff,arr,rows,ma
     else: #All the other keys
         if not str(key)[4:6] in fixstr:
             out=decode(key)
-            p1=text[:pointer+p_offset-1]
-            p2=text[pointer+p_offset-1:]
-            if key==b'\t': #Tab fix
-                if p2=="": p2=tabchr; fix_empty=1
-                else: fix_empty=0
-                text=(p1+out+p2)    
-                #Set spaces as 4 for python
-                if ch_T_SP: tabchr=" "; fix=4
-                else: fix=fix_tab(pointer+p_offset,text,tab_len)
-                out=tabchr*(fix-fix_empty)
-            else: fix=1;
+            p1=text[:pointer-1]
+            p2=text[pointer-1:]
+            if out=="\t" and ch_T_SP:
+                out=" "*4
+                pointer+=3
             text=(p1+out+p2)
-            if p_offset==0 and not pointer+fix>columns: pointer+=fix
-            elif not p_offset+pointer>len(text)+2: p_offset+=fix
-            else: pointer+=fix
+            pointer+=1
             status_st=False
 
-    return text,pointer,p_offset,oldptr,line,offset,columns,banoff,arr,rows,max_len,filename,status,status_st,copy_buffer,fixstr,fix,ch_T_SP
+    return text,pointer,oldptr,line,offset,columns,banoff,arr,rows,max_len,filename,status,status_st,copy_buffer,fixstr,fix,ch_T_SP
 

@@ -1,19 +1,19 @@
 #Code by Sergio1260
 
 from msvcrt import getch
-from functions1 import decode, fix_out_tab,fix_read_tab
+from functions import decode
 
-def save_as(filename,black,reset,rows,banoff,arr,saved_txt,status_st,columns,status,tabchr,tab_len):
+def save_as(filename,black,reset,rows,banoff,arr,saved_txt,status_st,columns,status):
     
-    saveastxt="Save as: "; lenght=len(saveastxt)+2; filewrite=filename; wrtptr=lenght+len(filewrite)
+    saveastxt=" Save as: "; lenght=len(saveastxt)+2; filewrite=filename; wrtptr=lenght+len(filewrite)
     bottom="\n       "+black+"^Q"+reset+" CANCEL      "+black+"^S"+reset+" SAVE      "
     bottom+=black+"^B"+reset+" BACKUP      "+black+"^A"+reset+" APPEND      "
     bottom+=black+"^P"+reset+" PREPEND           "
     
     while True:
-        out=saveastxt+filewrite; full=columns-len(out)
+        out=saveastxt+filewrite; full=columns-len(out)+2
         print("\r\033[%d;%dH"%(rows+banoff+2, 1),end="")
-        print("\r"+" "*(len(filewrite)+lenght+1), end="")
+        print("\r"+" "*(len(filewrite)+lenght), end="")
         print("\r"+black+out+(" "*full)+reset+bottom,end="")
         print("\r\033[%d;%dH"%(rows+banoff+2, wrtptr-1),end="")
         
@@ -27,7 +27,6 @@ def save_as(filename,black,reset,rows,banoff,arr,saved_txt,status_st,columns,sta
                     filewrite+=".bak" #Ctrl+B and if same name
                     
                 out=open(filewrite,"w",encoding="UTF-8")
-                arr=fix_out_tab(arr,tabchr,tab_len)
                 out.write("\n".join(arr)); out.close(); status_st=True
                 
                 if key==b'\x13': #Ctr + S
@@ -35,11 +34,8 @@ def save_as(filename,black,reset,rows,banoff,arr,saved_txt,status_st,columns,sta
                     for x in tmp: arr.append(x.replace("\r","").replace("\n","").replace("\f",""))
                     arr.append(""); filename=filewrite
                     out=open(filewrite,"r",encoding="UTF-8")
-                    arr=out.readlines()+[""]
-                    arr=fix_read_tab(arr,tab_len,tabchr)
                     break
-                    
-                else: status=black+"Backed UP"+reset; break
+                else: status=black+"BkUPd"+reset; break
                 
             except: pass
             
@@ -80,4 +76,4 @@ def save_as(filename,black,reset,rows,banoff,arr,saved_txt,status_st,columns,sta
                 filewrite=p1+out+p2
                 wrtptr+=1
 
-    return arr, status_st, filename, status
+    return status_st, filename, status
