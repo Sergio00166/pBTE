@@ -58,11 +58,6 @@ if not __name__=="__main__":
     #Define a lot of stuff
     text=arr[0]; pointer=offset=0; line=banoff=1
     banner=black+" "*3+"pBTE "+version+reset
-    bottom="    "+black+"^Q"+reset+" EXIT  "+black+"^S"+reset+" SAVE  "
-    bottom+=black+"^A"+reset+" Save as  "+black+"^O"+reset+" OPEN  "
-    bottom+=black+"^C"+reset+" COPY  "+black+"^X"+reset+" CUT  "
-    bottom+=black+"^P"+reset+" PASTE  "+black+"^G"+reset+" GOTO  "
-    bottom+=black+"^T"+reset+" T/SP    "
     copy_buffer=""; fix=False; oldptr=p_offset=0
 
     #Flag to show after saving the file

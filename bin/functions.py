@@ -1,9 +1,11 @@
 #Code by Sergio1260
 
 from os import get_terminal_size
+from msvcrt import getch
 from sys import path
 path.append(path[0]+"\\lib.zip")
 from wcwidth import wcwidth
+
 
 def wrap(text, columns):
     out=[]; counter=-1; buffer=""
@@ -30,20 +32,25 @@ def decode(key):
 
 def get_size():
     size=get_terminal_size()
-    return size[1]-4,size[0]-2
+    return size[1]-3,size[0]-2
 
 def fix_arr_line_len(arr, columns, black, reset):
-    out=[]
-    for x in arr:
-        bigger=text_real_size(x)>columns+1
-        if bigger: out.append(x[:columns+1]+black+">"+reset)
-        else: out.append(x)
+    out=[]; fix=0//(columns+2)
+    for text in arr:
+        wrapped_text = wrap(text,columns)
+        if len(wrapped_text)==0: wrapped_text=""
+        elif fix==len(wrapped_text):
+            text=wrapped_text[fix-1]
+        else: text=wrapped_text[fix]
+        if (len(wrapped_text)-fix)>1:
+            text+=black+">"+reset
+        out.append(text)   
     return out
       
 def tab_len(pointer,text):
     fix=text[:pointer+1]+"\f"+text[pointer+1:]
     fix=fix.expandtabs(8); length=fix[pointer:]
-    length=length[:length.find("\f")]   
+    length=length[:length.find("\f")]  
     return len(length)
 
 def text_real_size(text):
@@ -59,4 +66,3 @@ def fixlenline(text, pointer, oldptr):
         return length,oldptr
     elif oldptr>pointer: return oldptr,oldptr
     else: return pointer,oldptr
-        

@@ -7,8 +7,9 @@ from functions2 import *
 from saveas import save_as
 from openfile import open_file
 
-def keys(key,text,pointer,oldptr,line,offset,columns,banoff,arr,rows,max_len,filename,\
-         status,status_st,copy_buffer,fixstr,fix,black,reset,saved_txt,ch_T_SP):
+def keys(key,text,pointer,oldptr,line,offset,columns,banoff,arr,rows,\
+         max_len,filename,status,status_st,copy_buffer,fixstr,fix,\
+         black,reset,saved_txt,ch_T_SP,legacy,banner):
         
     if key==b'\xe0': #Special Keys
         text, pointer, oldptr, line, offset, status_st =\
@@ -32,18 +33,22 @@ def keys(key,text,pointer,oldptr,line,offset,columns,banoff,arr,rows,max_len,fil
         out=open(filename,"r",encoding="UTF-8")
         
     elif key==b'\x18': #Ctrl + X (CUT LINE)
-        if not line+offset>len(arr)-1:
-            copy_buffer=arr[line+offset-banoff][pointer+p_offset-1:]
-            arr.pop(line+offset-banoff); text=arr[line+offset-banoff]
-            status_st=False
+        if line+offset>len(arr)-1:
+            copy_buffer=text[pointer-1:]
+            text=text[:pointer-1]
+        else:
+            copy_buffer=arr[line+offset-banoff][:]
+            arr.pop(line+offset-banoff)
+            text=arr[line+offset-banoff][:pointer-1]
+        status_st=False
         
     elif key==b'\x03': #Ctrl + C (COPY LINE)
-        copy_buffer=arr[line+offset-banoff][pointer+p_offset-1:]
+        copy_buffer=arr[line+offset-banoff][pointer-1:]
         
     elif key==b'\x10': #Ctrl + P (PASTE TEXT)
         if not len(copy_buffer)==0:
             p1=arr[:line+offset-banoff]; p2=arr[line+offset-banoff+1:]
-            fix1=text[:p_offset+pointer-1]; fix2=text[p_offset+pointer-1:]
+            fix1=text[:pointer-1]; fix2=text[+pointer-1:]
             out=fix1+copy_buffer+fix2; arr=p1+[out]+p2; text=out
             status_st=False
 
@@ -51,17 +56,19 @@ def keys(key,text,pointer,oldptr,line,offset,columns,banoff,arr,rows,max_len,fil
         line,offset,text = goto(rows,banoff,line,arr,offset,black,reset)
 
     elif key==b'\x01': #Ctrl + A (Save as)
-        status_st, filename, status =\
-        save_as(filename,black,reset,rows,banoff,\
-        arr,saved_txt,status_st,columns,status)
+        args=(filename,black,reset,rows,banoff,arr,columns,\
+        legacy,status,offset,line,banner,status_st,saved_txt)
+        status_st, filename, status = save_as(args)
 
     elif key==b'\x0f': #Ctlr + O (Open file)
-        arr,filename = open_file(filename,black,\
-        reset,rows,banoff,arr,columns)
+        args=(filename,black,reset,rows,banoff,arr,columns,legacy,status,offset,line,banner)
+        arr,filename = open_file(args); line=1; offset=0; text=arr[0]
 
     elif key==b'\x14': #Ctrl + T (Use 4 spaces instead of tabs)
         if ch_T_SP: ch_T_SP=False
         else: ch_T_SP=True
+
+    elif key==b'\n': pass
         
     else: #All the other keys
         if not str(key)[4:6] in fixstr:
