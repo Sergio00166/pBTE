@@ -2,7 +2,7 @@
 
 def updscr_thr():
     global black,reset,legacy,status,banoff,offset,line,pointer,arr
-    global banner,filename,rows,columns,run_thread,text, kill,p_offset
+    global banner,filename,rows,columns,run_thread,text,kill,p_offset
     while not kill:
         delay(0.01)
         if run_thread:

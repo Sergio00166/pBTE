@@ -58,7 +58,8 @@ def open_file(args):
                 tmp=open(openfile, "r", encoding="UTF-8").readlines(); arr=[]
                 for x in tmp: arr.append(x.replace("\r","").replace("\n","").replace("\f",""))
                 arr.append(""); filename=openfile
-                break
+                run=False;kill=True
+                thr.join(); break
             except: pass
             
         #Ctrl + Q (cancel)

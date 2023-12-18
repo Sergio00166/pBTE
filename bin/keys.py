@@ -37,9 +37,9 @@ def keys(key,text,pointer,oldptr,line,offset,columns,banoff,arr,rows,\
             copy_buffer=text[pointer-1:]
             text=text[:pointer-1]
         else:
-            copy_buffer=arr[line+offset-banoff][:]
+            copy_buffer=arr[line+offset-banoff]
             arr.pop(line+offset-banoff)
-            text=arr[line+offset-banoff][:pointer-1]
+            text=arr[line+offset-banoff]
         status_st=False
         
     elif key==b'\x03': #Ctrl + C (COPY LINE)
@@ -50,6 +50,7 @@ def keys(key,text,pointer,oldptr,line,offset,columns,banoff,arr,rows,\
             p1=arr[:line+offset-banoff]; p2=arr[line+offset-banoff+1:]
             fix1=text[:pointer-1]; fix2=text[+pointer-1:]
             out=fix1+copy_buffer+fix2; arr=p1+[out]+p2; text=out
+            pointer=len(fix1+copy_buffer)
             status_st=False
 
     elif key==b'\x07': #Ctrl + G (go to line)

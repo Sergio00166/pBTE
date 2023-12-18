@@ -48,14 +48,14 @@ def save_as(args):
         key=getch() #Map keys
         run=False #Stop update screen thread
         
-        #Ctrl + S (confirms) or Ctrl + B backup
-        if key==b'\x13' or key==b'\x02':
+        #Ctrl + A (confirms) or Ctrl + B backup
+        if key==b'\x01' or key==b'\x02':
             try:
                 if key==b'\x02' and filewrite==filename:
                     filewrite+=".bak" #Ctrl+B and if same name    
                 out=open(filewrite,"w",encoding="UTF-8")
                 out.write("\n".join(arr)); out.close(); status_st=True
-                if key==b'\x13': #Ctr + S
+                if key==b'\x01': #Ctr + A
                     status=saved_txt; tmp=open(filewrite, "r", encoding="UTF-8").readlines(); arr=[]
                     for x in tmp: arr.append(x.replace("\r","").replace("\n","").replace("\f",""))
                     arr.append(""); filename=filewrite
