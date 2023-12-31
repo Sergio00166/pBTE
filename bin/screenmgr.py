@@ -3,16 +3,14 @@
 from sys import path
 path.append(path[0]+"\\lib.zip")
 from wcwidth import wcwidth
-from functions import wrap, text_real_size, tab_len, fix_arr_line_len
+from functions import wrap, str_len, tab_len, fix_arr_line_len
 
 
 def fix_cursor_pos(text,pointer,columns,black,reset):
+    
     len_arr=[]; ptr=pointer
-    #Generate arr lenght dictionary
-    for x in text[:pointer-1]:
-        if not x=="\t": len_arr.append(wcwidth(x))
-        else: len_arr.append(tab_len(text.index(x),text))
-    pointer=sum(len_arr)
+    pointer=str_len(text,pointer)
+    
     fix=pointer//(columns+2)
     wrapped_text = wrap(text,columns)
     if len(wrapped_text)==0: wrapped_text=""
@@ -20,9 +18,9 @@ def fix_cursor_pos(text,pointer,columns,black,reset):
         text=wrapped_text[fix-1]
     else: text=wrapped_text[fix]
     pointer-=(fix*columns)
+    if fix>0: text=black+"<"+reset+text
     if (len(wrapped_text)-fix)>1:
         text+=black+">"+reset
-    if fix>0: text=black+"<"+reset+text
 
     return pointer+1, text
 

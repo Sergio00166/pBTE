@@ -11,16 +11,17 @@ def wrap(text, columns):
     out=[]; counter=-1; buffer=""
     for x in text:
         if counter>=columns-1:
-            if x=="\t":
-                lenght=tab_len(text.index(x),text)
-            else: lenght=wcwidth(x)
-            if lenght>1: out.append(buffer)
-            else: out.append(buffer+x)
-            buffer=""; counter=0       
+            lenght=str_len(x)
+            if lenght>1:
+                out.append(buffer)
+                buffer=x
+            else:
+                out.append(buffer+x)
+                buffer=""
+            counter=0
         else:
             buffer+=x
-            if x=="\t": counter+=tab_len(text.index(x),text)
-            else: counter+=wcwidth(x)
+            counter+=str_len(x)
     if not buffer=="": out.append(buffer)
     return out
 
@@ -50,14 +51,17 @@ def fix_arr_line_len(arr, columns, black, reset):
 def tab_len(pointer,text):
     fix=text[:pointer+1]+"\f"+text[pointer+1:]
     fix=fix.expandtabs(8); length=fix[pointer:]
-    length=length[:length.find("\f")]  
+    length=length[:length.find("\f")]
+
     return len(length)
 
-def text_real_size(text):
+def str_len(text,pointer=None):
     lenght=0
-    for x in text:
-        if x=="\t": lenght+=tab_len(text.index(x),text)
-        else: lenght+=wcwidth(x)
+    if not pointer==None:
+        fix=text[:pointer-1]
+    else: fix=text
+    fix=fix.expandtabs(8)
+    for x in fix: lenght+=wcwidth(x)
     return lenght
 
 def fixlenline(text, pointer, oldptr):
