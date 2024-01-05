@@ -2,7 +2,6 @@
 
 from msvcrt import getch
 from functions1 import *
-from functions2 import *
 
 def special_keys(pointer,text,columns,offset,line,banoff,arr,rows,oldptr,max_len,status_st):
     

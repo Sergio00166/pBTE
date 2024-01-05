@@ -3,13 +3,12 @@
 from special_keys import special_keys
 from functions import *
 from functions1 import *
-from functions2 import *
 from saveas import save_as
 from openfile import open_file
 
 def keys(key,text,pointer,oldptr,line,offset,columns,banoff,arr,rows,\
          max_len,filename,status,status_st,copy_buffer,fixstr,fix,\
-         black,reset,saved_txt,ch_T_SP,legacy,banner):
+         black,reset,saved_txt,ch_T_SP,banner):
         
     if key==b'\xe0': #Special Keys
         text, pointer, oldptr, line, offset, status_st =\
@@ -58,11 +57,11 @@ def keys(key,text,pointer,oldptr,line,offset,columns,banoff,arr,rows,\
 
     elif key==b'\x01': #Ctrl + A (Save as)
         args=(filename,black,reset,rows,banoff,arr,columns,\
-        legacy,status,offset,line,banner,status_st,saved_txt)
+        status,offset,line,banner,status_st,saved_txt)
         status_st, filename, status = save_as(args)
 
     elif key==b'\x0f': #Ctlr + O (Open file)
-        args=(filename,black,reset,rows,banoff,arr,columns,legacy,status,offset,line,banner)
+        args=(filename,black,reset,rows,banoff,arr,columns,status,offset,line,banner)
         arr,filename = open_file(args); line=1; offset=0; text=arr[0]
 
     elif key==b'\x14': #Ctrl + T (Use 4 spaces instead of tabs)

@@ -7,8 +7,7 @@ if not __name__=="__main__":
     from os import getcwd
     from sys import argv, path
     from os.path import exists
-    from screenmgr import update_scr
-    from functions import get_size
+    from functions import get_size, update_scr
     from keys import keys
     from subprocess import check_output
     path.append(path[0]+"\\lib.zip")
@@ -19,18 +18,12 @@ if not __name__=="__main__":
     init(autoreset=False,convert=True); reset=Style.RESET_ALL
     black=Back.WHITE+Style.DIM+Fore.BLACK+Style.DIM
     
-    version="β v0.4.0"
+    version="v0.4.1  "
     
     rows,columns=get_size()
 
     ch_T_SP=False
     
-    # FIXES WHEN USING LEGACY CMD
-    fix_oldcmd=str(check_output("mode con", shell=True)).split("\\r\\n")[3].replace(" ","")
-    fix_oldcmd=int(fix_oldcmd[fix_oldcmd.find(":")+1:])
-    if fix_oldcmd>rows+4: legacy=True
-    else: legacy=False
-        
     #Check if we have arguments via cli, if not create an empty one
     if not len(argv)==1:
         filename=" ".join(argv[1:])
@@ -62,6 +55,8 @@ if not __name__=="__main__":
 
     #Flag to show after saving the file
     saved_txt=black+"SAVED"+reset; status=saved_df=black+" "*5+reset; status_st=0
+
+    print("\033c", end="")
 
     
 
