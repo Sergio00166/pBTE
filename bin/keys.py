@@ -2,7 +2,7 @@
 
 from special_keys import special_keys
 from functions import *
-from functions1 import *
+from actions import *
 from saveas import save_as
 from openfile import open_file
 
@@ -61,8 +61,8 @@ def keys(key,text,pointer,oldptr,line,offset,columns,banoff,arr,rows,\
         status_st, filename, status = save_as(args)
 
     elif key==b'\x0f': #Ctlr + O (Open file)
-        args=(filename,black,reset,rows,banoff,arr,columns,status,offset,line,banner)
-        arr,filename = open_file(args); line=1; offset=0; text=arr[0]
+        args=(filename,black,reset,rows,banoff,arr,columns,status,offset,line,banner,status_st)
+        arr,filename,status_st = open_file(args); line=1; offset=0; text=arr[0]
 
     elif key==b'\x14': #Ctrl + T (Use 4 spaces instead of tabs)
         if ch_T_SP: ch_T_SP=False

@@ -86,13 +86,7 @@ def goto(rows, banoff, line, arr, offset, black, reset):
     print("\r\033[%d;%dH"%(rows+banoff+2,1),end="")
     print(" "+black+"Go to line:"+reset, end=" "); p1=input()
     print("\r\033[%d;%dH"%(line, 1),end="")
-    if p1=="-": p1=len(arr)-1
-    try:
-        p1=int(p1)
-        if p1<len(arr):
-            if p1<rows: offset=0; line=p1+banoff
-            else: offset=p1-rows; line=rows+banoff
-        text=arr[line+offset-banoff]
-    except: pass
-    return line, offset, text
+    line,offset,text = CalcRelLine(p1,arr,offset,line,banoff,rows)
+    print("\033c", end="")
+    return line, offset,text
 

@@ -1,7 +1,7 @@
 #Code by Sergio1260
 
 from msvcrt import getch
-from functions1 import *
+from actions import *
 
 def special_keys(pointer,text,columns,offset,line,banoff,arr,rows,oldptr,max_len,status_st):
     

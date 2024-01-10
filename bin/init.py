@@ -14,11 +14,12 @@ if not __name__=="__main__":
     from colorama import init, Fore, Back, Style
     from threading import Thread
     from time import sleep as delay
+    from time import time
     
     init(autoreset=False,convert=True); reset=Style.RESET_ALL
     black=Back.WHITE+Style.DIM+Fore.BLACK+Style.DIM
     
-    version="v0.4.1  "
+    version="v0.4.2  "
     
     rows,columns=get_size()
 
@@ -56,7 +57,7 @@ if not __name__=="__main__":
     #Flag to show after saving the file
     saved_txt=black+"SAVED"+reset; status=saved_df=black+" "*5+reset; status_st=0
 
-    print("\033c", end="")
+    print("\033c", end=""); end=1; start=0
 
     
 

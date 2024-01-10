@@ -59,6 +59,17 @@ def fixlenline(text, pointer, oldptr):
     elif oldptr>pointer: return oldptr,oldptr
     else: return pointer,oldptr
 
+def CalcRelLine(p1,arr,offset,line,banoff,rows):
+    if p1=="-": p1=len(arr)-1
+    try:
+        p1=int(p1)
+        if p1<len(arr):
+            if p1<rows: offset=0; line=p1+banoff
+            else: offset=p1-rows; line=rows+banoff
+    except: pass
+    text=arr[line+offset-banoff]
+    return line, offset, text
+
 def fix_cursor_pos(text,pointer,columns,black,reset):
     len_arr=[]; ptr=pointer; pos=0
     pointer=str_len(text,pointer)   
@@ -96,7 +107,3 @@ def update_scr(black,reset,status,banoff,offset,line,pointer,arr,banner,filename
     print(cls+outb+black+" "*(columns-31-len(filename))+reset, end="")
     print(black+filename+reset+black+" "+reset+"\n"+all_file, end="")
     print(("\r\033[%d;%dH"%(line+1, pointer)), end="")
-
-
-
-

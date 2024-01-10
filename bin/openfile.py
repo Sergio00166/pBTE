@@ -29,7 +29,7 @@ def open_file(args):
     global saveastxt,openfile,rows,columns,black,reset,status,banoff,lenght
     global wrtptr,offset,line,arr,banner,filename,rows,columns,run,kill
 
-    filename,black,reset,rows,banoff,arr,columns,status,offset,line,banner=args
+    filename,black,reset,rows,banoff,arr,columns,status,offset,line,banner,status_st=args
     openfile=chr(92).join(filename.split(chr(92))[:-1])+chr(92)
     saveastxt=" Open: "; lenght=len(saveastxt)+2; wrtptr=lenght+len(openfile)
     thr=Thread(target=updscr_thr); run=False; kill=False; thr.start()
@@ -74,7 +74,8 @@ def open_file(args):
                 for x in tmp: arr.append(x.replace("\r","").replace("\n","").replace("\f",""))
                 arr.append(""); filename=openfile
                 run=False;kill=True;thr.join()
-                print("\033c", end=""); break
+                print("\033c", end="")
+                status_st=False; break
             except: pass
             
         #Ctrl + Q (cancel)
@@ -120,4 +121,4 @@ def open_file(args):
                 openfile=p1+out+p2
                 wrtptr+=1
 
-    return arr, filename
+    return arr, filename, status_st

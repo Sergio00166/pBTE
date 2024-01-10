@@ -1,9 +1,7 @@
 # pBTE
 python-based Basic Text Editor
 
-A a basic "clone" of GNU/NANO with some changes
-
-Using the minimun external libraries as possible (only wcwidth and colorama) 
+A a basic terminal text editor with python using the minimun external libraries as possible (only wcwidth and colorama) 
 
 Nowadays it is in development stage, then it can be expected to be broken
 
