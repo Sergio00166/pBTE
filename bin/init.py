@@ -3,27 +3,36 @@
            
 if not __name__=="__main__":
 
-    from msvcrt import getch
-    from os import getcwd
+    from os import getcwd, sep
     from sys import argv, path
-    from os.path import exists
+    from os.path import exists, isabs
     from functions import get_size, update_scr
-    from keys import keys
+    from keys_func import keys_func
     from subprocess import check_output
-    path.append(path[0]+"\\lib.zip")
-    from colorama import init, Fore, Back, Style
+    path.append(path[0]+sep+"lib.zip")
+    from colorama import init, Fore, Back, Style, deinit
     from threading import Thread
     from time import sleep as delay
     from time import time
     
     init(autoreset=False,convert=True); reset=Style.RESET_ALL
-    black=Back.WHITE+Style.DIM+Fore.BLACK+Style.DIM
+    black=Back.WHITE+Style.DIM+Fore.BLACK+Style.DIM; deinit()
+    rows,columns=get_size(); ch_T_SP=False
     
-    version="v0.4.2  "
+    version="v0.4.5  "
     
-    rows,columns=get_size()
-
-    ch_T_SP=False
+    if sep==chr(92): #Windows
+        from msvcrt import getch
+    else: # Unix like OSes
+        import sys; import tty; import termios
+        def getch():
+            fd = sys.stdin.fileno()
+            old_settings = termios.tcgetattr(fd)
+            try:
+                tty.setraw(fd)
+                char = sys.stdin.read(1).encode('utf-8')
+            finally: termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+            return char
     
     #Check if we have arguments via cli, if not create an empty one
     if not len(argv)==1:
@@ -39,8 +48,8 @@ if not __name__=="__main__":
     else: #Create an empty new file
         filename="NewFile"; arr=[""] 
 
-    if not ":\\" in filename: #Fix file path
-        filename=getcwd()+"\\"+filename 
+    if not isabs(filename): #Fix file path
+        filename=getcwd()+sep+filename 
 
     # Creates a list of banned chars code
     values=["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f"]
@@ -58,6 +67,23 @@ if not __name__=="__main__":
     saved_txt=black+"SAVED"+reset; status=saved_df=black+" "*5+reset; status_st=0
 
     print("\033c", end=""); end=1; start=0
+
+    if sep==chr(92):
+        keys = {"special":b'\xe0',"delete":b'\x08',"return":b'\r',"ctrl+s":b'\x13',
+                "ctrl+n":b'\x0e',"ctrl+x":b'\x18',"ctrl+c":b'\x03',"ctrl+p":b'\x10',
+                "ctrl+g":b'\x07',"ctrl+a":b'\x01',"ctrl+o":b'\x0f',"ctrl+t":b'\x14',
+                "ctrl+b":b'\x02',"ctrl+q":b'\x11',"arr_up":b'H',"arr_down":b'P',
+                "arr_right":b'M',"arr_left":b'K',"supr":b'S',"start":b'G',
+                "end":b'O',"tab":b'\t'}
+    else:
+        keys = {"special":b'\x1b',"delete":b'\x7f',"return":b'\r',"ctrl+s":b'\x13',
+                "ctrl+n":b'\x0e',"ctrl+x":b'\x18',"ctrl+c":b'\x03',"ctrl+p":b'\x10',
+                "ctrl+g":b'\x07',"ctrl+a":b'\x01',"ctrl+o":b'\x0f',"ctrl+t":b'\x14',
+                "ctrl+b":b'\x02',"ctrl+q":b'\x11',"arr_up":b'A',"arr_down":b'B',
+                "arr_right":b'C',"arr_left":b'D',"supr":b'~',"start":b'H',
+                "end":b'F',"tab":b'\t'}
+
+    
 
     
 

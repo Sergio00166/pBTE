@@ -1,9 +1,8 @@
 #Code by Sergio1260
 
-from os import get_terminal_size
-from msvcrt import getch
+from os import get_terminal_size,sep
 from sys import path
-path.append(path[0]+"\\lib.zip")
+path.append(path[0]+sep+"lib.zip")
 from wcwidth import wcwidth
 
 
@@ -20,15 +19,15 @@ def wrap(text, columns):
     if not buffer=="": out.append(buffer)
     return out
 
-def decode(key):
+def get_size():
+    size=get_terminal_size()
+    return size[1]-3,size[0]-2
+
+def decode(key,getch):
     for x in range(3):
         try: out=key.decode("UTF-8"); break
         except: key+=getch()
     return out
-
-def get_size():
-    size=get_terminal_size()
-    return size[1]-3,size[0]-2
 
 def fix_arr_line_len(arr, columns, black, reset):
     out=[]; fix=0//(columns+2)
@@ -86,24 +85,21 @@ def fix_cursor_pos(text,pointer,columns,black,reset):
     if (len(wrapped_text)-fix)>1: text+=black+">"+reset
     return pointer+1, text
 
-def update_scr(black,reset,status,banoff,offset,line,pointer,arr,banner,filename,rows,columns,fixcs=False):
+def update_scr(black,reset,status,banoff,offset,line,pointer,arr,banner,filename,rows,columns):
     position=black+"  "+str(line+offset-banoff)+" "*(4-len(str(line+offset-banoff)))
     text=arr[line+offset-1]; pointer, text = fix_cursor_pos(text,pointer,columns,black,reset)
     out_arr=fix_arr_line_len(arr[offset:rows+offset+1], columns, black, reset)
-    if fixcs: cls = "\033c" # ANSII code to clear scr
-    else:
-        cls="\r\033[%d;%dH"%(1, 1)
-        cls+=(" "*(columns+2))*(rows+2)
-        cls+="\r\033[%d;%dH"%(1, 1)  
+    cls="\r\033[%d;%dH"%(1, 1)+(" "*(columns+2))*(rows+2)+"\r\033[%d;%dH"%(1, 1)
     out_arr[line-1]=text 
     all_file="\n".join(out_arr).expandtabs(8)
     outb=position+black+" "+reset+status+banner
     outb=outb+black+"    "+reset
     if len(filename)+31>columns: #If filename overflows
-        flfix=filename.split("\\")
+        flfix=filename.split(sep)
         filename=flfix[len(flfix)-1]
         if len(filename)+31>columns: #If still not fiting
-            filename=filename[:5]+"*"+filename[len(filename)-4:]    
+            middle = len(filename) // 2
+            filename=filename[:middle-1]+'*'+filename[middle+2:]    
     print(cls+outb+black+" "*(columns-31-len(filename))+reset, end="")
     print(black+filename+reset+black+" "+reset+"\n"+all_file, end="")
     print(("\r\033[%d;%dH"%(line+1, pointer)), end="")

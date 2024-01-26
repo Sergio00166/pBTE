@@ -6,32 +6,32 @@ from actions import *
 from saveas import save_as
 from openfile import open_file
 
-def keys(key,text,pointer,oldptr,line,offset,columns,banoff,arr,rows,\
+def keys_func(key,text,pointer,oldptr,line,offset,columns,banoff,arr,rows,\
          max_len,filename,status,status_st,copy_buffer,fixstr,fix,\
-         black,reset,saved_txt,ch_T_SP,banner):
+         black,reset,saved_txt,ch_T_SP,banner,getch,keys):
         
-    if key==b'\xe0': #Special Keys
+    if key==keys["special"]:
         text, pointer, oldptr, line, offset, status_st =\
         special_keys(pointer,text,columns,offset,line,banoff,\
-                     arr,rows,oldptr,max_len,status_st)
+                     arr,rows,oldptr,max_len,status_st,getch,keys)
         
-    elif key==b'\x08': #Backspace (removes char)
+    elif key==keys["delete"]:
         line, offset, text, arr, pointer =\
         backspace(pointer,text,offset,line,arr,banoff)
         status_st=False
 
-    elif key==b'\r': #Return (adds new lines or moves text)
+    elif key==keys["return"]:
         line, offset, arr, pointer, text =\
         newline(text,pointer,offset,banoff,line,arr,rows)
         status_st=False
 
-    elif key==b'\x13': #Ctrl + S (SAVE)
+    elif key==keys["ctrl+s"]:
         out=open(filename,"w",encoding="UTF-8")
         out.write("\n".join(arr)); out.close()
         status=saved_txt; status_st=True
         out=open(filename,"r",encoding="UTF-8")
         
-    elif key==b'\x18': #Ctrl + X (CUT LINE)
+    elif key==keys["ctrl+x"]:
         if line+offset>len(arr)-1:
             copy_buffer=text[pointer-1:]
             text=text[:pointer-1]
@@ -41,10 +41,10 @@ def keys(key,text,pointer,oldptr,line,offset,columns,banoff,arr,rows,\
             text=arr[line+offset-banoff]
         status_st=False
         
-    elif key==b'\x03': #Ctrl + C (COPY LINE)
+    elif key==keys["ctrl+c"]:
         copy_buffer=arr[line+offset-banoff][pointer-1:]
         
-    elif key==b'\x10': #Ctrl + P (PASTE TEXT)
+    elif key==keys["ctrl+p"]:
         if not len(copy_buffer)==0:
             p1=arr[:line+offset-banoff]; p2=arr[line+offset-banoff+1:]
             fix1=text[:pointer-1]; fix2=text[+pointer-1:]
@@ -52,27 +52,28 @@ def keys(key,text,pointer,oldptr,line,offset,columns,banoff,arr,rows,\
             pointer=len(fix1+copy_buffer)
             status_st=False
 
-    elif key==b'\x07': #Ctrl + G (go to line)
+    elif key==keys["ctrl+g"]:
         line,offset,text = goto(rows,banoff,line,arr,offset,black,reset)
 
-    elif key==b'\x01': #Ctrl + A (Save as)
+    elif key==keys["ctrl+a"]:
         args=(filename,black,reset,rows,banoff,arr,columns,\
-        status,offset,line,banner,status_st,saved_txt)
+        status,offset,line,banner,status_st,saved_txt,getch,keys)
         status_st, filename, status = save_as(args)
 
-    elif key==b'\x0f': #Ctlr + O (Open file)
-        args=(filename,black,reset,rows,banoff,arr,columns,status,offset,line,banner,status_st)
-        arr,filename,status_st = open_file(args); line=1; offset=0; text=arr[0]
+    elif key==keys["ctrl+o"]:
+        args=(filename,black,reset,rows,banoff,arr,columns,\
+              status,offset,line,banner,status_st,getch,keys)
+        arr,filename,status_st = open_file(args)
+        line=1; offset=0; text=arr[0]
 
-    elif key==b'\x14': #Ctrl + T (Use 4 spaces instead of tabs)
+    elif key==keys["ctrl+t"]:
         if ch_T_SP: ch_T_SP=False
         else: ch_T_SP=True
 
-    elif key==b'\n': pass
         
     else: #All the other keys
         if not str(key)[4:6] in fixstr:
-            out=decode(key)
+            out=decode(key,getch)
             p1=text[:pointer-1]
             p2=text[pointer-1:]
             if out=="\t" and ch_T_SP:

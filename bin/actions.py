@@ -3,14 +3,16 @@
 from functions import *
 
 def supr(pointer,max_len,text,offset,banoff,arr,line):
-    if not pointer==max_len+1:
-        p1=list(text); p1.pop(pointer-1)
-        text="".join(p1)
-    elif not line+offset==1: #move all to previous line
-        seltext=arr[line+offset-banoff+1]
-        arr[line+offset-banoff+1]=text+seltext
-        arr.pop(line+offset-banoff+1)
-        text=text+seltext
+    try:
+        if not pointer==max_len+1:
+            p1=list(text); p1.pop(pointer-1)
+            text="".join(p1)
+        elif not line+offset==1: #move all to previous line
+            seltext=arr[line+offset-banoff+1]
+            arr[line+offset-banoff+1]=text+seltext
+            arr.pop(line+offset-banoff+1)
+            text=text+seltext
+    except: pass
     return text, arr
 
 def down(line, offset, arr, text, banoff, oldptr, rows, pointer):
@@ -59,7 +61,6 @@ def newline(text, pointer, offset, banoff, line, arr, rows):
     if not line>rows: line+=1
     else: offset+=1
     return line, offset, arr, pointer, text
-
 
 def left(pointer,oldptr,line,offset,banoff,text,arr):
     if not pointer==1: pointer-=1; oldptr=pointer
