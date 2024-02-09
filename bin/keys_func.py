@@ -1,6 +1,5 @@
 #Code by Sergio1260
 
-from special_keys import special_keys
 from functions import *
 from actions import *
 from saveas import save_as
@@ -11,9 +10,29 @@ def keys_func(key,text,pointer,oldptr,line,offset,columns,banoff,arr,rows,\
          black,reset,saved_txt,ch_T_SP,banner,getch,keys):
         
     if key==keys["special"]:
-        text, pointer, oldptr, line, offset, status_st =\
-        special_keys(pointer,text,columns,offset,line,banoff,\
-                     arr,rows,oldptr,max_len,status_st,getch,keys)
+        if not sep==chr(92): special_key=getch()
+        special_key=getch() #Read char      
+        if special_key==keys["arr_up"]:
+            pointer, oldptr, text, offset, line =\
+            up(line,offset,arr,text,banoff,oldptr,rows,pointer)
+        elif special_key==keys["arr_down"]:
+            pointer, oldptr, text, offset, line =\
+            down(line,offset,arr,text,banoff,oldptr,rows,pointer)
+        elif special_key==keys["arr_right"]:
+            text, pointer, oldptr, line, offset =\
+            right(pointer,text,columns,offset,line,banoff,arr,rows,oldptr)               
+        elif special_key==keys["arr_left"]:
+            pointer, oldptr, text, line, offset =\
+            left(pointer,oldptr,line,offset,banoff,text,arr)           
+        elif special_key==keys["supr"]: #Supr
+            text,arr = supr(pointer,max_len,text,offset,banoff,arr,line)
+            status_st=False
+        elif special_key==keys["start"]: #Start
+            pointer=1; p_offset=0
+            oldptr=pointer       
+        elif special_key==keys["end"]: #End
+            pointer=len(text)+1
+            oldptr=pointer
         
     elif key==keys["delete"]:
         line, offset, text, arr, pointer =\
@@ -61,16 +80,15 @@ def keys_func(key,text,pointer,oldptr,line,offset,columns,banoff,arr,rows,\
         status_st, filename, status = save_as(args)
 
     elif key==keys["ctrl+o"]:
-        args=(filename,black,reset,rows,banoff,arr,columns,\
-              status,offset,line,banner,status_st,getch,keys)
-        arr,filename,status_st = open_file(args)
-        line=1; offset=0; text=arr[0]
-
+        args = (filename,black,reset,rows,banoff,arr,columns,\
+        status,offset,line,banner,status_st,getch,keys,pointer)
+        arr,filename,status_st,pointer,line,offset = open_file(args)
+        text=arr[line+offset-1]
+        
     elif key==keys["ctrl+t"]:
         if ch_T_SP: ch_T_SP=False
         else: ch_T_SP=True
 
-        
     else: #All the other keys
         if not str(key)[4:6] in fixstr:
             out=decode(key,getch)
