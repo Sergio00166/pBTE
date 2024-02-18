@@ -1,7 +1,7 @@
 #Code by Sergio1260
 
 from functions import decode, get_size
-from upd_scr import update_scr, updscr
+from upd_scr import menu_updsrc
 from threading import Thread
 from os import sep
 from time import sleep as delay
@@ -22,7 +22,7 @@ def updscr_thr():
             mode=(filewrite,saveastxt,wrtptr,lenght)
             arg=(black,reset,status,banoff,offset,line,\
             wrtptr,arr,banner,filename,rows,columns)
-            rows,columns = updscr(arg,mode)
+            rows,columns = menu_updsrc(arg,mode)
 
 def save_as(args):
     global saveastxt,filewrite,rows,columns,black,reset,status,banoff
@@ -36,17 +36,10 @@ def save_as(args):
     kill=False; thr.start(); complete=False; cmp_counter=0
     
     while True:
-        rows,columns=get_size()
-        out=saveastxt+filewrite
-        full=columns-len(out)+2
-        fix=len(out)//(columns+2)
-        update_scr(black,reset,status,banoff,\
-        offset,line,0,arr,banner,filename,rows,columns)
-        print("\r\033[%d;%dH"%(rows+banoff+2, 1),end="")
-        print("\r"+black+" "*(columns+2)+reset, end="")
-        print("\r\033[%d;%dH"%(rows+banoff+2-fix, 1),end="")
-        print("\r"+black+out+(" "*full)+reset,end="")
-        print("\r\033[%d;%dH"%(rows+banoff+2-fix, wrtptr-1),end="")
+        mode=(filewrite,saveastxt,wrtptr,lenght)
+        arg=(black,reset,status,banoff,offset,line,\
+        wrtptr,arr,banner,filename,rows,columns)
+        rows,columns = menu_updsrc(arg,mode,True)
         
         run=True #Start update screen thread
         key=getch() #Map keys
@@ -95,14 +88,18 @@ def save_as(args):
         elif key==keys["delete"]:
             if not wrtptr==lenght:
                 if complete:
-                    filewrite=sep.join(filewrite.split(sep)[:-1])+sep
+                    filewrite=filewrite.split(sep)[:-1]
+                    filewrite=sep.join(filewrite)+sep
                     wrtptr-=len(filewrite[-1])-1
                     complete=False
                 else: 
-                    p1=list(filewrite); p1.pop(wrtptr-lenght-1)
-                    filewrite="".join(p1); wrtptr-=1
+                    p1=list(filewrite)
+                    p1.pop(wrtptr-lenght-1)
+                    filewrite="".join(p1)
+                    wrtptr-=1
 
         elif key==keys["special"]:
+            if not sep==chr(92): special_key=getch()
             arrow=getch()
             if arrow==keys["arr_left"]:
                 if not wrtptr==lenght:
@@ -110,6 +107,16 @@ def save_as(args):
             elif arrow==keys["arr_right"]:
                 if not wrtptr>len(filewrite)+lenght-1:
                     wrtptr+=1
+            elif arrow==keys["supr"]:
+                if not wrtptr==lenght:
+                    if complete:
+                        filewrite=sep.join(filewrite.split(sep)[:-1])+sep
+                        wrtptr-=len(filewrite[-1])-1
+                        complete=False
+                    else: 
+                        p1=list(filewrite)
+                        p1.pop(wrtptr-lenght)
+                        filewrite="".join(p1)       
      
         elif key==keys["return"]: pass
 
