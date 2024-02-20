@@ -72,17 +72,22 @@ def CalcRelLine(p1,arr,offset,line,banoff,rows):
 def fix_cursor_pos(text,pointer,columns,black,reset):
     len_arr=[]; ptr=pointer; pos=0
     pointer=str_len(text,pointer)   
-    fix=pointer//(columns+2)
     wrapped_text = wrap(text,columns)  
     for x in wrapped_text:
         if pointer-str_len(x)<1: break
         else: pos+=1
         pointer-=str_len(x)
     if pos>0: pointer+=1
-    if len(wrapped_text)==0: wrapped_text==""
-    else: text=wrapped_text[pos]
-    if fix>0: text=black+"<"+reset+text
-    if (len(wrapped_text)-fix)>1: text+=black+">"+reset
+    if not len(wrapped_text)==0:
+        text=wrapped_text[pos]
+        if pos>0:
+            text=black+"<"+reset+text
+            if not pos==len(wrapped_text)-1:
+                text+=black+">"+reset
+        elif len(wrapped_text)>1:
+            text+=black+">"+reset      
+    else: text=""
+                
     return pointer+1, text
 
 def fixfilename(filename, columns):
@@ -94,17 +99,21 @@ def fixfilename(filename, columns):
             filename=filename[:middle-1]+'*'+filename[middle+2:]
     return filename
 
-def arr2str(arr,columns,rows,line,offset,black,reset,pointer):
-    text=arr[line+offset-1]; uptr=pointer
+def scr_arr2str(arr,line,offset,pointer,black,reset,columns,rows,banoff):
+    text=arr[line+offset-banoff]; uptr=pointer
     pointer, text = fix_cursor_pos(text,pointer,columns,black,reset)
     arr=arr[offset : rows+offset+1]
     arr = fix_arr_line_len(arr,columns,black,reset)
     arr[line-1]=text; out_arr=[]
     for x in arr:
         ln=str_len(x)
-        if uptr>columns and arr.index(x)==line-1: ln-=12
-        if ln<columns: x=x+(" "*(columns-ln+2))
+        if uptr>(columns+2) and arr.index(x)==line-1: ln-=12
+        if ln<(columns+2): x=x+(" "*(columns-ln+2))
         out_arr.append(x)
+    if not len(arr)==rows:
+        out_arr+=[" "*(columns+2)]*(rows-len(arr)+1)
         
     return "\n".join(out_arr).expandtabs(8), pointer
 
+    
+    

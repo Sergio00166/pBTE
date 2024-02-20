@@ -19,5 +19,5 @@ Also now "works" under linux (tested under FEDORA and UBUNTU)
 <br>*Open file menu*<br>
 ^Q CANCEL | ^O OPEN  | ^N NEW FILE <br>
 <br>*Save as menu*<br>
-^Q CANCEL | ^A SAVE | ^B BACKUP | ^A APPEND | ^P PREPEND
+^Q CANCEL | ^S SAVE | ^B BACKUP | ^A APPEND | ^P PREPEND
 <br>

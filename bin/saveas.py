@@ -7,39 +7,64 @@ from os import sep
 from time import sleep as delay
 from glob import glob
 
+if not sep==chr(92): import tty; import termios
+
+
 def updscr_thr():
     global saveastxt,filewrite,rows,columns,black,reset,status,banoff
-    global lenght,wrtptr,offset,line,arr,banner,filename,rows,columns,run,kill
+    global lenght,wrtptr,offset,line,arr,banner,filename,rows,columns
+    global run,kill, fd, old_settings
     
+    while not kill:
+        delay(0.01)
+        if run:
+            # If OS is LINUX restore TTY to it default values
+            if not sep==chr(92): termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+            # Call Screen updater
+            mode=(filewrite,saveastxt,wrtptr,lenght)
+            arg=(black,reset,status,banoff,offset,line,\
+            wrtptr,arr,banner,filename,rows,columns)
+            rows,columns = menu_updsrc(arg,mode)
+            # If OS is LINUX set TTY to raw mode
+            if not sep==chr(92): tty.setraw(fd)
+
+
+def exit():
+    global fd, old_settings, run, kill, thr
+    run=False; kill=True; thr.join()
+    if not sep==chr(92):
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+    print("\033c", end="")
+
+            
+def save_as(args):
+    global saveastxt,filewrite,rows,columns,black,reset,status,banoff
+    global lenght,wrtptr,offset,line,arr,banner,filename,rows,columns
+    global run, kill, fd, old_settings, thr
+
     if not sep==chr(92): #If OS is LINUX
         #Get default values for TTY
         import sys; import termios; import tty
         fd = sys.stdin.fileno()
         old_settings = termios.tcgetattr(fd)
-    while not kill:
-        delay(0.01)
-        if run:
-            mode=(filewrite,saveastxt,wrtptr,lenght)
-            arg=(black,reset,status,banoff,offset,line,\
-            wrtptr,arr,banner,filename,rows,columns)
-            rows,columns = menu_updsrc(arg,mode)
 
-def save_as(args):
-    global saveastxt,filewrite,rows,columns,black,reset,status,banoff
-    global lenght,wrtptr,offset,line,arr,banner,filename,rows,columns,run,kill
-
-    filename,black,reset,rows,banoff,arr,columns,status,\
-    offset,line,banner,status_st,saved_txt,getch,keys = args
+    filename,black,reset,rows,banoff,arr,columns,status,offset,\
+    line,banner,status_st,saved_txt,getch,keys,fixstr = args
     saveastxt=" Save as: "; lenght=len(saveastxt)+2
     filewrite=filename; wrtptr=lenght+len(filewrite)
     thr=Thread(target=updscr_thr); run=False
     kill=False; thr.start(); complete=False; cmp_counter=0
     
     while True:
+        # If OS is LINUX restore TTY to it default values
+        if not sep==chr(92): termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        # Call Screen updater
         mode=(filewrite,saveastxt,wrtptr,lenght)
         arg=(black,reset,status,banoff,offset,line,\
         wrtptr,arr,banner,filename,rows,columns)
         rows,columns = menu_updsrc(arg,mode,True)
+        # If OS is LINUX set TTY to raw mode
+        if not sep==chr(92): tty.setraw(fd)
         
         run=True #Start update screen thread
         key=getch() #Map keys
@@ -62,28 +87,24 @@ def save_as(args):
             complete=False
         
         #Ctrl + A (confirms) or Ctrl + B backup
-        elif key==keys["ctrl+a"] or key==keys["ctrl+b"]:
+        elif key==keys["ctrl+s"] or key==keys["ctrl+b"]:
             try:
                 if key==["ctrl+b"] and filewrite==filename:
                     filewrite+=".bak"
                 out=open(filewrite,"w",encoding="UTF-8")
                 out.write("\n".join(arr)); out.close(); status_st=True
-                if key==keys["ctrl+a"]:
+                if key==keys["ctrl+s"]:
                     status=saved_txt; tmp=open(filewrite, "r", encoding="UTF-8").readlines(); arr=[]
                     for x in tmp: arr.append(x.replace("\r","").replace("\n","").replace("\f",""))
                     arr.append(""); filename=filewrite
                     out=open(filewrite,"r",encoding="UTF-8")
-                    run=False;kill=True; thr.join()
-                    print("\033c", end=""); break
+                    exit(); break
                 else:
                     status=black+"BkUPd"+reset
-                    run=False;kill=True; thr.join()
-                    print("\033c", end=""); break
+                    exit(); break
             except: pass
             
-        elif key==keys["ctrl+q"]:
-            run=False;kill=True; thr.join()
-            print("\033c", end=""); break
+        elif key==keys["ctrl+q"]: exit(); break
     
         elif key==keys["delete"]:
             if not wrtptr==lenght:
@@ -116,7 +137,13 @@ def save_as(args):
                     else: 
                         p1=list(filewrite)
                         p1.pop(wrtptr-lenght)
-                        filewrite="".join(p1)       
+                        filewrite="".join(p1)
+
+            elif arrow==keys["start"]:
+                wrtptr=lenght
+                
+            elif arrow==keys["end"]:
+                wrtptr=len(filewrite)+lenght
      
         elif key==keys["return"]: pass
 
@@ -127,14 +154,18 @@ def save_as(args):
                 if key==keys["ctrl+a"]: output=list(arr+tmp)
                 elif key==keys["ctrl+p"]: output=list(tmp+arr)
                 out=open(filewrite, "w", encoding="UTF-8")
-                out.write("\n".join(output)); break
+                out.write("\n".join(output))
+                exit(); break
             except: pass
         
         else: #Rest of keys
-            out=decode(key,getch)
-            p1=filewrite[:wrtptr-lenght]
-            p2=filewrite[wrtptr-lenght:]
-            filewrite=p1+out+p2
-            wrtptr+=1
+            cond1=wrtptr<((columns+2)*rows+1)
+            cond2=str(key)[4:6] in fixstr
+            if cond1 and not cond2:
+                out=decode(key,getch)
+                p1=filewrite[:wrtptr-lenght]
+                p2=filewrite[wrtptr-lenght:]
+                filewrite=p1+out+p2
+                wrtptr+=1
 
     return status_st, filename, status

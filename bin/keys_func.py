@@ -41,13 +41,17 @@ def keys_func(key,text,pointer,oldptr,line,offset,columns,banoff,arr,rows,\
             pointer=len(text)+1; oldptr=pointer
             
         elif special_key==keys["repag"]:
-            if not offset-rows<0:
-                offset-=rows; text=arr[line+offset-1]
+            p1=line+offset-banoff-rows
+            if p1<0: p1=0
+            line, offset, text =\
+            CalcRelLine(p1,arr,offset,line,banoff,rows)
             if not sep==chr(92): getch()
             
         elif special_key==keys["avpag"]:
-            if not pointer+offset+rows>len(arr):
-                offset+=rows; text=arr[line+offset-1]
+            p1=line+offset-banoff+rows
+            if p1>=len(arr): p1="-"
+            line, offset, text =\
+            CalcRelLine(p1,arr,offset,line,banoff,rows)
             if not sep==chr(92): getch()
 
         
@@ -91,13 +95,13 @@ def keys_func(key,text,pointer,oldptr,line,offset,columns,banoff,arr,rows,\
         goto(rows,banoff,line,arr,offset,black,reset)
 
     elif key==keys["ctrl+a"]:
-        args=(filename,black,reset,rows,banoff,arr,columns,\
-        status,offset,line,banner,status_st,saved_txt,getch,keys)
+        args = (filename,black,reset,rows,banoff,arr,columns,\
+        status,offset,line,banner,status_st,saved_txt,getch,keys,fixstr)
         status_st, filename, status = save_as(args)
 
     elif key==keys["ctrl+o"]:
         args = (filename,black,reset,rows,banoff,arr,columns,\
-        status,offset,line,banner,status_st,getch,keys,pointer)
+        status,offset,line,banner,status_st,getch,keys,pointer,fixstr)
         arr,filename,status_st,pointer,line,offset = open_file(args)
         text=arr[line+offset-1]
         
