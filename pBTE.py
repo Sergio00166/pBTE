@@ -8,8 +8,10 @@ path.append(path[0]+sep+"bin")
 from init import *
 
 def updscr_thr():
-    global black,reset,status,banoff,offset,line,pointer,arr
-    global banner,filename,rows,columns,run_thread,text,kill,p_offset
+    global black,reset,status,banoff,offset,line,pointer
+    global banner,filename,rows,columns,run_thread,text
+    global kill,p_offset,arr,select
+    
     if not sep==chr(92): #If OS is LINUX
         #Get default values for TTY
         import sys; import termios; import tty
@@ -33,7 +35,7 @@ def updscr_thr():
                 print("\r\033c",end="") #Clear screen
                 # If OS is LINUX restore TTY to it default values
                 if not sep==chr(92): termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-                update_scr(black,reset,status,banoff,offset,line,pointer,arr,banner,filename,rows,columns)
+                update_scr(black,reset,status,banoff,offset,line,pointer,arr,banner,filename,rows,columns,False,select)
                 # If OS is LINUX set TTY to raw mode
                 if not sep==chr(92): tty.setraw(fd)
 
@@ -54,7 +56,7 @@ while True:
             # Get the terminal size and set some values
             rows,columns=get_size(); max_len=len(text); arr[line+offset-banoff]=text
             # Call screen updater function
-            update_scr(black,reset,status,banoff,offset,line,pointer,arr,banner,filename,rows,columns)
+            update_scr(black,reset,status,banoff,offset,line,pointer,arr,banner,filename,rows,columns,False,select)
         if not key_fast: run_thread=True #Start update Thread
         # Set time after reading key from keyboard and stopping the update Thread
         start=time(); key=getch(); end=time(); run_thread=False
@@ -63,7 +65,7 @@ while True:
         else: #Call keys functions (Yeah, its a lot of args and returned values)
             text,pointer,oldptr,line,offset,columns,banoff,arr,rows,\
             max_len,filename,status,status_st,copy_buffer,fixstr,fix,\
-            ch_T_SP = keys_func(key,text,pointer,oldptr,line,offset,columns,\
-            banoff,arr,rows,max_len,filename,status,status_st,copy_buffer,\
-            fixstr,fix,black,reset,saved_txt,ch_T_SP,banner,getch,keys)
+            ch_T_SP,select = keys_func(key,text,pointer,oldptr,line,offset,\
+            columns,banoff,arr,rows,max_len,filename,status,status_st,copy_buffer,\
+            fixstr,fix,black,reset,saved_txt,ch_T_SP,banner,getch,keys,select)
     except: pass

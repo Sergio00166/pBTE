@@ -88,6 +88,8 @@ def open_file(args):
         elif key==keys["ctrl+o"]:
             try:
                 openfile=glob(openfile, recursive=False)[0]
+                for i in open(openfile, "r", encoding="UTF-8").readlines():
+                    if '\x00' in i: raise ValueError
                 tmp=open(openfile, "r", encoding="UTF-8").readlines(); arr=[]
                 for x in tmp: arr.append(x.replace("\r","").replace("\n","").replace("\f",""))
                 arr.append(""); filename=openfile
@@ -141,8 +143,10 @@ def open_file(args):
         elif key==keys["return"]: pass
         
         elif key==keys["ctrl+n"]:
-            arr=[""]; filename=getcwd()+sep+"NewFile"
-            status_st=False; exit(); break
+            arr=[""]; text=""
+            pointer=1; offset=0; line=1
+            filename=getcwd()+sep+"NewFile"
+            exit(); break
         
         else: #Rest of keys
             cond1=wrtptr<((columns+2)*rows+1)

@@ -3,12 +3,33 @@
 from functions import get_size, fixfilename, scr_arr2str
 
 
-def update_scr(black,reset,status,banoff,offset,line,pointer,arr,banner,filename,rows,columns,rrw=False):
+def update_scr(black,reset,status,banoff,offset,line,pointer,arr,banner,filename,rows,columns,rrw=False,select=[]):
     position=black+"  "+str(line+offset-banoff)+" "*(4-len(str(line+offset-banoff)))
     outb=position+black+" "+reset+status+banner+black+"    "+reset
     filename = fixfilename(filename, columns); cls="\r\033[%d;%dH"%(1, 1)
     all_file,pointer = scr_arr2str(arr,line,offset,pointer,black,reset,columns,rows,banoff)
     menu=cls+outb+black+" "*(columns-31-len(filename))
+
+    # Highlight selector
+    if len(select)>0:  
+        start=select[0]; end=select[1][0]
+        if not offset>start[1]: start=start[0]
+        else: start=sum(start)-offset-line
+        all_file=all_file.split("\n")
+        p0="\n".join(all_file[:start])
+        p2="\n".join(all_file[end:])
+        p1=all_file[start:end]
+        out=[]
+        lenght=len(black+"*"+reset)
+        for x in p1:
+            if x.endswith(black+">"+reset):
+                out.append(x[:-lenght]+reset+">"+black)
+            elif x.startswith(black+"<"+reset):
+                out.append(x[:-lenght]+reset+"<"+black)
+            else: out.append(x)
+        p1="\n".join(out)
+        all_file=p0+black+p1+reset+p2
+
     menu+=filename+" "+reset+"\n"+all_file
     
     if rrw: return menu
