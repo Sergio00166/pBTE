@@ -117,5 +117,9 @@ def scr_arr2str(arr,line,offset,pointer,black,reset,columns,rows,banoff):
     
     return "\n".join(out_arr).expandtabs(8), pointer
 
-    
-    
+def del_sel(select, arr, banoff):
+    p1=arr[:sum(select[0])]; p2=arr[sum(select[1]):]
+    line=select[0][0]+banoff; offset=select[0][1]
+    select=[]; arr=p1+p2; text=arr[line+offset-banoff]
+    return select, arr, text, line, offset
+

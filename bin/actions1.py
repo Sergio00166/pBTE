@@ -3,12 +3,8 @@
 from functions import *
 
 
-def supr(pointer,max_len,text,offset,banoff,arr,line,select,status_st):
-    if not len(select)==0:
-        p1=arr[:sum(select[0])]; p2=arr[sum(select[1]):]
-        line=select[0][0]+banoff; offset=select[0][1]
-        select=[]; arr=p1+p2; text=arr[line+offset-banoff]
-    else:
+def supr(pointer,max_len,text,offset,banoff,arr,line,status_st,select):
+    if len(select)==0:
         try:
             if not pointer==max_len+1:
                 p1=list(text); p1.pop(pointer-1)
@@ -21,7 +17,8 @@ def supr(pointer,max_len,text,offset,banoff,arr,line,select,status_st):
         except: pass
         if not sep==chr(92): getch()
         status_st=False
-    return text, arr, select, status_st
+    else: select,arr,text,line,offset = del_sel(select,arr,banoff)
+    return text, arr, line, offset, status_st, select
 
 def goto(rows, banoff, line, arr, offset, black, reset):
     print("\r\033[%d;%dH"%(rows+banoff+2,1),end="")

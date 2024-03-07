@@ -12,14 +12,14 @@ def update_scr(black,reset,status,banoff,offset,line,pointer,arr,banner,filename
 
     # Highlight selector
     if len(select)>0:  
-        start=select[0]; end=select[1][0]
-        if not offset>start[1]: start=start[0]
-        else: start=sum(start)-offset-line
+        start=select[0][0]; end=select[1][0]
+        end+=select[1][1]-select[0][1]
+        start-=select[1][1]-select[0][1]
+        if start<0: start=0
         all_file=all_file.split("\n")
         p0="\n".join(all_file[:start])
         p2="\n".join(all_file[end:])
-        p1=all_file[start:end]
-        out=[]
+        p1=all_file[start:end]; out=[]
         lenght=len(black+"*"+reset)
         for x in p1:
             if x.endswith(black+">"+reset):

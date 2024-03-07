@@ -3,8 +3,8 @@
 from functions import *
 
 
-def down(line,offset,arr,text,banoff,oldptr,rows,pointer,key,keys,select):
-    selected=key==keys["ctrl+arr_down"]
+def down(line,offset,arr,text,banoff,oldptr,rows,pointer,key,keys,select,fix):
+    selected=key==keys["ctrl+arr_down"] and fix
     if selected:
         selst=[line-banoff,offset]
         fix=line+offset
@@ -22,15 +22,15 @@ def down(line,offset,arr,text,banoff,oldptr,rows,pointer,key,keys,select):
  
     return pointer, oldptr, text, offset, line, select
 
-def up(line,offset,arr,text,banoff,oldptr,rows,pointer,key,keys,select):
-    selected=key==keys["ctrl+arr_up"]
-    if selected: seled=[line,offset]
+def up(line,offset,arr,text,banoff,oldptr,rows,pointer,key,keys,select,fix): 
+    selected=key==keys["ctrl+arr_up"] and fix
+    if selected: seled=[line-banoff,offset]
     if not line==banoff: line-=1
     elif offset>0: offset-=1
     text=arr[line+offset-banoff]
     pointer,oldptr=fixlenline(text,pointer,oldptr)
     if selected:
-        selst=[line,offset]
+        selst=[line-banoff,offset]
         if not len(select)==0:
             select[0]=selst
         else: select=[selst,seled]
@@ -38,11 +38,7 @@ def up(line,offset,arr,text,banoff,oldptr,rows,pointer,key,keys,select):
     return pointer, oldptr, text, offset, line, select
 
 def backspace(pointer,text,offset,line,arr,banoff,select):
-    if not len(select)==0:
-        p1=arr[:sum(select[0])]; p2=arr[sum(select[1]):]
-        line=select[0][0]+banoff; offset=select[0][1]
-        select=[]; arr=p1+p2; text=arr[line+offset-banoff]
-    else:
+    if len(select)==0:
         if not pointer==1: #Delete char   
             p1=list(text)+[""]
             p1.pop(pointer-2)
@@ -59,9 +55,10 @@ def backspace(pointer,text,offset,line,arr,banoff,select):
                 if not offset==0: offset-=1
                 else: line-=1
                 status_st=False
+    else: select,arr,text,line,offset = del_sel(select,arr,banoff)
     return line, offset, text, arr, pointer, select
 
-def newline(text,pointer,offset,banoff,line,arr,rows,status):
+def newline(text,pointer,offset,banoff,line,arr,rows,status,select):  
     p1=arr[:line+offset-banoff]
     p2=arr[line+offset-banoff:]
     if not len(text)==0:
@@ -74,7 +71,8 @@ def newline(text,pointer,offset,banoff,line,arr,rows,status):
     if not line>rows: line+=1
     else: offset+=1
     status_st=False
-    return line, offset, arr, pointer, text, status
+    if not len(select)==0: select=[]
+    return line, offset, arr, pointer, text, status, select
 
 def left(pointer,oldptr,line,offset,banoff,text,arr):
     if not pointer==1: pointer-=1; oldptr=pointer
