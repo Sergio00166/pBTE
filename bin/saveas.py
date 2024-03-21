@@ -56,22 +56,22 @@ def save_as(args):
     kill=False; thr.start(); complete=False; cmp_counter=0
     
     while True:
-        # If OS is LINUX restore TTY to it default values
-        if not sep==chr(92): termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-        # Call Screen updater
-        mode=(filewrite,saveastxt,wrtptr,lenght)
-        arg=(black,reset,status,banoff,offset,line,\
-        wrtptr,arr,banner,filename,rows,columns)
-        rows,columns = menu_updsrc(arg,mode,True)
-        # If OS is LINUX set TTY to raw mode
-        if not sep==chr(92): tty.setraw(fd)
-        
-        run=True #Start update screen thread
-        key=getch() #Map keys
-        run=False #Stop update screen thread
+        try:
+            # If OS is LINUX restore TTY to it default values
+            if not sep==chr(92): termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+            # Call Screen updater
+            mode=(filewrite,saveastxt,wrtptr,lenght)
+            arg=(black,reset,status,banoff,offset,line,\
+            wrtptr,arr,banner,filename,rows,columns)
+            rows,columns = menu_updsrc(arg,mode,True)
+            # If OS is LINUX set TTY to raw mode
+            if not sep==chr(92): tty.setraw(fd)
+            
+            run=True #Start update screen thread
+            key=getch() #Map keys
+            run=False #Stop update screen thread
 
-        if key==keys["tab"]:
-            try:
+            if key==keys["tab"]:
                 if not (filewrite==sep or len(filewrite)==0):
                     if not complete: content=glob(filewrite+"*",recursive=False)
                     if len(content)>1: complete=True
@@ -80,15 +80,13 @@ def save_as(args):
                         filewrite=content[cmp_counter]
                         cmp_counter+=1
                     else: filewrite=content[0]
-            except: pass
 
-        elif complete and key==keys["return"]:
-            wrtptr=len(filewrite)+len(saveastxt)+2
-            complete=False
-        
-        #Ctrl + A (confirms) or Ctrl + B backup
-        elif key==keys["ctrl+s"] or key==keys["ctrl+b"]:
-            try:
+            elif complete and key==keys["return"]:
+                wrtptr=len(filewrite)+len(saveastxt)+2
+                complete=False
+            
+            #Ctrl + A (confirms) or Ctrl + B backup
+            elif key==keys["ctrl+s"] or key==keys["ctrl+b"]:
                 if key==["ctrl+b"] and filewrite==filename:
                     filewrite+=".bak"
                 out=open(filewrite,"w",encoding="UTF-8")
@@ -102,70 +100,70 @@ def save_as(args):
                 else:
                     status=black+"BkUPd"+reset
                     exit(); break
-            except: pass
-            
-        elif key==keys["ctrl+q"]: exit(); break
-    
-        elif key==keys["delete"]:
-            if not wrtptr==lenght:
-                if complete:
-                    filewrite=filewrite.split(sep)[:-1]
-                    filewrite=sep.join(filewrite)+sep
-                    wrtptr-=len(filewrite[-1])-1
-                    complete=False
-                else: 
-                    p1=list(filewrite)
-                    p1.pop(wrtptr-lenght-1)
-                    filewrite="".join(p1)
-                    wrtptr-=1
-
-        elif key==keys["special"]:
-            if not sep==chr(92): special_key=getch()
-            arrow=getch()
-            if arrow==keys["arr_left"]:
-                if not wrtptr==lenght:
-                    wrtptr-=1
-            elif arrow==keys["arr_right"]:
-                if not wrtptr>len(filewrite)+lenght-1:
-                    wrtptr+=1
-            elif arrow==keys["supr"]:
+                
+            elif key==keys["ctrl+q"]: exit(); break
+        
+            elif key==keys["delete"]:
                 if not wrtptr==lenght:
                     if complete:
-                        filewrite=sep.join(filewrite.split(sep)[:-1])+sep
+                        filewrite=filewrite.split(sep)[:-1]
+                        filewrite=sep.join(filewrite)+sep
                         wrtptr-=len(filewrite[-1])-1
                         complete=False
                     else: 
                         p1=list(filewrite)
-                        p1.pop(wrtptr-lenght)
+                        p1.pop(wrtptr-lenght-1)
                         filewrite="".join(p1)
+                        wrtptr-=1
 
-            elif arrow==keys["start"]:
-                wrtptr=lenght
-                
-            elif arrow==keys["end"]:
-                wrtptr=len(filewrite)+lenght
-     
-        elif key==keys["return"]: pass
+            elif key==keys["special"]:
+                if not sep==chr(92): special_key=getch()
+                arrow=getch()
+                if arrow==keys["arr_left"]:
+                    if not wrtptr==lenght:
+                        wrtptr-=1
+                elif arrow==keys["arr_right"]:
+                    if not wrtptr>len(filewrite)+lenght-1:
+                        wrtptr+=1
+                elif arrow==keys["supr"]:
+                    if not wrtptr==lenght:
+                        if complete:
+                            filewrite=sep.join(filewrite.split(sep)[:-1])+sep
+                            wrtptr-=len(filewrite[-1])-1
+                            complete=False
+                        else: 
+                            p1=list(filewrite)
+                            p1.pop(wrtptr-lenght)
+                            filewrite="".join(p1)
 
-        elif key==keys["ctrl+p"] or key==keys["ctrl+a"]:
-            try:
-                tmp=open(filewrite, "r", encoding="UTF-8").readlines()
-                status=saved_txt
-                if key==keys["ctrl+a"]: output=list(arr+tmp)
-                elif key==keys["ctrl+p"]: output=list(tmp+arr)
-                out=open(filewrite, "w", encoding="UTF-8")
-                out.write("\n".join(output))
-                exit(); break
-            except: pass
-        
-        else: #Rest of keys
-            cond1=wrtptr<((columns+2)*rows+1)
-            cond2=str(key)[4:6] in fixstr
-            if cond1 and not cond2:
-                out=decode(key,getch)
-                p1=filewrite[:wrtptr-lenght]
-                p2=filewrite[wrtptr-lenght:]
-                filewrite=p1+out+p2
-                wrtptr+=1
+                elif arrow==keys["start"]:
+                    wrtptr=lenght
+                    
+                elif arrow==keys["end"]:
+                    wrtptr=len(filewrite)+lenght
+         
+            elif key==keys["return"]: pass
+
+            elif key==keys["ctrl+p"] or key==keys["ctrl+a"]:
+                try:
+                    tmp=open(filewrite, "r", encoding="UTF-8").readlines()
+                    status=saved_txt
+                    if key==keys["ctrl+a"]: output=list(arr+tmp)
+                    elif key==keys["ctrl+p"]: output=list(tmp+arr)
+                    out=open(filewrite, "w", encoding="UTF-8")
+                    out.write("\n".join(output))
+                    exit(); break
+                except: pass
+            
+            else: #Rest of keys
+                cond1=wrtptr<((columns+2)*rows+1)
+                cond2=str(key)[4:6] in fixstr
+                if cond1 and not cond2:
+                    out=decode(key,getch)
+                    p1=filewrite[:wrtptr-lenght]
+                    p2=filewrite[wrtptr-lenght:]
+                    filewrite=p1+out+p2
+                    wrtptr+=1
+        except: pass
 
     return status_st, filename, status
