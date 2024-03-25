@@ -32,9 +32,10 @@ def updscr_thr():
 def exit():
     global fd, old_settings, run, kill, thr
     run=False; kill=True; thr.join()
-    if not sep==chr(92):
+    if not sep == chr(92):
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-    print("\033c", end="")
+    print(reset+"\r\033c", end="")
+
 
             
 def save_as(args):
@@ -126,6 +127,7 @@ def save_as(args):
                     if not wrtptr>len(filewrite)+lenght-1:
                         wrtptr+=1
                 elif arrow==keys["supr"]:
+                    if not sep==chr(92): getch()
                     if not wrtptr==lenght:
                         if complete:
                             filewrite=sep.join(filewrite.split(sep)[:-1])+sep
@@ -134,7 +136,7 @@ def save_as(args):
                         else: 
                             p1=list(filewrite)
                             p1.pop(wrtptr-lenght)
-                            filewrite="".join(p1)
+                            filewrite="".join(p1)                   
 
                 elif arrow==keys["start"]:
                     wrtptr=lenght

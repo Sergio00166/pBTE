@@ -31,9 +31,9 @@ def updscr_thr():
 def exit():
     global fd, old_settings, run, kill, thr
     run=False; kill=True; thr.join()
-    if not sep==chr(92):
+    if not sep == chr(92):
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-    print("\033c", end="")
+    print(reset+"\r\033c", end="")
 
 def open_file(args):
     global opentxt,openfile,rows,columns,black,reset,status,banoff
@@ -120,6 +120,7 @@ def open_file(args):
                     if not wrtptr>len(openfile)+lenght-1:
                         wrtptr+=1
                 elif arrow==keys["supr"]:
+                    if not sep==chr(92): getch()
                     if not wrtptr==lenght:
                         if complete:
                             openfile=openfile.split(sep)[:-1]

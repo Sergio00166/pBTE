@@ -15,7 +15,6 @@ def supr(pointer,max_len,text,offset,banoff,arr,line,status_st,select):
                 arr.pop(line+offset-banoff+1)
                 text=text+seltext
         except: pass
-        if not sep==chr(92): getch()
         status_st=False
     else: select,arr,text,line,offset = del_sel(select,arr,banoff)
     return text, arr, line, offset, status_st, select
