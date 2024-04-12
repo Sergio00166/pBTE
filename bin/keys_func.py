@@ -47,10 +47,12 @@ def keys_func(key,text,pointer,oldptr,line,offset,columns,banoff,arr,rows,\
         elif special_key==keys["repag"]:
             line, offset, text, pointer, oldptr =\
             repag(line,offset,banoff,rows,arr,sep,pointer,oldptr)
+            if not sep==chr(92): getch()
             
         elif special_key==keys["avpag"]:
             line, offset, text, pointer, oldptr =\
             avpag(line,offset,banoff,rows,arr,sep,pointer,oldptr)
+            if not sep==chr(92): getch()
 
 
     elif key==keys["delete"]:

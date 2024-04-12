@@ -67,7 +67,6 @@ def repag(line,offset,banoff,rows,arr,sep,pointer,oldptr):
     if p1<0: p1=0
     line, offset, text =\
     CalcRelLine(p1,arr,offset,line,banoff,rows)
-    if not sep==chr(92): getch()
     pointer,oldptr = fixlenline(text,pointer,oldptr)
     return line, offset, text, pointer, oldptr
 
@@ -76,7 +75,6 @@ def avpag(line,offset,banoff,rows,arr,sep,pointer,oldptr):
     if p1>=len(arr): p1="-"
     line, offset, text =\
     CalcRelLine(p1,arr,offset,line,banoff,rows)
-    if not sep==chr(92): getch()
     pointer,oldptr = fixlenline(text,pointer,oldptr)
     return line, offset, text, pointer, oldptr
 

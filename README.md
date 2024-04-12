@@ -1,6 +1,8 @@
 # pBTE
 python-based Basic Text Editor
 
+DISCONTINUED
+
 A a basic terminal text editor with python using the minimun external libraries as possible (only wcwidth and colorama) 
 
 Nowadays it is in development stage, then it can be expected to be broken
@@ -11,7 +13,7 @@ Requirements:<br>
 Python 3 (tested under python 3.12)<br>
 No dependencies<br>
 Windows, with UTF-8 mode<br> (tested under win11)
-Also now "works" under linux (tested under FEDORA and UBUNTU)
+Also now "works" under linux (tested under FEDORA and UBUNTU with GUI)
 
 <br><h2>OPTIONS</h2>
 <br>*NORMAL*<br>
