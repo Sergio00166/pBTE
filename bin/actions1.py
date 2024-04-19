@@ -3,29 +3,29 @@
 from functions import *
 
 
-def supr(pointer,max_len,text,offset,banoff,arr,line,status_st,select):
+def supr(pointer,max_len,text,offset,banoff,arr,line,select):
     if len(select)==0:
-        try:
-            if not pointer==max_len+1:
-                p1=list(text); p1.pop(pointer-1)
-                text="".join(p1)
-            elif not line+offset==1: #move all to previous line
-                seltext=arr[line+offset-banoff+1]
-                arr[line+offset-banoff+1]=text+seltext
-                arr.pop(line+offset-banoff+1)
-                text=text+seltext
-        except: pass
-        status_st=False
+        if not pointer==max_len+1:
+            p1=list(text); p1.pop(pointer-1)
+            text="".join(p1)
+        elif not line+offset==len(arr): #move all to previous line
+            seltext=arr[line+offset-banoff+1]
+            arr[line+offset-banoff+1]=text+seltext
+            arr.pop(line+offset-banoff+1)
+            text=text+seltext
     else: select,arr,text,line,offset = del_sel(select,arr,banoff)
-    return text, arr, line, offset, status_st, select
+    return text, arr, line, offset, select
 
-def goto(rows, banoff, line, arr, offset, black, reset):
-    print("\r\033[%d;%dH"%(rows+banoff+2,1),end="")
-    print(" "+black+"Go to line:"+reset, end=" "); p1=input()
-    print("\r\033[%d;%dH"%(line, 1),end="")
-    line,offset,text = CalcRelLine(p1,arr,offset,line,banoff,rows)
+def goto(columns, rows, banoff, line, arr, offset, black):
+    try:
+        print("\r\033[%d;%dH"%(rows+banoff+2,1),end="")
+        print(black+(" "*(columns+2))+"\r", end="")
+        print(" Go to line: ", end=""); p1=input()
+        print("\r\033[%d;%dH"%(line, 1),end="")
+        line,offset,text = CalcRelLine(p1,arr,offset,line,banoff,rows)
+    except: pass
     print("\033c", end="")
-    return line, offset,text 
+    return line, offset, text 
 
     
 def paste(copy_buffer,arr,line,offset,banoff,pointer,text,status_st):
@@ -51,16 +51,17 @@ def cut(select,arr,line,offset,banoff,text,status_st,copy_buffer,pointer):
         if not start==0: copy_buffer=copy_buffer[1:]
         line=select[0][0]+banoff; offset=select[0][1]
         select = []; arr = p1 + p2
-    elif line+offset-banoff==len(arr)-1:
-        copy_buffer=text[pointer-1:]
-        text=text[:pointer-1]
-    else:
-        copy_buffer=arr[line+offset-banoff]
-        arr.pop(line+offset-banoff)
-        text=arr[line+offset-banoff]
-    status_st=False
+    else: copy_buffer=text[pointer-1:]; text=text[:pointer-1]
+    status_st=False; return copy_buffer,arr,text,line,offset,select
 
-    return copy_buffer,arr,text,line,offset,select
+def copy(select,arr,line,offset,banoff,pointer):
+    if not len(select)==0:
+        start=sum(select[0])-1
+        if start<0: start=0
+        copy_buffer=arr[start:sum(select[1])]
+        if not start==0: copy_buffer=copy_buffer[1:]
+    else: copy_buffer=arr[line+offset-banoff][pointer-1:]
+    select=[]; return copy_buffer, select
 
 def repag(line,offset,banoff,rows,arr,sep,pointer,oldptr):
     p1=line+offset-banoff-rows
@@ -77,16 +78,6 @@ def avpag(line,offset,banoff,rows,arr,sep,pointer,oldptr):
     CalcRelLine(p1,arr,offset,line,banoff,rows)
     pointer,oldptr = fixlenline(text,pointer,oldptr)
     return line, offset, text, pointer, oldptr
-
-def copy(select,arr,line,offset,banoff,pointer):
-    if not len(select)==0:
-        start=sum(select[0])-1
-        if start<0: start=0
-        copy_buffer=arr[start:sum(select[1])]
-        if not start==0: copy_buffer=copy_buffer[1:]
-    else: copy_buffer=arr[line+offset-banoff][pointer-1:]
-    select=[]
-    return copy_buffer, select
 
 
     

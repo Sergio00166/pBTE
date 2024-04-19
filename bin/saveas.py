@@ -19,7 +19,8 @@ def updscr_thr():
         delay(0.01)
         if run:
             # If OS is LINUX restore TTY to it default values
-            if not sep==chr(92): termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+            if not sep==chr(92):
+                termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
             # Call Screen updater
             mode=(filewrite,saveastxt,wrtptr,lenght)
             arg=(black,reset,status,banoff,offset,line,\
@@ -37,8 +38,8 @@ def exit():
     print(reset+"\r\033c", end="")
 
 
-            
-def save_as(args):
+def save_as(arg):
+    
     global saveastxt,filewrite,rows,columns,black,reset,status,banoff
     global lenght,wrtptr,offset,line,arr,banner,filename,rows,columns
     global run, kill, fd, old_settings, thr
@@ -50,7 +51,8 @@ def save_as(args):
         old_settings = termios.tcgetattr(fd)
 
     filename,black,reset,rows,banoff,arr,columns,status,offset,\
-    line,banner,status_st,saved_txt,getch,keys,fixstr = args
+    line,banner,status_st,saved_txt,getch,keys,fixstr = arg
+
     saveastxt=" Save as: "; lenght=len(saveastxt)+2
     filewrite=filename; wrtptr=lenght+len(filewrite)
     thr=Thread(target=updscr_thr); run=False

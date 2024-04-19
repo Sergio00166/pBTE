@@ -24,7 +24,7 @@ def updscr_thr():
             old_rows=rows; old_columns=columns
             rows,columns=get_size()
             # Check if terminal is too small
-            if rows<4: print("\r\033cTerminal too small")
+            if rows<4 or columns<34: print("\r\033cTerminal too small")
             # Compare the old values with the new ones
             elif not (old_rows==rows and old_columns==columns):
                 # Set some values
@@ -66,13 +66,16 @@ while True:
                 tmp=open(files[0], "r", encoding="UTF-8").readlines(); arr=[]
                 for x in tmp: arr.append(x.replace("\r","").replace("\n","").replace("\f",""))
                 arr.append(""); filename=files[0]; files=files[1:]; text=arr[0]
-                pointer=1; line=1; offset=0; print("\033c",end="")
+                pointer=1; line=1; offset=0; status_st=False; print("\033c",end="")
 
             else: kill=True; update_thr.join(); print("\033c",end=""); break    
         else: #Call keys functions (Yeah, its a lot of args and returned values)
+            args = (key,text,pointer,oldptr,line,offset,columns,banoff,arr,rows,\
+                    max_len,filename,status,status_st,copy_buffer,fixstr,fix,\
+                    black,reset,saved_txt,ch_T_SP,banner,getch,keys,select)
+            
             text,pointer,oldptr,line,offset,columns,banoff,arr,rows,\
             max_len,filename,status,status_st,copy_buffer,fixstr,fix,\
-            ch_T_SP,select = keys_func(key,text,pointer,oldptr,line,offset,\
-            columns,banoff,arr,rows,max_len,filename,status,status_st,copy_buffer,\
-            fixstr,fix,black,reset,saved_txt,ch_T_SP,banner,getch,keys,select)
+            ch_T_SP,select = keys_func(*args)
+            
     except: pass

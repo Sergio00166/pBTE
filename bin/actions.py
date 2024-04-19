@@ -44,7 +44,7 @@ def backspace(pointer,text,offset,line,arr,banoff,select):
             p1.pop(pointer-2)
             text="".join(p1)
             pointer-=1
-            
+     
         else: #move all to previous line
             if not offset+line==1:
                 seltext=arr[line+offset-banoff-1]

@@ -101,15 +101,22 @@ def fixfilename(filename, columns):
                 filename=filename[:columns-32]+"*"
     return filename
 
+def del_sel(select, arr, banoff):
+    p1=arr[:sum(select[0])]; p2=arr[sum(select[1]):]
+    line=select[0][0]+banoff; offset=select[0][1]
+    select=[]; arr=p1+p2; text=arr[line+offset-banoff]
+    return select, arr, text, line, offset
+
 def scr_arr2str(arr,line,offset,pointer,black,reset,columns,rows,banoff):
-    text=arr[line+offset-banoff]; uptr=pointer
+    uptr=pointer; out_arr=[]; sp=black+"<"+reset
+    text=arr[line+offset-banoff]
     pointer, text = fix_cursor_pos(text,pointer,columns,black,reset)
-    arr=arr[offset : rows+offset+1]
+    arr = arr[offset:rows+offset+1]
     arr = fix_arr_line_len(arr,columns,black,reset)
-    arr[line-1]=text; out_arr=[]
+    arr[line-1] = text
+    
     for x in arr:
-        ln=str_len(x)
-        if uptr>(columns+2) and arr.index(x)==line-1: ln-=12
+        ln=str_len(x.replace(sp," "))
         if ln<(columns+2): x=x+(" "*(columns-ln+2))
         out_arr.append(x)
     if not len(arr)==rows:
@@ -117,9 +124,5 @@ def scr_arr2str(arr,line,offset,pointer,black,reset,columns,rows,banoff):
     
     return "\n".join(out_arr).expandtabs(8), pointer
 
-def del_sel(select, arr, banoff):
-    p1=arr[:sum(select[0])]; p2=arr[sum(select[1]):]
-    line=select[0][0]+banoff; offset=select[0][1]
-    select=[]; arr=p1+p2; text=arr[line+offset-banoff]
-    return select, arr, text, line, offset
+
 
