@@ -1,20 +1,25 @@
 # Code by Sergio1260
 
-from functions import get_size, fixfilename, scr_arr2str
+from functions import scr_arr2str, rscp
+from functions1 import get_size, fixfilename
 
 
-def update_scr(black,reset,status,banoff,offset,line,pointer,arr,banner,filename,rows,columns,rrw=False,select=[]):
+def update_scr(black,reset,status,banoff,offset,line,pointer,arr,banner,filename,rows,columns,status_st,rrw=False,select=[]):
     # Create the string that represents on which line we are
-    position=black+"  "+str(line+offset-banoff)+" "*(4-len(str(line+offset-banoff)))
+    position=black+"  "+str(line+offset-banoff)+"   "
     # Create a part of the banner (position and status strings)
-    outb=position+black+" "+reset+status+banner+black+"    "+reset
+    status= (" "+banner[1] if not status_st else "  "+status)
+    outb=position+black+" "+banner[0]+status+"    "+reset
     # Now set the filenamevar with the fixed filename string and
     # sets the cls var with the clear screen scape code
     filename = fixfilename(filename, columns); cls="\r\033[%d;%dH"%(1, 1)
     # Get the text that will be on screen and update the pointer value
     all_file,pointer = scr_arr2str(arr,line,offset,pointer,black,reset,columns,rows,banoff)
+    # Get the separation between the Left and the filename
+    fix=outb.replace(black,"").replace(reset,"")
+    fix=columns-len(fix)-len(filename)+1
     # Initialize the menu with all the banner
-    menu=cls+outb+black+" "*(columns-31-len(filename))
+    menu=cls+outb+black+" "*fix
 
     # Highlight selector
     if len(select)>0:
@@ -36,6 +41,7 @@ def update_scr(black,reset,status,banoff,offset,line,pointer,arr,banner,filename
         lenght=len(black+"*"+reset)
         # For each line of p1
         for x in p1:
+            x=rscp(x,[black,reset])
             # Checks if the line rendered continues to the right
             # (having the flag that marks that)
             if x.endswith(black+">"+reset):
@@ -65,8 +71,8 @@ def update_scr(black,reset,status,banoff,offset,line,pointer,arr,banner,filename
 
 def menu_updsrc(arg,mode=None,updo=False):
     # Extract args
-    black,reset,status,banoff,offset,line,\
-    pointer,arr,banner,filename,rows,columns=arg
+    black,reset,status,banoff,offset,line,pointer,\
+    arr,banner,filename,rows,columns,status_st = arg
     # Save old vars and get new values
     old_rows=rows; old_columns=columns
     rows,columns=get_size()
@@ -84,10 +90,10 @@ def menu_updsrc(arg,mode=None,updo=False):
             # Calculate blank spaces
             full=((columns+2)*(fix+1))-len(out)
             # Get raw screen updated
-            menu = update_scr(black,reset,status,banoff,\
-            offset,line,0,arr,banner,filename,rows,columns,True)
+            menu = update_scr(black,reset,status,banoff,offset,\
+            line,0,arr,banner,filename,rows,columns,status_st,True)
             # Cut menu to add the menu bar
-            menu = "\n".join(menu.split("\n")[:rows+banoff+1-fix])
+            menu = "\n".join(menu.split("\n")[:rows+banoff-fix])
             # Add menu to it
             menu+="\n"+black+out+(" "*(full))
             # Calculate pointer y displacement

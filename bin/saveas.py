@@ -1,6 +1,6 @@
 #Code by Sergio1260
 
-from functions import decode, get_size
+from functions1 import decode, get_size
 from upd_scr import menu_updsrc
 from threading import Thread
 from os import sep
@@ -13,7 +13,7 @@ if not sep==chr(92): import tty; import termios
 def updscr_thr():
     global saveastxt,filewrite,rows,columns,black,reset,status,banoff
     global lenght,wrtptr,offset,line,arr,banner,filename,rows,columns
-    global run,kill, fd, old_settings
+    global run, kill, fd, old_settings, status_st
     
     while not kill:
         delay(0.01)
@@ -24,7 +24,7 @@ def updscr_thr():
             # Call Screen updater
             mode=(filewrite,saveastxt,wrtptr,lenght)
             arg=(black,reset,status,banoff,offset,line,\
-            wrtptr,arr,banner,filename,rows,columns)
+            wrtptr,arr,banner,filename,rows,columns,status_st)
             rows,columns = menu_updsrc(arg,mode)
             # If OS is LINUX set TTY to raw mode
             if not sep==chr(92): tty.setraw(fd)
@@ -39,10 +39,9 @@ def exit():
 
 
 def save_as(arg):
-    
     global saveastxt,filewrite,rows,columns,black,reset,status,banoff
     global lenght,wrtptr,offset,line,arr,banner,filename,rows,columns
-    global run, kill, fd, old_settings, thr
+    global run, kill, fd, thr, old_settings, status_st
 
     if not sep==chr(92): #If OS is LINUX
         #Get default values for TTY
@@ -65,7 +64,7 @@ def save_as(arg):
             # Call Screen updater
             mode=(filewrite,saveastxt,wrtptr,lenght)
             arg=(black,reset,status,banoff,offset,line,\
-            wrtptr,arr,banner,filename,rows,columns)
+            wrtptr,arr,banner,filename,rows,columns,status_st)
             rows,columns = menu_updsrc(arg,mode,True)
             # If OS is LINUX set TTY to raw mode
             if not sep==chr(92): tty.setraw(fd)
@@ -130,15 +129,14 @@ def save_as(arg):
                         wrtptr+=1
                 elif arrow==keys["supr"]:
                     if not sep==chr(92): getch()
-                    if not wrtptr==lenght:
-                        if complete:
-                            filewrite=sep.join(filewrite.split(sep)[:-1])+sep
-                            wrtptr-=len(filewrite[-1])-1
-                            complete=False
-                        else: 
-                            p1=list(filewrite)
-                            p1.pop(wrtptr-lenght)
-                            filewrite="".join(p1)                   
+                    if complete:
+                        filewrite=sep.join(filewrite.split(sep)[:-1])+sep
+                        wrtptr-=len(filewrite[-1])-1
+                        complete=False
+                    else: 
+                        p1=list(filewrite)
+                        p1.pop(wrtptr-lenght)
+                        filewrite="".join(p1)                   
 
                 elif arrow==keys["start"]:
                     wrtptr=lenght
