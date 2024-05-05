@@ -89,8 +89,8 @@ def keys_func(key,pointer,oldptr,line,offset,columns,banoff,arr,rows,
         copy_buffer = copy(*args)
         
     elif key==keys["ctrl+p"]:
-        args=(copy_buffer,arr,line,offset,banoff,pointer,status_st)
-        pointer,arr,status_st,copy_buffer = paste(*args)                                              
+        args=(copy_buffer,arr,line,offset,banoff,pointer,status_st,select)
+        pointer,arr,status_st,copy_buffer,line,offset,select = paste(*args)                                              
             
     elif key==keys["ctrl+g"]:
         args=(columns,rows,banoff,line,arr,offset,black)
@@ -108,15 +108,19 @@ def keys_func(key,pointer,oldptr,line,offset,columns,banoff,arr,rows,
 
     else: #All the other keys
         if not str(key)[4:6] in fixstr:
-            if not len(select)==0:
-                select,arr,line,offset =\
-                del_sel(select, arr, banoff)
-            out=decode(key,getch)
+            out=decode(key,getch); skip=False
             text=arr[line+offset-banoff]
             p1, p2 = text[:pointer-1], text[pointer-1:]
+            if len(select)>0:
+                if out=="\t":
+                    arr=mng_tab_select(arr,line,offset,select,ch_T_SP)
+                    skip = True
+                else: select,arr,line,offset = del_sel(select, arr, banoff)
             if out=="\t" and ch_T_SP: out=" "*4; pointer+=3
-            text=(p1+out+p2); pointer+=1; status_st=False
-            arr[line+offset-banoff]=text
+            if not skip:
+                text=(p1+out+p2); pointer+=1
+                arr[line+offset-banoff]=text
+            status_st=False
 
     return pointer,oldptr,line,offset,columns,banoff,arr,rows,\
            filename,status,status_st,copy_buffer,fixstr,fix,ch_T_SP,select

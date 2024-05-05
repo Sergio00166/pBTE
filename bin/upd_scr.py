@@ -25,7 +25,8 @@ def update_scr(black,reset,status,banoff,offset,line,pointer,arr,banner,filename
     if len(select)>0:
         # Get values from the select list
         start=select[0][0]; end=select[1][0]
-        end+=select[1][1]-select[0][1]
+        if line < rows+banoff:
+            end+=select[1][1]-select[0][1]
         start-=select[1][1]-select[0][1]
         # Fix start value
         if start<0: start=0

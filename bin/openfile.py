@@ -58,6 +58,9 @@ def open_file(arg):
     complete=False; cmp_counter=0
     
     while True:
+        # Fix when the pointer is out
+        if len(openfile)<wrtptr-lenght:
+            wrtptr = len(openfile)+lenght
         try:
             # If OS is LINUX restore TTY to it default values
             if not sep==chr(92):

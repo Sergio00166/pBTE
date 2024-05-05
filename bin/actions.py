@@ -39,9 +39,11 @@ def up(line,offset,arr,banoff,oldptr,rows,pointer,key,keys,select,fix):
 def backspace(pointer,offset,line,arr,banoff,select):
     text=arr[line+offset-banoff]
     if len(select)==0:
-        if not pointer==1: #Delete char   
+        if not pointer==1: #Delete char
             p1=list(text)+[""]
-            p1.pop(pointer-2)
+            # Fix weird bug
+            try: p1.pop(pointer-2)
+            except: p1.pop(pointer-1)
             text="".join(p1)
             pointer-=1
         else: #move all to previous line
@@ -77,11 +79,11 @@ def newline(pointer,offset,banoff,line,arr,rows,status,select):
     return line, offset, arr, pointer, status, select
 
 def left(pointer,oldptr,line,offset,banoff,arr):
-    text=arr[line+offset-banoff]
     if not pointer==1: pointer-=1; oldptr=pointer
     elif not line+offset==1:
         if offset==0: line-=1
         else: offset-=1
+        text=arr[line+offset-banoff]
         pointer=len(text)+1
     return pointer, oldptr, line, offset
 
@@ -97,4 +99,17 @@ def right(pointer,columns,offset,line,banoff,arr,rows,oldptr):
             pointer=1
     return pointer, oldptr, line, offset
 
+def mng_tab_select(arr,line,offset,select,ch_T_SP):
+    # Get the values from select
+    start=sum(select[0]); end=sum(select[1])
+    # Get the text that is upper and below the selected region
+    p0=arr[:start]; p2=arr[end:]
+    # Get the text that is selected
+    p1=arr[start:end]
+    # Add a tab at the start of each element
+    tab=" "*4 if ch_T_SP else "\t"
+    p1=[tab+x for x in p1]
+    # Now reconstruct all arr
+    return p0+p1+p2
 
+        

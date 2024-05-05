@@ -35,20 +35,19 @@ def goto(columns, rows, banoff, line, arr, offset, black):
     arr[line+offset-banoff]=text
     return line, offset, text 
 
-def paste(copy_buffer,arr,line,offset,banoff,pointer,status_st):
+def paste(copy_buffer,arr,line,offset,banoff,pointer,status_st,select):
     if not len(copy_buffer)==0:
+        if len(select)==0: start=end = line+offset-banoff
+        else: start,end = sum(select[0]),sum(select[1])
+        p1=arr[:start]; p2=arr[end:]
         if isinstance(copy_buffer, list):
-            p1=arr[:line+offset-banoff]
-            p2=arr[line+offset-banoff:]
             arr=p1+copy_buffer+p2
-            text=copy_buffer[0]        
-        else:
-            p1=arr[:line+offset-banoff]; p2=arr[line+offset-banoff+1:]
-            fix1=text[:pointer-1]; fix2=text[+pointer-1:]
-            out=fix1+copy_buffer+fix2; arr=p1+[out]+p2; text=out
-            pointer=len(fix1+copy_buffer)+1; status_st=False
-        arr[line+offset-banoff]=text
-    return pointer,arr,status_st,copy_buffer
+            if len(select)>0: line, offset = select[0]
+        else: arr=p1+[copy_buffer]+p2
+        select = []; 
+
+    return pointer,arr,status_st,copy_buffer,line,offset,select
+
     
 def cut(select,arr,line,offset,banoff,status_st,copy_buffer,pointer):
     text=arr[line+offset-banoff]

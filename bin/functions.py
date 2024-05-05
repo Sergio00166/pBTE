@@ -10,6 +10,7 @@ ascii_map = { 0x00: '␀',  0x01: '␁',  0x02: '␂', 0x03: '␃', 0x04: '␄',
               0x11: '␑',  0x12: '␒',  0x13: '␓', 0x14: '␔', 0x15: '␕', 0x16: '␖', 0x17: '␗', 0x18: '␘',
               0x19: '␙',  0x1A: '␚',  0x1B: '␛', 0x1C: '␜', 0x1D: '␝', 0x1E: '␞', 0x1F: '␟', 0x7F: '␡'
             }
+
 ascii_replaced = [ascii_map[x] for x in ascii_map]+[">","<","�"]
 
 
@@ -101,7 +102,7 @@ def sscp(arg,color):
         if ord(x) in ascii_map:
             ext.append(b+ascii_map[ord(x)]+r)
         elif str_len(x)>0: ext.append(x)
-        else: ext.append(b+"�"+r)   
+        else: ext.append(b+"�"+r)
     return "".join(ext)
 
 # Changes visual ascii chars to space (to read the real screen len)

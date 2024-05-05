@@ -51,8 +51,8 @@ while True:
         if not key_fast:
             # If status flag is 0 set save text to blank
             if status_st==0: status=saved_df 
-            # Get the terminal size and set some values
-            rows,columns=get_size(); max_len=len(text)
+            # Get the terminal size
+            rows,columns=get_size()
             # Call screen updater function
             update_scr(black,reset,status,banoff,offset,line,pointer,arr,\
                        banner,filename,rows,columns,status_st,False,select)
