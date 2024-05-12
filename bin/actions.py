@@ -4,7 +4,6 @@ from functions1 import *
 
 
 def down(line,offset,arr,banoff,oldptr,rows,pointer,key,keys,select,fix):
-    text=arr[line+offset-banoff]
     selected=key==keys["ctrl+arr_down"] and fix
     if selected:
         selst=[line-banoff,offset]
@@ -12,27 +11,30 @@ def down(line,offset,arr,banoff,oldptr,rows,pointer,key,keys,select,fix):
     if not line+offset==len(arr)+banoff-1:
         if not line==rows+banoff: line+=1
         elif not line+offset==len(arr)+1: offset+=1
+        text=arr[line+offset-banoff]
         pointer,oldptrt=fixlenline(text,pointer,oldptr)
     if selected:
         seled=[line-banoff,offset]
-        if not len(select)==0:
-            select[1]=seled
-        else: select=[selst,seled]
+        if sum(seled)<fix:
+            seled[0]=seled[0]+1
+        if len(select)==0:
+            select=[selst,seled]
+        else: select[1]=seled
     else: select=[]
     return pointer, oldptr, offset, line, select
 
 def up(line,offset,arr,banoff,oldptr,rows,pointer,key,keys,select,fix):
-    text=arr[line+offset-banoff]
     selected=key==keys["ctrl+arr_up"] and fix
     if selected: seled=[line-banoff,offset]
     if not line==banoff: line-=1
     elif offset>0: offset-=1
+    text=arr[line+offset-banoff]
     pointer,oldptr=fixlenline(text,pointer,oldptr)
     if selected:
         selst=[line-banoff,offset]
-        if not len(select)==0:
-            select[0]=selst
-        else: select=[selst,seled]
+        if len(select)==0:
+            select=[selst,seled]
+        else: select[0]=selst
     else: select=[]
     return pointer, oldptr, offset, line, select
 
@@ -56,8 +58,8 @@ def backspace(pointer,offset,line,arr,banoff,select):
                 if not offset==0: offset-=1
                 else: line-=1
                 status_st=False
-    else: select,arr,text,line,offset = del_sel(select,arr,banoff)
-    arr[line+offset-banoff]=text
+        arr[line+offset-banoff]=text
+    else: select,arr,line,offset = del_sel(select,arr,banoff)
     return line, offset, arr, pointer, select
 
 def newline(pointer,offset,banoff,line,arr,rows,status,select):
@@ -98,18 +100,3 @@ def right(pointer,columns,offset,line,banoff,arr,rows,oldptr):
             else: offset+=1
             pointer=1
     return pointer, oldptr, line, offset
-
-def mng_tab_select(arr,line,offset,select,ch_T_SP):
-    # Get the values from select
-    start=sum(select[0]); end=sum(select[1])
-    # Get the text that is upper and below the selected region
-    p0=arr[:start]; p2=arr[end:]
-    # Get the text that is selected
-    p1=arr[start:end]
-    # Add a tab at the start of each element
-    tab=" "*4 if ch_T_SP else "\t"
-    p1=[tab+x for x in p1]
-    # Now reconstruct all arr
-    return p0+p1+p2
-
-        

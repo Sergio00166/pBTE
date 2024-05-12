@@ -8,7 +8,7 @@ from openfile import open_file
 
 def keys_func(key,pointer,oldptr,line,offset,columns,banoff,arr,rows,
               filename,status,status_st,copy_buffer,fixstr,fix,\
-              black,reset,saved_txt,ch_T_SP,banner,getch,keys,select):
+              black,bnc,slc,reset,saved_txt,ch_T_SP,banner,getch,keys,select):
         
     if key==keys["special"]:
         if not sep==chr(92): getch()
@@ -75,7 +75,7 @@ def keys_func(key,pointer,oldptr,line,offset,columns,banoff,arr,rows,
         status_st = False
 
     elif key==keys["ctrl+s"]:
-        out=open(filename,"w",encoding="UTF-8")
+        out=open(filename,"w",encoding="UTF-8",newline='')
         out.write("\n".join(arr)); out.close()
         status=saved_txt; status_st=True
         out=open(filename,"r",encoding="UTF-8")
@@ -93,33 +93,37 @@ def keys_func(key,pointer,oldptr,line,offset,columns,banoff,arr,rows,
         pointer,arr,status_st,copy_buffer,line,offset,select = paste(*args)                                              
             
     elif key==keys["ctrl+g"]:
-        args=(columns,rows,banoff,line,arr,offset,black)
-        line,offset, = goto(*args)
+        args=(columns,rows,banoff,line,arr,offset,bnc)
+        line,offset = goto(*args)
 
     elif key==keys["ctrl+a"]:
-        args = (filename,black,reset,rows,banoff,arr,columns,status,offset,line,banner,status_st,saved_txt,getch,keys,fixstr)
+        args = (filename,black,bnc,slc,reset,rows,banoff,arr,columns,status,\
+                offset,line,banner,status_st,saved_txt,getch,keys,fixstr)
         status_st,filename,status = save_as(args)
 
     elif key==keys["ctrl+o"]:
-        args = (filename,black,reset,rows,banoff,arr,columns,status,offset,line,banner,status_st,getch,keys,pointer,fixstr)
-        arr,filename,status_st,pointer,line,offset = open_file(args)
+        args = (filename,black,bnc,slc,reset,rows,banoff,arr,columns,status,\
+                offset,line,banner,status_st,getch,keys,pointer,fixstr,select)
+        arr,filename,status_st,pointer,line,offset,select = open_file(args)
         
     elif key==keys["ctrl+t"]: ch_T_SP = not ch_T_SP
 
     else: #All the other keys
         if not str(key)[4:6] in fixstr:
             out=decode(key,getch); skip=False
-            text=arr[line+offset-banoff]
-            p1, p2 = text[:pointer-1], text[pointer-1:]
+            inc=(4 if out=="\t" and ch_T_SP else 1)
             if len(select)>0:
                 if out=="\t":
-                    arr=mng_tab_select(arr,line,offset,select,ch_T_SP)
-                    skip = True
-                else: select,arr,line,offset = del_sel(select, arr, banoff)
-            if out=="\t" and ch_T_SP: out=" "*4; pointer+=3
+                    args=arr,line,offset,select,ch_T_SP
+                    arr,skip = mng_tab_select(*args), True
+                else: select,arr,line,offset = del_sel(select,arr,banoff)
+                
+            if out=="\t" and ch_T_SP: out=" "*4
             if not skip:
-                text=(p1+out+p2); pointer+=1
-                arr[line+offset-banoff]=text
+                text=arr[line+offset-banoff]
+                p1,p2=text[:pointer-1],text[pointer-1:]
+                pointer+=inc # Increment the char pos
+                arr[line+offset-banoff]=(p1+out+p2)
             status_st=False
 
     return pointer,oldptr,line,offset,columns,banoff,arr,rows,\

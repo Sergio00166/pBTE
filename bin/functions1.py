@@ -1,6 +1,7 @@
 #Code by Sergio1260
 
 from os import get_terminal_size,sep
+from multiprocessing import cpu_count, Pool
 
 
 def get_size():
@@ -28,8 +29,7 @@ def CalcRelLine(p1,arr,offset,line,banoff,rows):
             if p1<rows: offset=0; line=p1+banoff
             else: offset=p1-rows; line=rows+banoff
     except: pass
-    text=arr[line+offset-banoff]
-    return line, offset, text
+    return line, offset
 
 def fixfilename(filename, columns):
     if len(filename)+32>columns: #If filename overflows
@@ -45,20 +45,31 @@ def fixfilename(filename, columns):
 def del_sel(select, arr, banoff):
     p1=arr[:sum(select[0])]; p2=arr[sum(select[1]):]
     line=select[0][0]+banoff; offset=select[0][1]
-    select=[]; arr=p1+p2; text=arr[line+offset-banoff]
-    return select, arr, text, line, offset
+    select=[]; arr=p1+p2 
+    return select, arr, line, offset
 
+def mng_tab_select(arr,line,offset,select,ch_T_SP):
+    # Get the values from select
+    start=sum(select[0]); end=sum(select[1])
+    # Get the text that is upper and below the selected region
+    p0=arr[:start]; p2=arr[end:]
+    # Get the text that is selected
+    p1=arr[start:end]
+    # Add a tab at the start of each element
+    tab=" "*4 if ch_T_SP else "\t"
+    p1=[tab+x for x in p1]
+    # Now reconstruct all arr
+    return p0+p1+p2
 
-# Reads with UTF8 but the shit it cant decode it threats it like ASCII
+# Each line is ejecuted on a separate CPU core
 def read_UTF8(file):
-    out = []
-    for x in open(file,"rb").readlines():
-        x=decode_until_error(x)
-        if x.endswith("\n"): x=x[:-1]
-        if x.endswith("\r"): x=x[:-1]
-        out.append(x)
+    file=open(file,"rb").readlines()
+    pool=Pool(processes=cpu_count())
+    out=pool.map_async(decode_until_error,file)
+    out=out.get(); pool.close()
     return out
 
+# Decodes the UTF8 and if it cant decode a byte it decodes it as ASCII
 def decode_until_error(data):
     decoded = ""; index = 0
     while index < len(data):
@@ -81,4 +92,7 @@ def decode_until_error(data):
             except UnicodeDecodeError:
                 for byte in byte_sequence:
                     decoded += chr(byte)
+
+    if decoded.endswith("\n"): decoded=decoded[:-1]
+    if decoded.endswith("\r"): decoded=decoded[:-1]
     return decoded

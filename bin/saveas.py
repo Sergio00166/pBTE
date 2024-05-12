@@ -13,7 +13,7 @@ if not sep==chr(92): import tty; import termios
 def updscr_thr():
     global saveastxt,filewrite,rows,columns,black,reset,status,banoff
     global lenght,wrtptr,offset,line,arr,banner,filename,rows,columns
-    global run, kill, fd, old_settings, status_st
+    global run, kill, fd, old_settings, status_st, bnc, slc
     
     while not kill:
         delay(0.01)
@@ -23,7 +23,7 @@ def updscr_thr():
                 termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
             # Call Screen updater
             mode=(filewrite,saveastxt,wrtptr,lenght)
-            arg=(black,reset,status,banoff,offset,line,\
+            arg=(black,bnc,slc,reset,status,banoff,offset,line,\
             wrtptr,arr,banner,filename,rows,columns,status_st)
             rows,columns = menu_updsrc(arg,mode)
             # If OS is LINUX set TTY to raw mode
@@ -41,7 +41,7 @@ def exit():
 def save_as(arg):
     global saveastxt,filewrite,rows,columns,black,reset,status,banoff
     global lenght,wrtptr,offset,line,arr,banner,filename,rows,columns
-    global run, kill, fd, thr, old_settings, status_st
+    global run, kill, fd, thr, old_settings, status_st, bnc, slc
 
     if not sep==chr(92): #If OS is LINUX
         #Get default values for TTY
@@ -49,7 +49,7 @@ def save_as(arg):
         fd = sys.stdin.fileno()
         old_settings = termios.tcgetattr(fd)
 
-    filename,black,reset,rows,banoff,arr,columns,status,offset,\
+    filename,black,bnc,slc,reset,rows,banoff,arr,columns,status,offset,\
     line,banner,status_st,saved_txt,getch,keys,fixstr = arg
 
     saveastxt=" Save as: "; lenght=len(saveastxt)+2
@@ -66,7 +66,7 @@ def save_as(arg):
             if not sep==chr(92): termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
             # Call Screen updater
             mode=(filewrite,saveastxt,wrtptr,lenght)
-            arg=(black,reset,status,banoff,offset,line,\
+            arg=(black,bnc,slc,reset,status,banoff,offset,line,\
             wrtptr,arr,banner,filename,rows,columns,status_st)
             rows,columns = menu_updsrc(arg,mode,True)
             # If OS is LINUX set TTY to raw mode
@@ -92,19 +92,12 @@ def save_as(arg):
             
             #Ctrl + A (confirms) or Ctrl + B backup
             elif key==keys["ctrl+s"] or key==keys["ctrl+b"]:
-                if key==["ctrl+b"] and filewrite==filename:
-                    filewrite+=".bak"
-                out=open(filewrite,"w",encoding="UTF-8")
+                if key==["ctrl+b"] and filewrite==filename: filewrite+=".bak"
+                out=open(filewrite,"w",encoding="UTF-8",newline='')
                 out.write("\n".join(arr)); out.close(); status_st=True
-                if key==keys["ctrl+s"]:
-                    status=saved_txt; tmp=open(filewrite, "r", encoding="UTF-8").readlines(); arr=[]
-                    for x in tmp: arr.append(x.replace("\r","").replace("\n","").replace("\f",""))
-                    arr.append(""); filename=filewrite
-                    out=open(filewrite,"r",encoding="UTF-8")
-                    exit(); break
-                else:
-                    status=black+"BkUPd"+reset
-                    exit(); break
+                if key==keys["ctrl+b"]: status=bnc+"BCKPd"
+                else: status,filename = saved_txt,filewrite
+                exit(); break
                 
             elif key==keys["ctrl+q"]: exit(); break
         
@@ -150,15 +143,13 @@ def save_as(arg):
             elif key==keys["return"]: pass
 
             elif key==keys["ctrl+p"] or key==keys["ctrl+a"]:
-                try:
-                    tmp=open(filewrite, "r", encoding="UTF-8").readlines()
-                    status=saved_txt
-                    if key==keys["ctrl+a"]: output=list(arr+tmp)
-                    elif key==keys["ctrl+p"]: output=list(tmp+arr)
-                    out=open(filewrite, "w", encoding="UTF-8")
-                    out.write("\n".join(output))
-                    exit(); break
-                except: pass
+                tmp=open(filewrite,"r",encoding="UTF-8",newline='').readlines()
+                if key==keys["ctrl+a"]: output=list(arr+tmp)
+                elif key==keys["ctrl+p"]: output=list(tmp+arr)
+                out=open(filewrite,"w",encoding="UTF-8",newline='')
+                out.write("\n".join(output)); out.close()
+                status,status_st = bnc+"ADDED",True
+                exit(); break
             
             else: #Rest of keys
                 cond1=wrtptr<((columns+2)*rows+1)

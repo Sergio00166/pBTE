@@ -13,7 +13,7 @@ if not sep==chr(92): import tty; import termios
 def updscr_thr():
     global opentxt,openfile,rows,columns,black,reset,status,banoff
     global lenght,wrtptr,offset,line,arr,banner,filename,rows,columns
-    global run, kill, fd, old_settings, status_st
+    global run, kill, fd, old_settings, status_st, bnc, slc
     
     while not kill:
         delay(0.01)
@@ -23,7 +23,7 @@ def updscr_thr():
                 termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
             # Call Screen updater
             mode=(openfile,opentxt,wrtptr,lenght)
-            arg=(black,reset,status,banoff,offset,line,\
+            arg=(black,bnc,slc,reset,status,banoff,offset,line,\
             wrtptr,arr,banner,filename,rows,columns,status_st)
             rows,columns = menu_updsrc(arg,mode)
             # If OS is LINUX set TTY to raw mode
@@ -40,7 +40,7 @@ def exit():
 def open_file(arg):
     global opentxt,openfile,rows,columns,black,reset,status,banoff
     global lenght,wrtptr,offset,line,arr,banner,filename,rows,columns
-    global run, kill, fd, old_settings, thr, status_st
+    global run, kill, fd, old_settings, thr, status_st, bnc, slc
 
     if not sep==chr(92): #If OS is LINUX
         #Get default values for TTY
@@ -48,8 +48,8 @@ def open_file(arg):
         fd = sys.stdin.fileno()
         old_settings = termios.tcgetattr(fd)
 
-    filename,black,reset,rows,banoff,arr,columns,status,offset,\
-    line,banner,status_st,getch,keys,pointer,fixstr = arg
+    filename,black,bnc,slc,reset,rows,banoff,arr,columns,status,offset,\
+    line,banner,status_st,getch,keys,pointer,fixstr,select = arg
 
     openfile=sep.join(filename.split(sep)[:-1])+sep
     opentxt=" Open: "; lenght=len(opentxt)+2; wrtptr=lenght+len(openfile)
@@ -67,7 +67,7 @@ def open_file(arg):
                 termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
             # Call Screen updater
             mode=(openfile,opentxt,wrtptr,lenght)
-            arg=(black,reset,status,banoff,offset,line,\
+            arg=(black,bnc,slc,reset,status,banoff,offset,line,\
             wrtptr,arr,banner,filename,rows,columns,status_st)
             rows,columns = menu_updsrc(arg,mode,True)
             # If OS is LINUX set TTY to raw mode
@@ -94,9 +94,8 @@ def open_file(arg):
             elif key==keys["ctrl+o"]:
                 openfile=glob(openfile, recursive=False)[0]
                 arr=read_UTF8(openfile); filename=openfile
-                exit(); status_st=False
-                pointer=offset=0; line=1
-                break
+                status_st,line,select = False,1,[]
+                pointer=offset=0; exit(); break
                 
             elif key==keys["ctrl+q"]: exit(); break
         
@@ -143,8 +142,8 @@ def open_file(arg):
             elif key==keys["return"]: pass
             
             elif key==keys["ctrl+n"]:
-                arr=[""]; text=""
-                pointer=1; offset=0; line=1
+                pointer,offset,line = 1,0,1
+                arr,select = [""],[]
                 filename=getcwd()+sep+"NewFile"
                 exit(); break
             
@@ -160,4 +159,4 @@ def open_file(arg):
                     complete=False
         except: pass
     
-    return arr,filename,status_st,pointer,line,offset
+    return arr,filename,status_st,pointer,line,offset,select
