@@ -4,9 +4,7 @@ from functions import scr_arr2str, rscp
 from functions1 import get_size, fixfilename
 from sys import stdout
 
-def print(text):
-    stdout.write(text)
-    stdout.flush()
+def print(text): stdout.write(text)
 
 def update_scr(black,bnc,slc,reset,status,banoff,offset,line,pointer,arr,banner,filename,rows,columns,status_st,rrw=False,select=[]):
     # Create the string that represents on which line we are
@@ -85,7 +83,7 @@ def menu_updsrc(arg,mode=None,updo=False):
     if rows<4 or columns<34: print("\r\033cTerminal too small")
     # Compare the old values with the new ones
     elif not (old_rows==rows and old_columns==columns) or updo:
-        if not updo: print("\r\033c",end="")
+        if not updo: print("\r\033c")
         if not mode==None or updo:
             # Set vars
             filetext,opentxt,wrtptr,lenght = mode

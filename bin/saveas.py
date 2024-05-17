@@ -7,8 +7,12 @@ from os import sep
 from time import sleep as delay
 from glob import glob
 
-if not sep==chr(92): import tty; import termios
-
+if not sep==chr(92): #If OS is LINUX
+    #Get default values for TTY
+    from termios import TCSADRAIN, tcsetattr, tcgetattr
+    from tty import setraw; from sys import stdin
+    fd = stdin.fileno()
+    old_settings = tcgetattr(fd)
 
 def updscr_thr():
     global saveastxt,filewrite,rows,columns,black,reset,status,banoff
@@ -20,21 +24,24 @@ def updscr_thr():
         if run:
             # If OS is LINUX restore TTY to it default values
             if not sep==chr(92):
-                termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+                old=(fd,TCSADRAIN,old_settings)
+                tcsetattr(fd, TCSADRAIN, old_settings)
             # Call Screen updater
             mode=(filewrite,saveastxt,wrtptr,lenght)
             arg=(black,bnc,slc,reset,status,banoff,offset,line,\
             wrtptr,arr,banner,filename,rows,columns,status_st)
             rows,columns = menu_updsrc(arg,mode)
             # If OS is LINUX set TTY to raw mode
-            if not sep==chr(92): tty.setraw(fd)
+            if not sep==chr(92):
+                terminal = tcgetattr(fd)
+                terminal[3] = terminal[3] & ~(ICANON | ECHO)
+                tcsetattr(fd, TCSADRAIN, terminal)
 
 
 def exit():
     global fd, old_settings, run, kill, thr
     run=False; kill=True; thr.join()
-    if not sep == chr(92):
-        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+    if not sep == chr(92): tcsetattr(fd,TCSADRAIN,old_settings)
     print(reset+"\r\033c", end="")
 
 
@@ -43,14 +50,8 @@ def save_as(arg):
     global lenght,wrtptr,offset,line,arr,banner,filename,rows,columns
     global run, kill, fd, thr, old_settings, status_st, bnc, slc
 
-    if not sep==chr(92): #If OS is LINUX
-        #Get default values for TTY
-        import sys; import termios; import tty
-        fd = sys.stdin.fileno()
-        old_settings = termios.tcgetattr(fd)
-
     filename,black,bnc,slc,reset,rows,banoff,arr,columns,status,offset,\
-    line,banner,status_st,saved_txt,getch,keys,fixstr = arg
+    line,banner,status_st,saved_txt,keys,fixstr,read_key = arg
 
     saveastxt=" Save as: "; lenght=len(saveastxt)+2
     filewrite=filename; wrtptr=lenght+len(filewrite)
@@ -63,17 +64,22 @@ def save_as(arg):
             wrtptr = len(filewrite)+lenght
         try:
             # If OS is LINUX restore TTY to it default values
-            if not sep==chr(92): termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+            if not sep==chr(92):
+                old=(fd,TCSADRAIN,old_settings)
+                tcsetattr(fd, TCSADRAIN, old_settings)
             # Call Screen updater
             mode=(filewrite,saveastxt,wrtptr,lenght)
             arg=(black,bnc,slc,reset,status,banoff,offset,line,\
             wrtptr,arr,banner,filename,rows,columns,status_st)
             rows,columns = menu_updsrc(arg,mode,True)
             # If OS is LINUX set TTY to raw mode
-            if not sep==chr(92): tty.setraw(fd)
+            if not sep==chr(92):
+                terminal = tcgetattr(fd)
+                terminal[3] = terminal[3] & ~(ICANON | ECHO)
+                tcsetattr(fd, TCSADRAIN, terminal)
             
             run=True #Start update screen thread
-            key=getch() #Map keys
+            key=read_key() #Map keys
             run=False #Stop update screen thread
 
             if key==keys["tab"]:
@@ -92,14 +98,14 @@ def save_as(arg):
             
             #Ctrl + A (confirms) or Ctrl + B backup
             elif key==keys["ctrl+s"] or key==keys["ctrl+b"]:
-                if key==["ctrl+b"] and filewrite==filename: filewrite+=".bak"
+                if key==keys["ctrl+b"] and filewrite==filename: filewrite+=".bak"
                 out=open(filewrite,"w",encoding="UTF-8",newline='')
                 out.write("\n".join(arr)); out.close(); status_st=True
                 if key==keys["ctrl+b"]: status=bnc+"BCKPd"
                 else: status,filename = saved_txt,filewrite
                 exit(); break
                 
-            elif key==keys["ctrl+q"]: exit(); break
+            elif key==keys["ctrl+c"]: exit(); break
         
             elif key==keys["delete"]:
                 if not wrtptr==lenght:
@@ -114,31 +120,26 @@ def save_as(arg):
                         filewrite="".join(p1)
                         wrtptr-=1
 
-            elif key==keys["special"]:
-                if not sep==chr(92): special_key=getch()
-                arrow=getch()
-                if arrow==keys["arr_left"]:
-                    if not wrtptr==lenght:
-                        wrtptr-=1
-                elif arrow==keys["arr_right"]:
-                    if not wrtptr>len(filewrite)+lenght-1:
-                        wrtptr+=1
-                elif arrow==keys["supr"]:
-                    if not sep==chr(92): getch()
-                    if complete:
-                        filewrite=sep.join(filewrite.split(sep)[:-1])+sep
-                        wrtptr-=len(filewrite[-1])-1
-                        complete=False
-                    else: 
-                        p1=list(filewrite)
-                        p1.pop(wrtptr-lenght)
-                        filewrite="".join(p1)                   
+            elif key==keys["arr_left"]:
+                if not wrtptr==lenght: wrtptr-=1
+                
+            elif key==keys["arr_right"]:
+                if not wrtptr>len(filewrite)+lenght-1:  wrtptr+=1
+                
+            elif key==keys["supr"]:
+                if not sep==chr(92): getch()
+                if complete:
+                    filewrite=sep.join(filewrite.split(sep)[:-1])+sep
+                    wrtptr-=len(filewrite[-1])-1
+                    complete=False
+                else: 
+                    p1=list(filewrite)
+                    p1.pop(wrtptr-lenght)
+                    filewrite="".join(p1)                   
 
-                elif arrow==keys["start"]:
-                    wrtptr=lenght
-                    
-                elif arrow==keys["end"]:
-                    wrtptr=len(filewrite)+lenght
+            elif key==keys["start"]: wrtptr=lenght
+                
+            elif key==keys["end"]: wrtptr=len(filewrite)+lenght
          
             elif key==keys["return"]: pass
 
@@ -155,7 +156,7 @@ def save_as(arg):
                 cond1=wrtptr<((columns+2)*rows+1)
                 cond2=str(key)[4:6] in fixstr
                 if cond1 and not cond2:
-                    out=decode(key,getch)
+                    out=decode(key)
                     p1=filewrite[:wrtptr-lenght]
                     p2=filewrite[wrtptr-lenght:]
                     filewrite=p1+out+p2
