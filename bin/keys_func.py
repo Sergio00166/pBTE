@@ -89,15 +89,16 @@ def keys_func(key,pointer,oldptr,line,offset,columns,banoff,arr,rows,
         status_st,filename,status = save_as(args)
 
     elif key==keys["ctrl+o"]:
-        args = (filename,black,bnc,slc,reset,rows,banoff,arr,columns,status,\
-                offset,line,banner,status_st,keys,pointer,fixstr,select,read_key)
-        arr,filename,status_st,pointer,line,offset,select = open_file(args)
+        args = (filename,black,bnc,slc,reset,rows,banoff,arr,columns,status,offset\
+                ,line,banner,status_st,keys,pointer,oldptr,fixstr,select,read_key)
+        arr,filename,status_st,pointer,oldptr,line,offset,select = open_file(args)
         
     elif key==keys["ctrl+t"]: ch_T_SP = not ch_T_SP
 
     else: #All the other keys
         args=(arr,key,select,pointer,line,offset,banoff,ch_T_SP,rows,keys)
         arr, pointer, line, offset = get_str(*args)
+        status_st = False
                 
     return pointer,oldptr,line,offset,columns,banoff,arr,rows,filename,\
            status,status_st,copy_buffer,fixstr,ch_T_SP,select
