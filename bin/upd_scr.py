@@ -8,7 +8,7 @@ def print(text): stdout.write(text)
 
 def update_scr(black,bnc,slc,reset,status,banoff,offset,line,pointer,arr,banner,filename,rows,columns,status_st,rrw=False,select=[]):
     # Create the string that represents on which line we are
-    position=bnc+"  "+str(line+offset-banoff)+"   "
+    position=bnc+"  "+str(line+offset-banoff)+"  "
     # Create a part of the banner (position and status strings)
     status= (" "+banner[1] if not status_st else "  "+status)
     outb=position+bnc+" "+banner[0]+status+"    "+reset
