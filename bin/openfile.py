@@ -46,7 +46,7 @@ def open_file(arg):
     global run, kill, fd, old_settings, thr, status_st, bnc, slc
 
     filename,black,bnc,slc,reset,rows,banoff,arr,columns,status,offset,\
-    line,banner,status_st,keys,pointer,oldptr,select,read_key = arg
+    line,banner,status_st,keys,pointer,oldptr,select,read_key,codec,lnsep = arg
     
     openfile=sep.join(filename.split(sep)[:-1])+sep
     opentxt=" Open: "; lenght=len(opentxt)+2; wrtptr=lenght+len(openfile)
@@ -92,7 +92,8 @@ def open_file(arg):
             
             elif key==keys["ctrl+o"]:
                 openfile=glob(openfile, recursive=False)[0]
-                arr=read_UTF8(openfile); filename=openfile
+                arr,codec,lnsep = read_UTF8(openfile)
+                filename = openfile
                 status_st,line,select = False,1,[]
                 pointer,offset,oldptr = 1,0,1
                 exit(); break
@@ -150,4 +151,4 @@ def open_file(arg):
                     complete=False
         except: pass
     
-    return arr,filename,status_st,pointer,oldptr,line,offset,select
+    return arr,filename,status_st,pointer,oldptr,line,offset,select,codec,lnsep

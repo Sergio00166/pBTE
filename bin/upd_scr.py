@@ -7,13 +7,14 @@ from sys import stdout
 def print(text): stdout.write(text)
 
 def update_scr(black,bnc,slc,reset,status,banoff,offset,line,pointer,arr,banner,filename,rows,columns,status_st,rrw=False,select=[]):
+    # Now set the filenamevar with the fixed filename string
+    filename = fixfilename(filename,columns)
+    filename = sscp(filename,[slc,reset+bnc])
     # Create the string that represents on which line we are
     position=bnc+"  "+str(line+offset-banoff)+"  "
     # Create a part of the banner (position and status strings)
     status= (" "+banner[1] if not status_st else "  "+status)
     outb=position+bnc+" "+banner[0]+status+"    "+reset
-    # Now set the filenamevar with the fixed filename string
-    filename = fixfilename(filename, columns)
     # Set the cls var with the clear screen scape code
     cls="\r\033[%d;%dH"%(1, 1)
     # Get the separation between the Left and the filename
@@ -61,8 +62,7 @@ def update_scr(black,bnc,slc,reset,status,banoff,offset,line,pointer,arr,banner,
         # Now create the all file string. Adding the
         # ascii chars to p1 (the selected string)
         all_file=p0+black+p1+reset+p2
-    # Add to the screen string the rest of the screen
-    filename=sscp(filename,[slc,reset+bnc])
+    # Now concatenate all to create the screen
     menu+=filename+" "+reset+"\n"+all_file
     # If raw mode is specified return the screen string
     if rrw: return menu
@@ -82,7 +82,7 @@ def menu_updsrc(arg,mode=None,updo=False):
     old_rows=rows; old_columns=columns
     rows,columns=get_size()
     # Check if terminal is too small
-    if rows<4 or columns<34: print("\r\033cTerminal too small")
+    if rows<4 or columns<24: print("\r\033cTerminal too small")
     # Compare the old values with the new ones
     elif not (old_rows==rows and old_columns==columns) or updo:
         if not updo: print("\r\033c")

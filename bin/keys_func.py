@@ -7,8 +7,8 @@ from openfile import open_file
 
 
 def keys_func(key,pointer,oldptr,line,offset,columns,banoff,arr,rows,
-              filename,status,status_st,copy_buffer,black,bnc,slc,
-              reset,saved_txt,ch_T_SP,banner,read_key,keys,select):
+              filename,status,status_st,copy_buffer,black,bnc,slc,reset,
+              saved_txt,ch_T_SP,banner,read_key,keys,select,codec,lnsep):
 
     if key==keys["supr"]:
         args=(pointer,offset,banoff,arr,line,select)
@@ -62,10 +62,9 @@ def keys_func(key,pointer,oldptr,line,offset,columns,banoff,arr,rows,
         status_st = False
 
     elif key==keys["ctrl+s"]:
-        out=open(filename,"w",encoding="UTF-8",newline='')
-        out.write("\n".join(arr)); out.close()
+        out=open(filename,"w",encoding=codec,newline='')
+        out.write(lnsep.join(arr)); out.close()
         status=saved_txt; status_st=True
-        out=open(filename,"r",encoding="UTF-8")
         
     elif key==keys["ctrl+x"]:
         args=(select,arr,line,offset,banoff,status_st,copy_buffer,pointer)
@@ -85,21 +84,21 @@ def keys_func(key,pointer,oldptr,line,offset,columns,banoff,arr,rows,
 
     elif key==keys["ctrl+a"]:
         args = (filename,black,bnc,slc,reset,rows,banoff,arr,columns,status,\
-                offset,line,banner,status_st,saved_txt,keys,read_key)
-        status_st,filename,status = save_as(args)
+                offset,line,banner,status_st,saved_txt,keys,read_key,codec,lnsep)
+        status_st,filename,status,codec,lnsep = save_as(args)
 
     elif key==keys["ctrl+o"]:
-        args = (filename,black,bnc,slc,reset,rows,banoff,arr,columns,status,offset\
-                ,line,banner,status_st,keys,pointer,oldptr,select,read_key)
-        arr,filename,status_st,pointer,oldptr,line,offset,select = open_file(args)
+        args = (filename,black,bnc,slc,reset,rows,banoff,arr,columns,status,offset,\
+                line,banner,status_st,keys,pointer,oldptr,select,read_key,codec,lnsep)
+        arr,filename,status_st,pointer,oldptr,line,offset,select,codec,lnsep = open_file(args)
         
     elif key==keys["ctrl+t"]: ch_T_SP = not ch_T_SP
 
     else: #All the other keys
-        args=(arr,key,select,pointer,line,offset,banoff,ch_T_SP,rows,keys)
+        args=(arr,key,select,pointer,line,offset,banoff,ch_T_SP,rows,keys,codec)
         arr, pointer, line, offset = get_str(*args)
         status_st = False
                 
-    return pointer,oldptr,line,offset,columns,banoff,arr,rows,\
-           filename,status,status_st,copy_buffer,ch_T_SP,select
+    return pointer,oldptr,line,offset,columns,banoff,arr,rows,filename,\
+           status,status_st,copy_buffer,ch_T_SP,select,codec,lnsep
 

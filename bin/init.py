@@ -1,6 +1,6 @@
 #Code by Sergio1260
 
-version="v0.5.7.7"
+version="v0.5.8.0"
      
 if not __name__=="__main__":
 
@@ -62,10 +62,16 @@ if not __name__=="__main__":
         files=[glob(x,recursive=False) for x in argv[1:]]
         files=[abspath(i) for x in files for i in x if not isdir(i)]
         if len(files)>0: 
-            arr=read_UTF8(files[0])
+            arr,codec,lnsep = read_UTF8(files[0])
             filename=files[0]; files=files[1:]
-        else: filename=getcwd()+sep+"NewFile"; arr=[""]; files=[]    
-    else: filename=getcwd()+sep+"NewFile"; arr=[""]; files=[] 
+        else:
+            filename=getcwd()+sep+"NewFile"
+            arr,files = [""],[]   
+            codec,lnsep = "UTF-8","\n" 
+    else:
+        filename=getcwd()+sep+"NewFile"
+        arr,files = [""],[]   
+        codec,lnsep = "UTF-8","\n"
 
     #Define a lot of stuff
     pointer=offset=oldptr=0
