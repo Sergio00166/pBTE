@@ -17,7 +17,9 @@ Also now "works" under linux (tested under FEDORA and UBUNTU)
 
 <br><h2>OPTIONS</h2>
 <br>*NORMAL*<br>
-^Q QUIT | ^S SAVE | ^A Save as | ^O OPEN | ^C COPY | ^X CUT | ^P PASTE | ^G GOTO | ^T T/SP <br>
+^Q QUIT | ^S SAVE | ^A Save as | ^O OPEN | ^C COPY | ^X CUT | ^P PASTE
+^G GOTO | ^D DEDENT | ^I INDENT | ^K COMMENT | ^U UNCOMMENT <br>
+F1 change indent str | F2 change comment str <br>
 <br>*Open file menu*<br>
 ^Q CANCEL | ^O OPEN  | ^N NEW FILE <br>
 <br>*Save as menu*<br>

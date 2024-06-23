@@ -8,7 +8,7 @@ from openfile import open_file
 
 def keys_func(key,pointer,oldptr,line,offset,columns,banoff,arr,rows,
               filename,status,status_st,copy_buffer,black,bnc,slc,reset,
-              saved_txt,ch_T_SP,banner,read_key,keys,select,codec,lnsep):
+              saved_txt,indent,banner,read_key,keys,select,codec,lnsep,comment):
 
     if key==keys["supr"]:
         args=(pointer,offset,banoff,arr,line,select)
@@ -26,12 +26,18 @@ def keys_func(key,pointer,oldptr,line,offset,columns,banoff,arr,rows,
         pointer, oldptr, offset, line, select = down(*args)
 
     elif key==keys["arr_right"] or key==keys["ctrl+arr_right"]:
-        args=(pointer,columns,offset,line,banoff,arr,rows,oldptr)
-        pointer, oldptr, line, offset = right(*args); select=[]
+        times = 4 if key==keys["ctrl+arr_right"] else 1
+        for x in range(times):
+            args=(pointer,columns,offset,line,banoff,arr,rows,oldptr)
+            pointer, oldptr, line, offset = right(*args)
+        select=[]
         
     elif key==keys["arr_left"] or key==keys["ctrl+arr_left"]:
-        args=(pointer,oldptr,line,offset,banoff,arr)
-        pointer,oldptr,line,offset = left(*args); select=[]
+        times = 4 if key==keys["ctrl+arr_left"] else 1
+        for x in range(times):
+            args=(pointer,oldptr,line,offset,banoff,arr)
+            pointer,oldptr,line,offset = left(*args)
+        select=[]
         
     elif key==keys["start"]: pointer,oldptr,select = 1,1,[]
         
@@ -76,7 +82,7 @@ def keys_func(key,pointer,oldptr,line,offset,columns,banoff,arr,rows,
         
     elif key==keys["ctrl+p"]:
         args=(copy_buffer,arr,line,offset,banoff,pointer,status_st,select)
-        pointer,arr,status_st,copy_buffer,line,offset,select = paste(*args)                                              
+        pointer,arr,status_st,copy_buffer,line,offset,select = paste(*args)
             
     elif key==keys["ctrl+g"]:
         args=(columns,rows,banoff,line,arr,offset,bnc)
@@ -92,13 +98,34 @@ def keys_func(key,pointer,oldptr,line,offset,columns,banoff,arr,rows,
                 line,banner,status_st,keys,pointer,oldptr,select,read_key,codec,lnsep)
         arr,filename,status_st,pointer,oldptr,line,offset,select,codec,lnsep = open_file(args)
         
-    elif key==keys["ctrl+t"]: ch_T_SP = not ch_T_SP
+    elif key==keys["f1"]: indent = chg_var_str(columns,rows,banoff,line,bnc,indent,"indent") 
+    elif key==keys["f2"]: comment = chg_var_str(columns,rows,banoff,line,bnc,comment) 
+
+    elif key==keys["ctrl+d"]:
+        if len(select)>0:
+            arr = select_add_start_str(arr,line,offset,select,indent,True)
+        else: arr,pointer = dedent(arr,line,offset,banoff,indent,pointer)
+    
+    elif key==keys["ctrl+k"]:
+        if len(select)>0: slt = select
+        else:
+            slt = [[line-banoff,offset],[line,offset]]
+            pointer += len(comment)
+        arr = select_add_start_str(arr,line,offset,slt,comment)
+    
+    elif key==keys["ctrl+u"]:    
+        if len(select)>0: slt = select
+        else: 
+            slt = [[line-banoff,offset],[line,offset]]
+            if arr[line+offset-banoff].startswith(comment):
+                pointer -= len(comment)
+        arr = select_add_start_str(arr,line,offset,slt,comment,True)
 
     else: #All the other keys
-        args=(arr,key,select,pointer,line,offset,banoff,ch_T_SP,rows,keys,codec)
+        args=(arr,key,select,pointer,line,offset,banoff,indent,rows,keys,codec)
         arr, pointer, line, offset = get_str(*args)
         status_st = False
                 
     return pointer,oldptr,line,offset,columns,banoff,arr,rows,filename,\
-           status,status_st,copy_buffer,ch_T_SP,select,codec,lnsep
+           status,status_st,copy_buffer,indent,select,codec,lnsep,comment
 

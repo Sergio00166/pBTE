@@ -29,8 +29,7 @@ def CalcRelLine(p1,arr,offset,line,banoff,rows):
     return line, offset
 
 
-def fixfilename(path, columns):
-    length = columns-24
+def fixfilename(path, columns, length):
     if len(path) <= length: return path
     dirname, basename = split(path)
     if len(path) <= length: return path
@@ -50,31 +49,31 @@ def del_sel(select, arr, banoff):
     select=[]; arr=p1+p2 
     return select, arr, line, offset
 
-def mng_tab_select(arr,line,offset,select,ch_T_SP):
+def select_add_start_str(arr,line,offset,select,str,remove=False):
     # Get the values from select
     start=sum(select[0]); end=sum(select[1])
     # Get the text that is upper and below the selected region
     p0=arr[:start]; p2=arr[end:]
     # Get the text that is selected
     p1=arr[start:end]
-    # Add a tab at the start of each element
-    tab=" "*4 if ch_T_SP else "\t"
-    p1=[tab+x for x in p1]
+    if not remove: p1=[str+x for x in p1]
+    else: p1 = [x[len(str):] if x.startswith(str) else x for x in p1] 
     # Now reconstruct all arr
     return p0+p1+p2
 
-def get_str(arr,key,select,pointer,line,offset,banoff,ch_T_SP,rows,keys,codec):
+def get_str(arr,key,select,pointer,line,offset,banoff,indent,rows,keys,codec):
     
     out,skip = decode(key),False
    
     if select:
         if not out=="\t": select,arr,line,offset = del_sel(select,arr,banoff)     
-        else: arr,skip = mng_tab_select(arr,line,offset,select,ch_T_SP),True
+        else: 
+            arr,skip = select_add_start_str(arr,line,offset,select,indent),True
        
     if not skip:
         pos=line+offset-banoff; text=arr[pos]
         p1,p2 = text[:pointer-1], text[pointer-1:]
-        if ch_T_SP: out=out.replace("\t"," "*4)
+        out=out.replace("\t",indent)
         out_lines = out.split(keys["return"].decode("utf-8"))
         arr[pos] = p1+out_lines[0]+p2
         

@@ -70,11 +70,11 @@ if __name__=="__main__":
             args = (
                 key,pointer,oldptr,line,offset,columns,banoff,arr,rows,
                 filename,status,status_st,copy_buffer,black,bnc,slc,reset,
-                saved_txt,ch_T_SP,banner,getch,keys,select,codec,lnsep
+                saved_txt,indent,banner,getch,keys,select,codec,lnsep,comment
             )
             pointer,oldptr,line,offset,columns,banoff,arr,\
             rows,filename,status,status_st,copy_buffer,\
-            ch_T_SP,select,codec,lnsep = keys_func(*args)
+            indent,select,codec,lnsep,comment = keys_func(*args)
                          
         except: pass
 
