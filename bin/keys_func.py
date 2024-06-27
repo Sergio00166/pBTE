@@ -123,7 +123,7 @@ def keys_func(key,pointer,oldptr,line,offset,columns,banoff,arr,rows,
 
     else: #All the other keys
         args=(arr,key,select,pointer,line,offset,banoff,indent,rows,keys,codec)
-        arr, pointer, line, offset = get_str(*args)
+        arr, pointer, line, offset, select = get_str(*args)
         status_st = False
                 
     return pointer,oldptr,line,offset,columns,banoff,arr,rows,filename,\

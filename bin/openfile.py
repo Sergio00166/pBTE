@@ -147,7 +147,7 @@ def open_file(arg):
                     p1=openfile[:wrtptr-lenght]
                     p2=openfile[wrtptr-lenght:]
                     openfile=p1+out+p2
-                    wrtptr+=1
+                    wrtptr+=len(out)
                     complete=False
         except: pass
     

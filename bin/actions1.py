@@ -58,6 +58,7 @@ def cut(select,arr,line,offset,banoff,status_st,copy_buffer,pointer):
     else:
         copy_buffer=text[pointer-1:] 
         if pointer==1 or pointer==len(text):
+            if pos-banoff==len(arr)-1: line-=1
             arr.pop(pos-banoff)
         else:
             text=text[:pointer-1]

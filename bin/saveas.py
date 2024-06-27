@@ -151,7 +151,7 @@ def save_as(arg):
                     p1=filewrite[:wrtptr-lenght]
                     p2=filewrite[wrtptr-lenght:]
                     filewrite=p1+out+p2
-                    wrtptr+=1
+                    wrtptr+=len(out)
         except: pass
 
     return status_st, filename, status, codec, lnsep
