@@ -93,7 +93,7 @@ def goto(columns, rows, banoff, line, arr, offset, black):
     print("\033c", end="")
     return line, offset
 
-def chg_var_str(columns,rows,banoff,line,black,old,text="comment"):
+def chg_var_str(columns,rows,banoff,line,black,old,text):
     try:    
         print("\r\033[%d;%dH"%(rows+banoff+2,1),end="")
         print(black+(" "*(columns+2))+"\r", end="")
@@ -113,7 +113,7 @@ def newline(pointer,offset,banoff,line,arr,rows,status,select):
         seltext=[text[:pointer-fix]]
         arr=p1+seltext+p2
         text=text[pointer-fix:]
-        pointer=0
+        pointer=1
     else: arr=p1+[""]+p2
     if not line>rows: line+=1
     else: offset+=1

@@ -12,14 +12,15 @@ Due to limitations with msvcrt.getch() on windows to select (highlight) lines yo
 Requirements:<br>
 Python 3 (tested under python 3.12)<br>
 No dependencies<br>
-Windows, with UTF-8 mode<br> (tested under win11)
-Also now "works" under linux (tested under FEDORA and UBUNTU)
+Windows or Linux with UTF-8 keyboard <br>
+
 
 <br><h2>OPTIONS</h2>
 <br>*NORMAL*<br>
 ^Q QUIT | ^S SAVE | ^A Save as | ^O OPEN | ^C COPY | ^X CUT | ^P PASTE <br>
 ^G GOTO | ^D DEDENT | ^I INDENT | ^K COMMENT | ^U UNCOMMENT <br>
-F1 change indent str | F2 change comment str <br>
+F1 change indent str | F2 change start comment str <br>
+F3 change end comment str<br>
 <br>*Open file menu*<br>
 ^Q CANCEL | ^O OPEN  | ^N NEW FILE <br>
 <br>*Save as menu*<br>

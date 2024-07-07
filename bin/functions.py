@@ -5,18 +5,35 @@ from sys import path
 path.append(path[0]+sep+"lib.zip")
 from wcwidth import wcwidth
 
-ascii_map = { 0x00: '␀',  0x01: '␁',  0x02: '␂', 0x03: '␃', 0x04: '␄', 0x05: '␅', 0x06: '␆', 0x07: '␇',
-              0x08: '␈',  0x0A: '␊',  0x0B: '␋', 0x0C: '␌', 0x0D: '␍', 0x0E: '␎', 0x0F: '␏', 0x10: '␐',
-              0x11: '␑',  0x12: '␒',  0x13: '␓', 0x14: '␔', 0x15: '␕', 0x16: '␖', 0x17: '␗', 0x18: '␘',
-              0x19: '␙',  0x1A: '␚',  0x1B: '␛', 0x1C: '␜', 0x1D: '␝', 0x1E: '␞', 0x1F: '␟', 0x7F: '␡'
+ascii_map = { 0x00: '␀', 0x01: '␁', 0x02: '␂', 0x03: '␃', 0x04: '␄', 0x05: '␅', 0x06: '␆',
+              0x07: '␇', 0x08: '␈', 0x0A: '␊', 0x0B: '␋', 0x0C: '␌', 0x0D: '␍', 0x0E: '␎',
+              0x0F: '␏', 0x10: '␐', 0x11: '␑', 0x12: '␒', 0x13: '␓', 0x14: '␔', 0x15: '␕',
+              0x16: '␖', 0x17: '␗', 0x18: '␘', 0x19: '␙', 0x1A: '␚', 0x1B: '␛', 0x1C: '␜',
+              0x1D: '␝', 0x1E: '␞', 0x1F: '␟', 0x7F: '␡'
             }
-
 ascii_replaced = [ascii_map[x] for x in ascii_map]+[">","<","�"]
+
+
+def expandtabs(self, tabsize=8):
+    result,col = [], 0
+    for char in self:
+        if char == '\t':
+            space_count = tabsize - (col % tabsize)
+            result.append(' ' * space_count)
+            col += space_count
+        else:
+            result.append(char)
+            char_width = wcwidth(char)
+            if char_width > 0:
+                col += char_width
+            else: col += 1
+    return ''.join(result)
+
 
 # Now it seems to work
 def wrap(text, columns):
     out,buffer,counter = [],"",-1
-    text=text.expandtabs(8)
+    text=expandtabs(text)
     for x in text:
         lenght=str_len(fscp(x))
         if counter+lenght>columns:
@@ -47,7 +64,7 @@ def str_len(text,pointer=None):
     if not pointer==None:
         fix=text[:pointer-1]
     else: fix=text
-    fix=fix.expandtabs(8)
+    fix=expandtabs(fix)
     for x in fix: lenght+=wcwidth(x)
     return lenght
 
@@ -97,7 +114,7 @@ def scr_arr2str(arr,line,offset,pointer,black,reset,columns,rows,banoff):
 def sscp(arg,color):
     global ascii_map
     b, r = color; ext = []
-    arg=arg.expandtabs(8)
+    arg=expandtabs(arg)
     for x in arg:
         if ord(x) in ascii_map:
             ext.append(b+ascii_map[ord(x)]+r)

@@ -49,18 +49,26 @@ def del_sel(select, arr, banoff):
     line=select[0][0]+banoff; offset=select[0][1]
     select=[]; arr=p1+p2
     # Fix when selection is on bottom
-    if line+offset-banoff>len(arr)-1: line-=1
+    if line>banoff and line+offset-banoff>len(arr)-1: line-=1
     return select, arr, line, offset
 
-def select_add_start_str(arr,line,offset,select,str,remove=False):
+def select_add_start_str(arr,line,offset,select,text,remove=False):
     # Get the values from select
     start=sum(select[0]); end=sum(select[1])
     # Get the text that is upper and below the selected region
     p0=arr[:start]; p2=arr[end:]
     # Get the text that is selected
     p1=arr[start:end]
-    if not remove: p1=[str+x for x in p1]
-    else: p1 = [x[len(str):] if x.startswith(str) else x for x in p1] 
+    if isinstance(text, list):
+        if not remove: p1=[text[0]+x+text[1] for x in p1]
+        else:
+            p1 = [x[len(text[0]):-len(text[1])]
+                  if x.startswith(text[0]) and x.endswith(text[1])
+                  else x for x in p1]
+    else:
+        if not remove: p1=[text+x for x in p1]
+        else: p1 = [x[len(text):] if x.startswith(text) else x for x in p1]
+    
     # Now reconstruct all arr
     return p0+p1+p2
 

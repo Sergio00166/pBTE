@@ -46,10 +46,6 @@ if __name__=="__main__":
         try:
             # Fix arr when empty
             if len(arr)==0: arr=[""]
-            # Fix for the pointer variable
-            lenght=len(arr[line+offset-banoff])+1
-            if pointer==0: pointer=1
-            elif pointer>lenght: pointer=lenght   
             # If status flag is 0 set save text to blank
             if status_st==0: status=saved_df 
             # Get the terminal size
@@ -77,6 +73,7 @@ if __name__=="__main__":
             indent,select,codec,lnsep,comment = keys_func(*args)
                          
         except: pass
+
 
     # Clear and reset the terminal
     if not sep==chr(92):

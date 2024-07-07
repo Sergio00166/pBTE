@@ -99,7 +99,8 @@ def keys_func(key,pointer,oldptr,line,offset,columns,banoff,arr,rows,
         arr,filename,status_st,pointer,oldptr,line,offset,select,codec,lnsep = open_file(args)
         
     elif key==keys["f1"]: indent = chg_var_str(columns,rows,banoff,line,bnc,indent,"indent") 
-    elif key==keys["f2"]: comment = chg_var_str(columns,rows,banoff,line,bnc,comment) 
+    elif key==keys["f2"]: comment[0] = chg_var_str(columns,rows,banoff,line,bnc,comment[0],"comment")
+    elif key==keys["f3"]: comment[1] = chg_var_str(columns,rows,banoff,line,bnc,comment[1],"end cmt") 
 
     elif key==keys["ctrl+d"]:
         if len(select)>0:
@@ -110,15 +111,16 @@ def keys_func(key,pointer,oldptr,line,offset,columns,banoff,arr,rows,
         if len(select)>0: slt = select
         else:
             slt = [[line-banoff,offset],[line,offset]]
-            pointer += len(comment)
+            pointer += len(comment[0])
         arr = select_add_start_str(arr,line,offset,slt,comment)
     
     elif key==keys["ctrl+u"]:    
         if len(select)>0: slt = select
         else: 
             slt = [[line-banoff,offset],[line,offset]]
-            if arr[line+offset-banoff].startswith(comment):
-                pointer -= len(comment)
+            x = arr[line+offset-banoff]
+            if x.startswith(comment[0]) and x.endswith(comment[1]):
+                pointer -= len(comment[0])
         arr = select_add_start_str(arr,line,offset,slt,comment,True)
 
     else: #All the other keys

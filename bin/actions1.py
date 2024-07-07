@@ -47,18 +47,15 @@ def cut(select,arr,line,offset,banoff,status_st,copy_buffer,pointer):
     pos = line+offset
     text=arr[pos-banoff]
     if not len(select)==0:
-        p1=arr[:sum(select[0])]
-        p2=arr[sum(select[1]):]
         start=sum(select[0])-1
         if start<0: start=0
         copy_buffer=arr[start:sum(select[1])]
         if not start==0: copy_buffer=copy_buffer[1:]
         line=select[0][0]+banoff; offset=select[0][1]
-        select = []; arr = p1 + p2
+        select,arr,line,offset = del_sel(select,arr,banoff)
     else:
-        copy_buffer=text[pointer-1:] 
+        copy_buffer=text[pointer-1:]
         if pointer==1 or pointer==len(text):
-            if pos-banoff==len(arr)-1: line-=1
             arr.pop(pos-banoff)
         else:
             text=text[:pointer-1]
