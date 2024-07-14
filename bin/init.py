@@ -1,6 +1,6 @@
 #Code by Sergio1260
 
-version="v0.5.8.6"
+version="v0.5.8.9"
      
 if not __name__=="__main__":
 
@@ -27,33 +27,31 @@ if not __name__=="__main__":
     slc=Back.LIGHTYELLOW_EX+Fore.BLUE+Style.BRIGHT
     deinit(); del init, Fore, Back, Style, deinit
 
-    if not sep==chr(92): #If OS is LINUX
+    if sep==chr(92):
+        from msvcrt import getch\
+             as gch, kbhit
+        
+        def getch():
+            out = gch()
+            while kbhit(): out+=gch()
+            return out
+    else:
         #Get default values for TTY
         from termios import TCSADRAIN,tcsetattr,tcgetattr
         from sys import stdin; from tty import setraw
+        from select import select as slsl
         fd = stdin.fileno(); old_settings = tcgetattr(fd)
-
-    if sep==chr(92):
-
-        from msvcrt import getch as getchar, kbhit
-
-        def getch():
-            out,count = [getchar()],0
-            while kbhit():
-                out.append(getchar())
-                count+=1
-                if count==8: break
-            return b''.join(out)
-
-    else: # Linux
 
         def getch():
             old=(fd,TCSADRAIN,old_settings)
             setraw(fd,when=TCSADRAIN)
-            try: out=read(fd,8)
-            except KeyboardInterrupt:
-                 out=b'\x03'
-            finally: tcsetattr(*old)
+            out,rlist = b'',True
+            while rlist:
+                out += read(fd,8)
+                # Check if available data
+                rlist = slsl([fd],[],[],0)[0]
+            # Set TTY to default
+            tcsetattr(*old)
             return out
 
 

@@ -56,7 +56,6 @@ def keys_func(key,pointer,oldptr,line,offset,columns,banoff,arr,rows,
         args=(line,offset,banoff,rows,arr,sep,pointer,oldptr,select,fix)
         line,offset,pointer,oldptr,select = avpag(*args)
             
-
     elif key==keys["delete"]:
         args=(pointer,offset,line,arr,banoff,select)
         line,offset,arr,pointer,select = backspace(*args)
@@ -81,7 +80,7 @@ def keys_func(key,pointer,oldptr,line,offset,columns,banoff,arr,rows,
         copy_buffer = copy(*args)
         
     elif key==keys["ctrl+p"]:
-        args=(copy_buffer,arr,line,offset,banoff,pointer,status_st,select)
+        args=(copy_buffer,arr,line,offset,banoff,pointer,status_st,select,rows)
         pointer,arr,status_st,copy_buffer,line,offset,select = paste(*args)
             
     elif key==keys["ctrl+g"]:
@@ -124,7 +123,7 @@ def keys_func(key,pointer,oldptr,line,offset,columns,banoff,arr,rows,
         arr = select_add_start_str(arr,line,offset,slt,comment,True)
 
     else: #All the other keys
-        args=(arr,key,select,pointer,line,offset,banoff,indent,rows,keys,codec)
+        args=(arr,key,select,pointer,line,offset,banoff,indent,rows,keys)
         arr, pointer, line, offset, select = get_str(*args)
         status_st = False
                 

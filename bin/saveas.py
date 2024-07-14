@@ -98,7 +98,7 @@ def save_as(arg):
                 else: status,filename = saved_txt,filewrite
                 exit(); break
                 
-            elif key==keys["ctrl+q"]: exit(); break
+            elif key==keys["ctrl+c"]: exit(); break
         
             elif key==keys["delete"]:
                 if not wrtptr==lenght:

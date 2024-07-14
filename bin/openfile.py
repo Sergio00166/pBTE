@@ -98,7 +98,7 @@ def open_file(arg):
                 pointer,offset,oldptr = 1,0,1
                 exit(); break
                 
-            elif key==keys["ctrl+q"]: exit(); break
+            elif key==keys["ctrl+c"]: exit(); break
         
             elif key==keys["delete"]:
                 if not wrtptr==lenght:

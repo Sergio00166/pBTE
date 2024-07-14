@@ -48,6 +48,7 @@ def wrap(text, columns):
 def fix_arr_line_len(arr, columns, black, reset):
     out=[]; fix=0//(columns+2)
     for text in arr:
+        text = text[:columns+2]
         wrapped_text = wrap(text,columns)
         if len(wrapped_text)==0: wrapped_text=""
         elif fix==len(wrapped_text):
@@ -70,6 +71,7 @@ def str_len(text,pointer=None):
 
 def fix_cursor_pos(text,pointer,columns,black,reset):
     len_arr=[]; ptr=pointer; pos=0
+    text = text[:pointer+columns+2]
     pointer=str_len(fscp(text),pointer)   
     wrapped_text = wrap(text,columns)  
     for x in wrapped_text:

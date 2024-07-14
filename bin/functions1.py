@@ -6,6 +6,13 @@ from multiprocessing import cpu_count, Pool
 from re import split as resplit
 
 
+def calc_displacement(data,line,banoff,offset,rows,rect=0):
+    line += len(data)-rect
+    if line-banoff>rows:
+        offset+=line-rows-banoff
+        line=rows+banoff
+    return line,offset
+
 def get_size():
     size=get_terminal_size()
     return size[1]-2,size[0]-2
@@ -49,8 +56,11 @@ def del_sel(select, arr, banoff):
     line=select[0][0]+banoff; offset=select[0][1]
     select=[]; arr=p1+p2
     # Fix when selection is on bottom
-    if line>banoff and line+offset-banoff>len(arr)-1: line-=1
+    if line>banoff and line+offset-banoff>len(arr)-1:
+        if offset>0: offset-=1
+        else: line-=1
     return select, arr, line, offset
+
 
 def select_add_start_str(arr,line,offset,select,text,remove=False):
     # Get the values from select
@@ -62,9 +72,12 @@ def select_add_start_str(arr,line,offset,select,text,remove=False):
     if isinstance(text, list):
         if not remove: p1=[text[0]+x+text[1] for x in p1]
         else:
-            p1 = [x[len(text[0]):-len(text[1])]
-                  if x.startswith(text[0]) and x.endswith(text[1])
-                  else x for x in p1]
+            p1 = [
+                x[len(text[0]):] if len(text[1])==0 and x.startswith(text[0])
+                else x[len(text[0]):-len(text[1])]
+                if x.startswith(text[0]) and x.endswith(text[1])
+                else x for x in p1
+            ]
     else:
         if not remove: p1=[text+x for x in p1]
         else: p1 = [x[len(text):] if x.startswith(text) else x for x in p1]
@@ -72,29 +85,25 @@ def select_add_start_str(arr,line,offset,select,text,remove=False):
     # Now reconstruct all arr
     return p0+p1+p2
 
-def get_str(arr,key,select,pointer,line,offset,banoff,indent,rows,keys,codec):
+
+def get_str(arr,key,select,pointer,line,offset,banoff,indent,rows,keys):
     out,skip = decode(key),False
     if select:
-        if not out=="\t": 
-            select,arr,line,offset = del_sel(select,arr,banoff)
-            if not key in [keys["return"], keys["supr"]]:
-                arr.insert(line + offset - banoff, "")
-                select = []
+        if not out=="\t": select,arr,line,offset = del_sel(select,arr,banoff)
         else: arr,skip = select_add_start_str(arr,line,offset,select,indent),True
        
     if not skip:
         pos=line+offset-banoff; text=arr[pos]
         p1,p2 = text[:pointer-1], text[pointer-1:]
         out=out.replace("\t",indent)
-        out_lines = resplit(r'[\n\r]+',out)
-        arr[pos] = p1+out_lines[0]+p2
+        out_lines = resplit(r'[\n\r]',out)
+        if not select and len(out_lines)>1:
+            arr[pos] = p1+out_lines[0]
+        else: arr[pos] = p1+out_lines[0]+p2
         if len(out_lines) > 1:
+            if not select: out_lines[-1] += p2
             arr[pos+1:pos+1] = out_lines[1:]
-            # Calculate displacement
-            line+=len(out_lines)-1
-            if line>rows+1:
-                offset+=line-rows
-                line=rows
+            line,offset = calc_displacement(out_lines,line,banoff,offset,rows,1)
             pointer += len(out_lines[-1])
         else: pointer += len(out_lines[0])
 
