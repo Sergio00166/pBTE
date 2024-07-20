@@ -21,7 +21,7 @@ def supr(pointer,offset,banoff,arr,line,select):
         del_sel(select,arr,banoff)
     return arr, line, offset, select
 
-def paste(copy_buffer,arr,line,offset,banoff,pointer,status_st,select,rows):
+def paste(copy_buffer,arr,line,offset,banoff,pointer,select,rows,status_st):
     if not len(copy_buffer)==0:
         if len(select)==0:
             pos=line+offset-banoff; text=arr[pos]
@@ -45,12 +45,13 @@ def paste(copy_buffer,arr,line,offset,banoff,pointer,status_st,select,rows):
                 pointer = len(copy_buffer[-1])+1
             else:
                 arr=p1+[copy_buffer]+p2
-                pointer = len(copy_buffer)+1                
-    return pointer,arr,status_st,copy_buffer,line,offset,select
+                pointer = len(copy_buffer)+1
+        status_st = False
+    return pointer,arr,copy_buffer,line,offset,select,status_st
     
-def cut(select,arr,line,offset,banoff,status_st,copy_buffer,pointer):
+def cut(select,arr,line,offset,banoff,copy_buffer,pointer):
     pos = line+offset-banoff
-    text=arr[pos-banoff]
+    text=arr[pos]
     if not len(select)==0:
         start=sum(select[0])-1
         if start<0: start=0
@@ -69,7 +70,7 @@ def cut(select,arr,line,offset,banoff,status_st,copy_buffer,pointer):
             text=text[:pointer-1]
             arr[pos]=text           
     if isinstance(copy_buffer,list) and len(copy_buffer)==1:
-        copy_buffer = copy_buffer[0] 
+        copy_buffer = copy_buffer[0]
     return copy_buffer,arr,line,offset,select
 
 def copy(select,arr,line,offset,banoff,pointer):

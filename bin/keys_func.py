@@ -72,16 +72,17 @@ def keys_func(key,pointer,oldptr,line,offset,columns,banoff,arr,rows,
         status=saved_txt; status_st=True
         
     elif key==keys["ctrl+x"]:
-        args=(select,arr,line,offset,banoff,status_st,copy_buffer,pointer)
+        args=(select,arr,line,offset,banoff,copy_buffer,pointer)
         copy_buffer,arr,line,offset,select = cut(*args)
+        status_st = False
         
     elif key==keys["ctrl+c"]:
         args=(select,arr,line,offset,banoff,pointer)
         copy_buffer = copy(*args)
         
     elif key==keys["ctrl+p"]:
-        args=(copy_buffer,arr,line,offset,banoff,pointer,status_st,select,rows)
-        pointer,arr,status_st,copy_buffer,line,offset,select = paste(*args)
+        args=(copy_buffer,arr,line,offset,banoff,pointer,select,rows,status_st)
+        pointer,arr,copy_buffer,line,offset,select,status_st = paste(*args)
             
     elif key==keys["ctrl+g"]:
         args=(columns,rows,banoff,line,arr,offset,bnc)
