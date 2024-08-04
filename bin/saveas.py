@@ -1,4 +1,4 @@
-#Code by Sergio1260
+# Code by Sergio00166
 
 from functions1 import decode, get_size, read_UTF8
 from upd_scr import menu_updsrc

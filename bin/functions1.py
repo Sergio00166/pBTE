@@ -1,4 +1,4 @@
-#Code by Sergio1260
+# Code by Sergio00166
 
 from os import get_terminal_size,sep
 from os.path import split as psplit
@@ -51,15 +51,18 @@ def fixfilename(path, columns, length):
     return compacted_path
    
 
-def del_sel(select, arr, banoff):
-    p1=arr[:sum(select[0])]; p2=arr[sum(select[1]):]
-    line=select[0][0]+banoff; offset=select[0][1]
-    select=[]; arr=p1+p2
+def del_sel(select, arr, banoff, blank=False):
+    p1=arr[:sum(select[0])]
+    p2=arr[sum(select[1]):]
+    line=select[0][0]+banoff
+    offset=select[0][1]
+    if blank: arr=p1+[""]+p2
+    else: arr=p1+p2
     # Fix when selection is on bottom
     if line>banoff and line+offset-banoff>len(arr)-1:
         if offset>0: offset-=1
         else: line-=1
-    return select, arr, line, offset
+    return [], arr, line, offset
 
 
 def select_add_start_str(arr,line,offset,select,text,remove=False):
@@ -89,7 +92,7 @@ def select_add_start_str(arr,line,offset,select,text,remove=False):
 def get_str(arr,key,select,pointer,line,offset,banoff,indent,rows,keys):
     out,skip = decode(key),False
     if select:
-        if not out=="\t": select,arr,line,offset = del_sel(select,arr,banoff)
+        if not out=="\t": select,arr,line,offset = del_sel(select,arr,banoff,True)
         else: arr,skip = select_add_start_str(arr,line,offset,select,indent),True
        
     if not skip:
