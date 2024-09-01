@@ -14,36 +14,40 @@ ascii_map = { 0x00: '␀', 0x01: '␁', 0x02: '␂', 0x03: '␃', 0x04: '␄', 0
 ascii_replaced = [ascii_map[x] for x in ascii_map]+[">","<","�"]
 
 
-def expandtabs(self, tabsize=8):
-    result,col = [], 0
-    for char in self:
+# Expands tabulators and splits the text in parts and as
+# optional calculates the position and relative cursor
+def wrap(text, columns, tabsize=8, cursor=None):
+    buffer,counter,col = "", -1, 0
+    result,pos,ptr = [], 0, 0
+    extra = cursor!=None
+
+    def handle_char(char, char_width):
+        nonlocal buffer,counter,col,result,ptr,pos
+        if counter + char_width > columns:
+            result.append(buffer)
+            if ptr-counter>0:
+                ptr -= counter
+                pos += 1
+            buffer, counter = char, char_width
+        else:
+            buffer += char
+            counter += char_width
+        col += char_width
+
+    for p,char in enumerate(text):
         if char == '\t':
             space_count = tabsize - (col % tabsize)
-            result.append(' ' * space_count)
-            col += space_count
+            expanded = ' ' * space_count
+            if extra and cursor>p: ptr += space_count
+            for x in expanded: handle_char(x, 1)
         else:
-            result.append(char)
-            char_width = wcwidth(char)
-            if char_width > 0:
-                col += char_width
-            else: col += 1
-    return ''.join(result)
+            char_width = wcwidth(char) if wcwidth(char) > 0 else 1
+            if extra and cursor>p: ptr += char_width
+            handle_char(char, char_width)
 
+    if buffer: result.append(buffer)
+    return (result,ptr,pos) if not cursor==None else (result)
 
-# Now it seems to work
-def wrap(text, columns):
-    out,buffer,counter = [],"",-1
-    text=expandtabs(text)
-    for x in text:
-        lenght=str_len(fscp(x))
-        if counter+lenght>columns:
-            out.append(buffer)
-            buffer,counter = x,lenght
-        else:
-            buffer+=x
-            counter+=lenght
-    out.append(buffer)
-    return out
 
 def fix_arr_line_len(arr, columns, black, reset):
     out=[]; fix=0//(columns+2)
@@ -60,25 +64,27 @@ def fix_arr_line_len(arr, columns, black, reset):
         out.append(text)   
     return out
 
-def str_len(text,pointer=None):
-    lenght=0
-    if not pointer==None:
-        fix=text[:pointer-1]
-    else: fix=text
-    fix=expandtabs(fix)
-    for x in fix: lenght+=wcwidth(x)
-    return lenght
+# Expands tabs and gets real string length
+def str_len(self, tabsize=8):
+    result,col,length = [],0,0
+    for char in self:
+        if char == '\t':
+            space_count = tabsize - (col % tabsize)
+            result.append(' ' * space_count)
+            length += space_count
+            col += space_count
+        else:
+            result.append(char)
+            char_width = wcwidth(char) if wcwidth(char) > 0 else 1
+            length += char_width
+    return length
 
-def fix_cursor_pos(text,pointer,columns,black,reset):
-    len_arr=[]; ptr=pointer; pos=0
-    text = text[:pointer+columns+2]
-    pointer=str_len(fscp(text),pointer)   
-    wrapped_text = wrap(text,columns)  
-    for x in wrapped_text:
-        if pointer-str_len(fscp(x))<1: break
-        else: pos+=1
-        pointer-=str_len(fscp(x))
-    if pos>0: pointer+=1
+
+def fix_cursor_pos(text,cursor,columns,black,reset):
+    text = text[:cursor+columns+2]
+    wrapped_text, cursor, pos =\
+    wrap(text,columns,cursor=cursor-1)
+
     if not len(wrapped_text)==0:
         if pos>len(wrapped_text)-1: pos=-1
         text=wrapped_text[pos]
@@ -91,48 +97,35 @@ def fix_cursor_pos(text,pointer,columns,black,reset):
             text+=black+">"+reset      
     else: text=""
                 
-    return pointer+1, text
+    return cursor+1, text
 
 
-def scr_arr2str(arr,line,offset,pointer,black,reset,columns,rows,banoff):
-    uptr=pointer; out_arr=[]; sp=black+"<"+reset
+def scr_arr2str(arr,line,offset,cursor,black,reset,columns,rows,banoff):
+    uptr=cursor; out_arr=[]; sp=black+"<"+reset
     text = arr[line+offset-banoff]
-    pointer, text = fix_cursor_pos(text,pointer,columns,black,reset)
+    cursor, text = fix_cursor_pos(text,cursor,columns,black,reset)
     arr = arr[offset:rows+offset+banoff]
     arr = fix_arr_line_len(arr,columns,black,reset)
     arr[line-banoff] = text
 
     for x in arr:
         ln=str_len(rscp(x,[black,reset],True))
-        if ln<(columns+2): x=x+(" "*(columns-ln+2))
-        out_arr.append(x)
+        out_arr.append(x+(" "*(columns-ln+2)))
     if not len(arr)==rows:
         out_arr+=[" "*(columns+2)]*(rows-len(arr)+1)
     
-    return "\n".join(out_arr), pointer
+    return "\n".join(out_arr), cursor
 
 
 # Replaces ascii control chars to the highlighted visual version
 def sscp(arg,color):
     global ascii_map
     b, r = color; ext = []
-    arg=expandtabs(arg)
     for x in arg:
         if ord(x) in ascii_map:
             ext.append(b+ascii_map[ord(x)]+r)
         elif str_len(x)>0: ext.append(x)
         else: ext.append(b+"�"+r)
-    return "".join(ext)
-
-# Changes visual ascii chars to space (to read the real screen len)
-def fscp(arg,null=False):
-    global ascii_map
-    r = "" if null else " "
-    ext = []
-    for x in arg:
-        if ord(x) in ascii_map: ext.append(r)
-        elif str_len(x)>0: ext.append(x)
-        else: ext.append(r)
     return "".join(ext)
 
 # Inverts the highlight (for the highlight selector)
