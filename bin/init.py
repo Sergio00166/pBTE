@@ -1,6 +1,6 @@
 # Code by Sergio00166
 
-version="v0.6.4.3"
+version="v0.6.5.0"
      
 if not __name__=="__main__":
 
@@ -15,6 +15,7 @@ if not __name__=="__main__":
     from threading import Thread
     from time import sleep as delay
     from glob import glob
+    from data import keys
 
     # Define colors
     init(autoreset=False,convert=True)
@@ -24,6 +25,7 @@ if not __name__=="__main__":
     slc=Back.LIGHTYELLOW_EX+Fore.BLUE+Style.BRIGHT
     deinit(); del init, Fore, Back, Style, deinit
 
+    # Create the raw kb reader
     if sep==chr(92):
         from msvcrt import getch\
              as gch, kbhit
@@ -85,29 +87,4 @@ if not __name__=="__main__":
     print("\033c", end="") # Clear the screen
     print("\033[1 q", end="") # Change cursor
 
-    # Here we have all the mapped scape codes for the keys and for Windows and Linux
-    if sep==chr(92):
-        
-        keys = {"delete":b'\x08',"return":b'\r',"ctrl+s":b'\x13',"ctrl+d":b'\x04',
-                "ctrl+n":b'\x0e',"ctrl+x":b'\x18',"ctrl+c":b'\x03',"ctrl+p":b'\x10',
-                "ctrl+g":b'\x07',"ctrl+a":b'\x01',"ctrl+o":b'\x0f',"f1":b'\x00;',
-                "f2":b'\x00<',"f3":b'\x00=',"ctrl+b":b'\x02',"ctrl+q":b'\x11',
-                "arr_up":b'\xe0H',"arr_down":b'\xe0P',"arr_right":b'\xe0M',"arr_left":b'\xe0K',
-                "supr":b'\xe0S',"start":b'\xe0G',"end":b'\xe0O',"repag":b'\xe0I',
-                "avpag":b'\xe0Q',"tab":b'\t',"insert":b'\xe0R',"ctrl+arr_up":b'\xe0\x8d',
-                "ctrl+arr_down":b'\xe0\x91',"ctrl+arr_left":b'\xe0s',"ctrl+arr_right":b'\xe0t',
-                "ctrl+repag":b'\xe0\x86', "ctrl+avpag":b'\xe0v',"ctrl+k":b'\x0b',
-                "ctrl+u":b'\x15',"ctrl+f":b'\x06',"f4":b'\x00>'}
-    else:
-        keys = {"delete":b'\x7f',"return":b'\r',"ctrl+s":b'\x13',"ctrl+d":b'\x04',
-                "ctrl+n":b'\x0e',"ctrl+x":b'\x18',"ctrl+c":b'\x03',"ctrl+p":b'\x10',
-                "ctrl+g":b'\x07',"ctrl+a":b'\x01',"ctrl+o":b'\x0f',"f1":b'\x1bOP',
-                "f2":b'\x1bOQ',"f3":b'\x1bOR',"ctrl+b":b'\x02',"ctrl+q":b'\x11',
-                "arr_up":b'\x1b[A',"arr_down":b'\x1b[B',"arr_right":b'\x1b[C',
-                "arr_left":b'\x1b[D',"supr":b'\x1b[3~',"start":b'\x1b[H',
-                "end":b'\x1b[F',"repag":b'\x1b[5~',"avpag":b'\x1b[6~',"tab":b'\t',
-                "insert":b'2',"ctrl+arr_up":b'\x1b[1;5A',"ctrl+arr_down":b'\x1b[1;5B',
-                "ctrl+arr_left":b'\x1b[1;5D',"ctrl+arr_right":b'\x1b[1;5C',
-                "ctrl+repag":b'\x1b[5;5~',"ctrl+avpag":b'\x1b[6;5~',"ctrl+k":b'\x0b',
-                "ctrl+u":b'\x15',"ctrl+f":b'\x06',"f4":b'\x1bOS'}
 
