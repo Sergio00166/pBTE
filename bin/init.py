@@ -1,16 +1,22 @@
 # Code by Sergio00166
 
-version="v0.6.5.0"
+version="v0.6.6.3"
      
 if not __name__=="__main__":
 
-    from os import getcwd, sep, read
+    from os import getcwd, sep, read, environ
     from sys import argv, path
+
+    # Add all file structure
+    root = path[0]+sep+"bin"+sep
+    path.append(path[0]+sep+"lib.zip")
+    path.append(root+"core")
+    path.append(root+"menus")
+    
     from os.path import abspath, isdir
     from functions1 import get_size,read_UTF8
     from upd_scr import update_scr
     from keys_func import keys_func
-    path.append(path[0]+sep+"lib.zip")
     from colorama import init, Fore, Back, Style, deinit
     from threading import Thread
     from time import sleep as delay

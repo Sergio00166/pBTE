@@ -122,5 +122,6 @@ def menu_updsrc(arg,mode=None,updo=False):
             ln=str_len(rscp(out,[slc,reset+bnc],True))
             out += " "*(columns-ln+2)
             # Print the whole screen and move cursor
-            print(menu+bnc+out+movcr%(rows+2,wrtptr))          
+            menu = hcr+menu+bnc+out+scr
+            print(menu+movcr%(rows+2,wrtptr))
     return rows,columns

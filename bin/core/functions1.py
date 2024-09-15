@@ -4,7 +4,7 @@ from os import get_terminal_size,sep
 from os.path import split as psplit
 from multiprocessing import cpu_count, Pool
 from re import split as resplit
-from data import ascii_map
+from data import ascii_no_lfcr
         
 
 def calc_displacement(data,line,banoff,offset,rows,rect=0):
@@ -20,8 +20,9 @@ def get_size():
 
 def decode(key):
     out = key.decode("UTF-8")
-    for x in ascii_map:
-        if chr(x) in out: return ""
+    for x in ascii_no_lfcr:
+        if chr(x) in out:
+            return ""
     return out
 
 def fixlenline(text,cursor,oldptr):

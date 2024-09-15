@@ -20,7 +20,7 @@ def updscr_thr():
                 if line>rows: offset=offset+(line-rows); line=rows	
                 # If OS is LINUX restore TTY to it default values
                 if not sep==chr(92): tcsetattr(fd, TCSADRAIN, old_settings)
-                print("\r\033[3J",end="") # Clear previous content
+                print("\r\033[3J") # Clear previous content
                 # Call screen updater function
                 update_scr(black,bnc,slc,reset,status,banoff,offset,line,cursor,\
                            arr,banner,filename,rows,columns,status_st,False,select)
@@ -77,4 +77,4 @@ if __name__=="__main__":
     # Clear and reset the terminal
     if not sep==chr(92):
         print("\x1b[H\x1b[2J\x1b[3J")
-    print("\r\033c"+"\033[0 q",end="")
+    print("\r\033c"+"\033[0 q")

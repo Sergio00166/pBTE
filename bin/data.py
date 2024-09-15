@@ -40,6 +40,8 @@ ascii_map = {
 }
 # Create a map with all the graphical symbols
 ascii_replaced = [ascii_map[x] for x in ascii_map]+[">","<","�"]
+# Create a map without LF and CR
+ascii_no_lfcr = [x for x in ascii_map if chr(x) not in ["\n", "\r"]]
 
 # Here we have all the mapped scape codes for the keys
 if sep == chr(92):  # Windows
@@ -81,6 +83,7 @@ if sep == chr(92):  # Windows
         "ctrl+u": b'\x15',
         "ctrl+f": b'\x06',
         "f4": b'\x00>',
+        "ctrl+r":b'\x12',
     }
 else:  # Linux
     keys = {
@@ -121,6 +124,5 @@ else:  # Linux
         "ctrl+u": b'\x15',
         "ctrl+f": b'\x06',
         "f4": b'\x1bOS',
+        "ctrl+r": b'\x12',
     }
-
-
