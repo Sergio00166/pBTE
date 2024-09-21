@@ -1,6 +1,6 @@
 # Code by Sergio00166
 
-version="v0.6.6.3"
+version="v0.6.6.7"
      
 if not __name__=="__main__":
 
@@ -60,24 +60,27 @@ if not __name__=="__main__":
             return out
 
 
-    #Check if we have arguments via cli, if not create an empty one
+    # Check if we have arguments via cli, if not create an empty one
+    filename = getcwd()+sep+"NewFile"
+    # Fix when current dir is root
+    if filename.startswith("//"):
+        filename = filename[1:]
+    arr,codec,lnsep = [""],"UTF-8","\n"
     if not len(argv)==1:
-        files=[glob(x,recursive=False) for x in argv[1:]]
-        files=[abspath(i) for x in files for i in x if not isdir(i)]
-        if len(files)>0: 
-            arr,codec,lnsep = read_UTF8(files[0])
-            filename=files[0]; files=files[1:]
-            files = [x.replace(sep,"/") for x in files]
-        else:
-            filename=getcwd()+sep+"NewFile"
-            arr,files = [""],[]   
-            codec,lnsep = "UTF-8","\n" 
-    else:
-        filename=getcwd()+sep+"NewFile"
-        arr,files = [""],[]   
-        codec,lnsep = "UTF-8","\n"
+        files = [glob(x,recursive=False) for x in argv[1:]]
+        files = [abspath(i) for x in files for i in x if not isdir(i)]
+        files = [x.replace(sep,"/") for x in files]
+        if len(files)>0:
+            # Skip unopenable files
+            for _ in range(len(files)):
+                try:
+                    name,files = files[0],files[1:]
+                    arr,codec,lnsep = read_UTF8(name)
+                    filename = name
+                    break
+                except: pass
+    else: files=[]
 
-    filename = filename.replace(sep,"/")
 
     #Define a lot of stuff
     offset=oldptr=0
@@ -87,6 +90,7 @@ if not __name__=="__main__":
     end,start,indent = 1,0,"\t"
     comment = ["#",""]
     rows,columns=get_size()
+    filename = filename.replace(sep,"/")
 
     #Flag to show after saving the file
     saved_txt="SAVED"; status=saved_df=" "*5; status_st=False

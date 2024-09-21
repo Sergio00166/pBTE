@@ -153,5 +153,9 @@ def save_as(arg):
                     filewrite=p1+out+p2
                     wrtptr+=len(out)
         except: pass
-    
+
+    # Fix when current dir is root
+    if filename.startswith("//"):
+        filename = filename[1:]
+ 
     return status_st, filename, status, codec, lnsep

@@ -42,9 +42,9 @@ def keys_func(key,cursor,oldptr,line,offset,columns,banoff,arr,rows,
             cursor,oldptr,line,offset = left(*args)
         select=[]
         
-    elif key==keys["start"]: cursor,oldptr,select = 1,1,[]
+    elif key in keys["start"]: cursor,oldptr,select = 1,1,[]
         
-    elif key==keys["end"]:
+    elif key in keys["end"]:
         text=arr[line+offset-banoff]
         cursor = len(text)+1
         oldptr,select = cursor,[]
@@ -114,22 +114,22 @@ def keys_func(key,cursor,oldptr,line,offset,columns,banoff,arr,rows,
                 status,offset,line,banner,status_st,keys,read_key,cursor)
         cursor,line,offset,arr,status_st = replace(args)
         
-    elif key==keys["f1"]: indent = " "*4 if indent=="\t" else "\t"
-    
-    elif key==keys["f2"]:
+    elif key==keys["alt+d"]: indent = " "*4 if indent=="\t" else "\t"
+
+    elif key==keys["alt+k"]:
         args = (filename,black,bnc,slc,reset,rows,banoff,arr,columns,status,offset,line,\
-                banner,status_st,keys,cursor,select,read_key,comment[0]," Set comment: ")    
+                banner,status_st,keys,cursor,select,read_key,comment[0]," Set comment: ")
         comment[0] = chg_var_str(args)
-        
-    elif key==keys["f3"]:
+
+    elif key==keys["alt+u"]:
         args = (filename,black,bnc,slc,reset,rows,banoff,arr,columns,status,offset,line,\
-                banner,status_st,keys,cursor,select,read_key,comment[1]," Set end cmt: ")    
-        comment[0] = chg_var_str(args)
-        
-    elif key==keys["f4"]:
+                banner,status_st,keys,cursor,select,read_key,comment[1]," Set end cmt: ")
+        comment[1] = chg_var_str(args)
+
+    elif key==keys["alt+i"]:
         args = (filename,black,bnc,slc,reset,rows,banoff,arr,columns,status,offset,line,\
-                banner,status_st,keys,cursor,select,read_key,indent," Set indent: ")    
-        comment[0] = chg_var_str(args)
+                banner,status_st,keys,cursor,select,read_key,indent," Set indent: ")
+        indent = chg_var_str(args)
 
     elif key==keys["ctrl+d"]:
         if len(select)>0:

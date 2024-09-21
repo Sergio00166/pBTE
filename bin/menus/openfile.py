@@ -150,5 +150,9 @@ def open_file(arg):
                     wrtptr+=len(out)
                     complete=False
         except: pass
+
+    # Fix when current dir is root
+    if filename.startswith("//"):
+        filename = filename[1:]
     
     return arr,filename,status_st,cursor,oldptr,line,offset,select,codec,lnsep
