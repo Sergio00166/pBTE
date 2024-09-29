@@ -104,9 +104,9 @@ def chg_var_str(arg,kctlc_f=False):
                 p1.pop(wrtptr-length)
                 entered_str="".join(p1)
 
-            elif key==keys["start"]: wrtptr=length
+            elif key in keys["start"]: wrtptr=length
                 
-            elif key==keys["end"]: wrtptr=len(entered_str)+length
+            elif key in keys["end"]: wrtptr=len(entered_str)+length
             
             else: #Rest of keys
                 if wrtptr<((columns+2)*rows+1):

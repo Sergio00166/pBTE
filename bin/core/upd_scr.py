@@ -8,14 +8,14 @@ from os import sep
 
 # Some ANSII ctrl codes
 movcr = "\r\033[%d;%dH"
-cls = movcr%(1,1)
+cls = "\r\033[3J"
+cls += movcr%(1,1)
 scr = "\r\x1b[?25h"
 hcr = "\r\x1b[?25l"
 
 def print(text):
     stdout.write(text)
     stdout.flush()
-
 
 def update_scr(black,bnc,slc,reset,status,banoff,offset,line,cursor,arr,banner,\
                filename,rows,columns,status_st,rrw=False,select=[],hlg_str=""):

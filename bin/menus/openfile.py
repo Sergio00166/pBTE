@@ -131,9 +131,9 @@ def open_file(arg):
                     p1.pop(wrtptr-length)
                     openfile="".join(p1)
 
-            elif key==keys["start"]: wrtptr=length
+            elif key in keys["start"]: wrtptr=length
                 
-            elif key==keys["end"]: wrtptr=len(openfile)+length
+            elif key in keys["end"]: wrtptr=len(openfile)+length
             
             elif key==keys["ctrl+n"]:
                 cursor,oldptr,offset,line = 1,1,0,1

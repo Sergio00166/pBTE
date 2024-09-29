@@ -130,9 +130,9 @@ def save_as(arg):
                     p1.pop(wrtptr-length)
                     filewrite="".join(p1)                   
 
-            elif key==keys["start"]: wrtptr=length
+            elif key in keys["start"]: wrtptr=length
                 
-            elif key==keys["end"]: wrtptr=len(filewrite)+length
+            elif key in keys["end"]: wrtptr=len(filewrite)+length
          
             elif key==keys["return"]: pass
 

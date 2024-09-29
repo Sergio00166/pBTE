@@ -36,8 +36,8 @@ def CalcRelLine(p1,arr,offset,line,banoff,rows):
     try: p1 = len(arr)-1 if p1=="-" else int(p1)
     except: return line, offset
     if p1<len(arr):
-        part,fix = (rows//2),(rows%2)
-        line,offset = part+fix,p1-part
+        part = (rows//2)
+        line,offset = part,p1-part
         if offset<0: offset,line = 0,p1
         line += banoff
     return line, offset
