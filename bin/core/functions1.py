@@ -104,7 +104,7 @@ def get_str(arr,key,select,cursor,line,offset,banoff,indent,rows,keys):
             if not select: out_lines[-1] += p2
             arr[pos+1:pos+1] = out_lines[1:]
             line,offset = calc_displacement(out_lines,line,banoff,offset,rows,1)
-            cursor += len(out_lines[-1])
+            cursor = len(out_lines[-1])+1
         else: cursor += len(out_lines[0])
     return arr, cursor, line, offset, select
 
