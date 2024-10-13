@@ -25,10 +25,10 @@ def update_scr(black,bnc,slc,reset,status,banoff,offset,line,cursor,arr,banner,\
     status= (" "+banner[1] if not status_st else "  "+status)
     outb=position+" "+banner[0]+status+"    "
     # Check if the space for the filename is too small
-    length = columns-len(outb); small = length<24
-    if small: outb,fix,length = "",1,columns
+    lenght = columns-len(outb); small = lenght<24
+    if small: outb,fix,lenght = "",1,columns
     # Fix the filename string to fit in the space
-    filename = fixfilename(filename,length)
+    filename = fixfilename(filename,lenght)
     # Use the fucking UNIX path separator
     filename = filename.replace(sep,"/")
     # Calculate blank space of necessary
@@ -59,18 +59,18 @@ def update_scr(black,bnc,slc,reset,status,banoff,offset,line,cursor,arr,banner,\
         # Get the text that is selected
         p1=all_file[start:end]; out=[]
         # Get the len of the higligh ascii code
-        length=len(black+"*"+reset)
+        lenght=len(black+"*"+reset)
         # For each line of p1
         for x in p1:
             x=rscp(x,[black,reset,slc])
             # Checks if the line rendered continues to the right
             # (having the flag that marks that)
             if x.endswith(black+">"+reset):
-                out.append(x[:-length]+reset+">"+black)
+                out.append(x[:-lenght]+reset+">"+black)
             # Checks if the line rendered continues to the left
             # (having the flag that marks that)
             elif x.startswith(black+"<"+reset):
-                out.append(x[:-length]+reset+"<"+black)
+                out.append(x[:-lenght]+reset+"<"+black)
             # If none of the above simply add is to out dic
             else: out.append(x)
         # Create a string from the list
@@ -110,7 +110,7 @@ def menu_updsrc(arg,mode=None,updo=False):
         if not updo: print("\r\033[3J") # Clear previous content
         if not mode==None or updo:
             # Set some vars
-            filetext,opentxt,wrtptr,length = mode
+            filetext,opentxt,wrtptr,lenght = mode
             out=opentxt+filetext
             # Get raw screen updated
             menu = update_scr(black,bnc,slc,reset,status,banoff,offset,\

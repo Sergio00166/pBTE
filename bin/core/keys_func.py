@@ -1,5 +1,7 @@
 # Code by Sergio00166
 
+from functions1 import cmt_w_ind
+from functions import str_len
 from actions import *
 from actions1 import *
 from saveas import save_as
@@ -7,6 +9,8 @@ from openfile import open_file
 from find_str import find
 from replace_str import replace
 from chg_var_str import chg_var_str
+from opt_menu import opt_menu
+from show_help import show_help
 
 
 def keys_func(key,cursor,oldptr,line,offset,columns,banoff,arr,rows,
@@ -112,24 +116,7 @@ def keys_func(key,cursor,oldptr,line,offset,columns,banoff,arr,rows,
     elif key==keys["ctrl+r"]:
         args = (filename,black,bnc,slc,reset,rows,banoff,arr,columns,\
                 status,offset,line,banner,status_st,keys,read_key,cursor)
-        cursor,line,offset,arr,status_st = replace(args)
-        
-    elif key==keys["alt+d"]: indent = " "*4 if indent=="\t" else "\t"
-
-    elif key==keys["alt+k"]:
-        args = (filename,black,bnc,slc,reset,rows,banoff,arr,columns,status,offset,line,\
-                banner,status_st,keys,cursor,select,read_key,comment[0]," Set comment: ")
-        comment[0] = chg_var_str(args)
-
-    elif key==keys["alt+u"]:
-        args = (filename,black,bnc,slc,reset,rows,banoff,arr,columns,status,offset,line,\
-                banner,status_st,keys,cursor,select,read_key,comment[1]," Set end cmt: ")
-        comment[1] = chg_var_str(args)
-
-    elif key==keys["alt+i"]:
-        args = (filename,black,bnc,slc,reset,rows,banoff,arr,columns,status,offset,line,\
-                banner,status_st,keys,cursor,select,read_key,indent," Set indent: ")
-        indent = chg_var_str(args)
+        cursor,line,offset,arr,status_st = replace(args)  
 
     elif key==keys["ctrl+d"]:
         if len(select)>0:
@@ -137,20 +124,22 @@ def keys_func(key,cursor,oldptr,line,offset,columns,banoff,arr,rows,
         else: arr,cursor = dedent(arr,line,offset,banoff,indent,cursor)
     
     elif key==keys["ctrl+k"]:
-        if len(select)>0: slt = select
-        else:
-            slt = [[line-banoff,offset],[line,offset]]
-            cursor += len(comment[0])
-        arr = select_add_start_str(arr,line,offset,slt,comment)
-    
-    elif key==keys["ctrl+u"]:    
-        if len(select)>0: slt = select
-        else: 
-            slt = [[line-banoff,offset],[line,offset]]
-            x = arr[line+offset-banoff]
-            if x.startswith(comment[0]) and x.endswith(comment[1]):
-                cursor -= len(comment[0])
-        arr = select_add_start_str(arr,line,offset,slt,comment,True)
+        arr,cursor = comment_func(arr,line,offset,banoff,select,comment,cursor,indent)
+
+    elif key==keys["ctrl+u"]:
+        arr,cursor = uncomment_func(arr,line,offset,banoff,select,comment,cursor,indent)
+        
+    elif key==keys["ctrl+t"]:
+        args = (filename,black,bnc,slc,reset,rows,banoff,arr,columns,status,offset,\
+                line,banner,status_st,keys,cursor,select,read_key,comment,indent)
+        comment,indent = opt_menu(args)
+
+    elif key==keys["help"]:
+        text = "^Q [Quit], ^T [Change vars], ^S [Save], ^A [Save as], ^O [Open], ^C [Copy], ^X [Cut], ^P [Paste]"
+        text += ", ^G [GOTO], ^D [Dedent], ^I [Ident], ^K [Comment], ^U [Uncomment], ^F [Find], ^R [Replace]"
+        args = (filename,black,bnc,slc,reset,rows,banoff,arr,columns,\
+                status,offset,line,banner,status_st,keys,read_key,text)
+        show_help(args)
 
     else: #All the other keys
         args=(arr,key,select,cursor,line,offset,banoff,indent,rows,keys)

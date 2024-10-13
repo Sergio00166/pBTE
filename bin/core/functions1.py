@@ -18,6 +18,11 @@ def get_size():
     size=get_terminal_size()
     return size[1]-2,size[0]-2
 
+def cmt_w_ind(string, sepstr):
+    pos,lenght = 0,len(sepstr)
+    while string.startswith(sepstr,pos): pos+=lenght
+    return string[:pos], string[pos:]
+
 def decode(key):
     out = key.decode("UTF-8")
     for x in ascii_no_lfcr:
@@ -26,9 +31,9 @@ def decode(key):
     return out
 
 def fixlenline(text,cursor,oldptr):
-    length=len(text)+1
-    if cursor>length or oldptr>length:
-        return length
+    lenght=len(text)+1
+    if cursor>lenght or oldptr>lenght:
+        return lenght
     elif oldptr>cursor: return oldptr
     else: return cursor
 
@@ -55,14 +60,14 @@ def del_sel(select, arr, banoff, blank=False):
         else: line-=1
     return [], arr, line, offset
 
-def fixfilename(path, length):
-    if len(path) <= length: return path
+def fixfilename(path, lenght):
+    if len(path) <= lenght: return path
     dirname, basename = psplit(path)
-    if len(path) <= length: return path
-    available_length = length - len(basename) - 1
-    if available_length <= 0: return basename[:length - 1]+'*'
+    if len(path) <= lenght: return path
+    available_lenght = lenght - len(basename) - 1
+    if available_lenght <= 0: return basename[:lenght - 1]+'*'
     parts = dirname.split(sep)
-    while len(parts) > 0 and len(sep.join(parts)) > available_length: parts.pop(0)
+    while len(parts) > 0 and len(sep.join(parts)) > available_lenght: parts.pop(0)
     if len(parts) == 0: compacted_path=basename
     else: compacted_path = sep.join(parts)+sep+basename
     return compacted_path

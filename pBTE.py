@@ -38,7 +38,8 @@ if __name__=="__main__":
     
     # Run the update Thread
     update_thr=Thread(target=updscr_thr)
-    run_thread=True; kill=False
+    run_thread,kill = True,False
+    update_thr.daemon = True
     update_thr.start()
     
     while True:
@@ -84,3 +85,5 @@ if __name__=="__main__":
     if not sep==chr(92):
         print("\x1b[H\x1b[2J\x1b[3J")
     print("\r\033c"+"\033[0 q")
+    exit(0) # Kill itself
+

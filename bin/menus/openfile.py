@@ -2,10 +2,12 @@
 
 from functions1 import decode, get_size, read_UTF8
 from upd_scr import menu_updsrc
-from threading import Thread
-from glob import glob
-from os import getcwd, sep
 from time import sleep as delay
+from show_help import show_help
+from threading import Thread
+from os import getcwd,sep
+from glob import glob
+
 
 if not sep==chr(92): #If OS is LINUX
     #Get default values for TTY
@@ -15,7 +17,7 @@ if not sep==chr(92): #If OS is LINUX
 
 def updscr_thr():
     global opentxt,openfile,rows,columns,black,reset,status,banoff
-    global length,wrtptr,offset,line,arr,banner,filename,rows,columns
+    global lenght,wrtptr,offset,line,arr,banner,filename,rows,columns
     global run, kill, fd, old_settings, status_st, bnc, slc
     
     while not kill:
@@ -26,7 +28,7 @@ def updscr_thr():
                 old=(fd,TCSADRAIN,old_settings)
                 tcsetattr(fd, TCSADRAIN, old_settings)
             # Call Screen updater
-            mode=(openfile,opentxt,wrtptr,length)
+            mode=(openfile,opentxt,wrtptr,lenght)
             arg=(black,bnc,slc,reset,status,banoff,offset,line,\
             wrtptr,arr,banner,filename,rows,columns,status_st)
             rows,columns = menu_updsrc(arg,mode)
@@ -41,21 +43,24 @@ def exit():
 
 def open_file(arg):
     global opentxt,openfile,rows,columns,black,reset,status,banoff
-    global length,wrtptr,offset,line,arr,banner,filename,rows,columns
+    global lenght,wrtptr,offset,line,arr,banner,filename,rows,columns
     global run, kill, fd, old_settings, thr, status_st, bnc, slc
 
     filename,black,bnc,slc,reset,rows,banoff,arr,columns,status,offset,\
     line,banner,status_st,keys,cursor,oldptr,select,read_key,codec,lnsep = arg
 
     openfile = "/".join(filename.split("/")[:-1])+"/"
-    opentxt=" Open: "; length=len(opentxt)+2; wrtptr=length+len(openfile)
-    thr=Thread(target=updscr_thr); run=False; kill=False; thr.start()
+    opentxt=" Open: "; lenght=len(opentxt)+2
+    wrtptr=lenght+len(openfile)
+    thr=Thread(target=updscr_thr)
+    run,kill = False,False
+    thr.daemon = True; thr.start()
     complete=False; cmp_counter=0
     
     while True:
         # Fix when the cursor is out
-        if len(openfile)<wrtptr-length:
-            wrtptr = len(openfile)+length
+        if len(openfile)<wrtptr-lenght:
+            wrtptr = len(openfile)+lenght
         try:
             # Force use LINUX dir separator
             openfile=openfile.replace(chr(92),"/")
@@ -64,7 +69,7 @@ def open_file(arg):
                 old=(fd,TCSADRAIN,old_settings)
                 tcsetattr(fd, TCSADRAIN, old_settings)
             # Call Screen updater
-            mode=(openfile,opentxt,wrtptr,length)
+            mode=(openfile,opentxt,wrtptr,lenght)
             arg=(black,bnc,slc,reset,status,banoff,offset,line,\
             wrtptr,arr,banner,filename,rows,columns,status_st)
             rows,columns = menu_updsrc(arg,mode,True)
@@ -97,12 +102,12 @@ def open_file(arg):
                 filename = openfile
                 status_st,line,select = False,1,[]
                 cursor,offset,oldptr = 1,0,1
-                exit(); break
+                break
                 
-            elif key==keys["ctrl+c"]: exit(); break
+            elif key==keys["ctrl+c"]: break
         
             elif key==keys["delete"]:
-                if not wrtptr==length:
+                if not wrtptr==lenght:
                     if complete:
                         openfile=openfile.split("/")[:-1]
                         openfile="/".join(openfile)+"/"
@@ -110,15 +115,15 @@ def open_file(arg):
                         complete=False
                     else: 
                         p1=list(openfile)
-                        p1.pop(wrtptr-length-1)
+                        p1.pop(wrtptr-lenght-1)
                         openfile="".join(p1)
                         wrtptr-=1
 
             elif key==keys["arr_left"]:
-                if not wrtptr==length: wrtptr-=1
+                if not wrtptr==lenght: wrtptr-=1
                 
             elif key==keys["arr_right"]:
-                if not wrtptr>len(openfile)+length-1: wrtptr+=1
+                if not wrtptr>len(openfile)+lenght-1: wrtptr+=1
                     
             elif key==keys["supr"]:
                 if complete:
@@ -128,31 +133,36 @@ def open_file(arg):
                     complete=False
                 else:
                     p1=list(openfile)
-                    p1.pop(wrtptr-length)
+                    p1.pop(wrtptr-lenght)
                     openfile="".join(p1)
 
-            elif key in keys["start"]: wrtptr=length
+            elif key in keys["start"]: wrtptr=lenght
                 
-            elif key in keys["end"]: wrtptr=len(openfile)+length
+            elif key in keys["end"]: wrtptr=len(openfile)+lenght
             
             elif key==keys["ctrl+n"]:
                 cursor,oldptr,offset,line = 1,1,0,1
                 arr,select,status_st = [""],[],False
                 filename=getcwd()+"/NewFile"
-                exit(); break
-            
+                break
+
+            elif key==keys["help"]:
+                text = "^C [Exit], ^O [Open], Tab/Ret [Navigate], ^N [New File]"
+                args = (filename,black,bnc,slc,reset,rows,banoff,arr,columns,\
+                        status,offset,line,banner,status_st,keys,read_key,text)
+                show_help(args)
+  
             else: #Rest of keys
                 if wrtptr<((columns+2)*rows+1):
                     out=decode(key)
-                    p1=openfile[:wrtptr-length]
-                    p2=openfile[wrtptr-length:]
+                    p1=openfile[:wrtptr-lenght]
+                    p2=openfile[wrtptr-lenght:]
                     openfile=p1+out+p2
                     wrtptr+=len(out)
                     complete=False
         except: pass
 
+    exit() # Reset
     # Fix when current dir is root
-    if filename.startswith("//"):
-        filename = filename[1:]
-    
+    if filename.startswith("//"): filename = filename[1:]
     return arr,filename,status_st,cursor,oldptr,line,offset,select,codec,lnsep

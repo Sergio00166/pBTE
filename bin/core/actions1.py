@@ -31,7 +31,39 @@ def paste(copy_buffer,arr,line,offset,banoff,cursor,select,rows,status_st):
                 cursor = len(copy_buffer)+1
         status_st = False
     return cursor,arr,copy_buffer,line,offset,select,status_st
-    
+
+
+def paste(copy_buffer, arr, line, offset, banoff, cursor, select, rows, status_st):
+    if not len(copy_buffer)==0:
+        if len(select)==0:
+            pos = line+offset-banoff
+            text = arr[pos]
+            p1,p2 = text[:cursor-1],text[cursor-1:]
+            if isinstance(copy_buffer,list):
+                arr[pos] = p1+copy_buffer[0]
+                for i, new_line in enumerate(copy_buffer[1:], start=1):
+                    arr.insert(pos+i,new_line)
+                arr[pos+len(copy_buffer)-1] += p2
+                line,offset = calc_displacement(copy_buffer[1:],line,banoff,offset,rows)
+                cursor = len(copy_buffer[-1])+1
+            else:
+                arr[pos] = p1+copy_buffer+p2
+                cursor += len(copy_buffer)
+        else:
+            start = sum(select[0])
+            select,arr,line,offset = del_sel(select, arr, banoff)
+            if isinstance(copy_buffer,list):
+                for i, new_line in enumerate(copy_buffer):
+                    arr.insert(start+i,new_line)
+                line,offset = calc_displacement(copy_buffer,line,banoff,offset,rows,1)
+                cursor = len(copy_buffer[-1])+1
+            else:
+                arr.insert(start,copy_buffer)
+                cursor = len(copy_buffer)+1
+        status_st = False
+    return cursor, arr, copy_buffer, line, offset, select, status_st
+
+
 def cut(select,arr,line,offset,banoff,copy_buffer,cursor):
     pos = line+offset-banoff
     text=arr[pos]

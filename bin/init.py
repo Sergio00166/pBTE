@@ -1,6 +1,6 @@
 # Code by Sergio00166
 
-version="v0.6.6.9"
+version="v0.6.8.1"
      
 if not __name__=="__main__":
 
@@ -93,7 +93,7 @@ if not __name__=="__main__":
     filename = filename.replace(sep,"/")
 
     #Flag to show after saving the file
-    saved_txt="SAVED"; status=saved_df=" "*5; status_st=False
+    saved_txt="SAVED"; status=saved_df=""; status_st=False
     print("\033c", end="") # Clear the screen
     print("\033[1 q", end="") # Change cursor
 
