@@ -1,9 +1,8 @@
 # Code by Sergio00166
 
-from functions1 import decode, get_size, read_UTF8
+from functions1 import decode, get_size, read_UTF8, taborspace
 from upd_scr import menu_updsrc
 from time import sleep as delay
-from show_help import show_help
 from threading import Thread
 from os import getcwd,sep
 from glob import glob
@@ -46,8 +45,8 @@ def open_file(arg):
     global lenght,wrtptr,offset,line,arr,banner,filename,rows,columns
     global run, kill, fd, old_settings, thr, status_st, bnc, slc
 
-    filename,black,bnc,slc,reset,rows,banoff,arr,columns,status,offset,\
-    line,banner,status_st,keys,cursor,oldptr,select,read_key,codec,lnsep = arg
+    filename,black,bnc,slc,reset,rows,banoff,arr,columns,status,offset,line,\
+    banner,status_st,keys,cursor,oldptr,select,read_key,codec,lnsep,indent = arg
 
     openfile = "/".join(filename.split("/")[:-1])+"/"
     opentxt=" Open: "; lenght=len(opentxt)+2
@@ -99,9 +98,9 @@ def open_file(arg):
             elif key==keys["ctrl+o"]:
                 openfile=glob(openfile, recursive=False)[0]
                 arr,codec,lnsep = read_UTF8(openfile)
-                filename = openfile
-                status_st,line,select = False,1,[]
-                cursor,offset,oldptr = 1,0,1
+                filename,status_st = openfile,False
+                cursor,offset,oldptr,line,select = 1,0,1,1,[]
+                indent = taborspace(arr)
                 break
                 
             elif key==keys["ctrl+c"]: break
@@ -145,12 +144,6 @@ def open_file(arg):
                 arr,select,status_st = [""],[],False
                 filename=getcwd()+"/NewFile"
                 break
-
-            elif key==keys["help"]:
-                text = "^C [Exit], ^O [Open], Tab/Ret [Navigate], ^N [New File]"
-                args = (filename,black,bnc,slc,reset,rows,banoff,arr,columns,\
-                        status,offset,line,banner,status_st,keys,read_key,text)
-                show_help(args)
   
             else: #Rest of keys
                 if wrtptr<((columns+2)*rows+1):
@@ -165,4 +158,4 @@ def open_file(arg):
     exit() # Reset
     # Fix when current dir is root
     if filename.startswith("//"): filename = filename[1:]
-    return arr,filename,status_st,cursor,oldptr,line,offset,select,codec,lnsep
+    return arr,filename,status_st,cursor,oldptr,line,offset,select,codec,lnsep,indent

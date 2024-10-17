@@ -1,6 +1,6 @@
 # Code by Sergio00166
 
-version="v0.6.8.1"
+version="v0.6.8.3"
      
 if not __name__=="__main__":
 
@@ -14,7 +14,7 @@ if not __name__=="__main__":
     path.append(root+"menus")
     
     from os.path import abspath, isdir
-    from functions1 import get_size,read_UTF8
+    from functions1 import get_size,read_UTF8,taborspace
     from upd_scr import update_scr
     from keys_func import keys_func
     from colorama import init, Fore, Back, Style, deinit
@@ -81,13 +81,13 @@ if not __name__=="__main__":
                 except: pass
     else: files=[]
 
-
     #Define a lot of stuff
+    indent = taborspace(arr)
     offset=oldptr=0
     cursor=line=banoff=1
     banner=["pBTE",version]
     copy_buffer,select = "",[]
-    end,start,indent = 1,0,"\t"
+    end,start = 1,0
     comment = ["#",""]
     rows,columns=get_size()
     filename = filename.replace(sep,"/")

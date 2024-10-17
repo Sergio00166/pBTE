@@ -102,10 +102,13 @@ def scr_arr2str(arr,line,offset,cursor,black,reset,columns,rows,banoff):
     arr = fix_arr_line_len(arr,columns,black,reset)
     arr[line-banoff] = text
 
+    # Fill the lines with empty spaces
     for x in arr:
         ln=str_len(rscp(x,[black,reset],True))
         out_arr.append(x+(" "*(columns-ln+2)))
-    if not len(arr)==rows:
+
+    # Add empty lines to fill it
+    if not len(arr)==rows-banoff:
         out_arr+=[" "*(columns+2)]*(rows-len(arr)+1)
     
     return "\n".join(out_arr), cursor

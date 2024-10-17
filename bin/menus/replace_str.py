@@ -4,7 +4,6 @@ from upd_scr import update_scr,movcr,hcr,print
 from functions1 import get_size,CalcRelLine
 from chg_var_str import chg_var_str
 from time import sleep as delay
-from show_help import show_help
 from functions import str_len
 from threading import Thread
 from os import sep
@@ -168,12 +167,6 @@ def replace(arg):
                     arr[p] = x.replace(find_str,replace_str)
                 status_st = False # Reset status value
                 break # Exit this menu program
-
-            elif key==keys["help"]:
-                text = "^C [Exit], <- [Previous], -> [Next], ^A [Replace All]"       
-                args = (filename,black,bnc,slc,reset,rows,banoff,arr,columns,\
-                        status,offset,line,banner,status_st,keys,read_key,text)
-                show_help(args)
 
         except: pass
 

@@ -97,19 +97,6 @@ def supr(cursor,offset,banoff,arr,line,select):
     else: select,arr,line,offset = del_sel(select,arr,banoff)
     return arr, line, offset, select
 
-def newline(cursor, offset, banoff, line, arr, rows, status, select):
-    if not len(select) == 0:
-        select,arr,line,offset = del_sel(select, arr, banoff)
-    text = arr[line+offset-banoff]
-    if not len(text) == 0:
-        arr.insert(line+offset-banoff,text[:cursor-1])  # Inserta la nueva línea
-        text = text[cursor-1:]; cursor = 1
-    else: arr.insert(line+offset-banoff, "")
-    if line>rows: offset += 1
-    else: line += 1
-    arr[line+offset-banoff] = text
-    return line, offset, arr, cursor, status, select
-
 def comment_func(arr,line,offset,banoff,select,comment,cursor,indent):
     orig = arr[line+offset-banoff]
     if not len(select)>0:

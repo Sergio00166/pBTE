@@ -47,7 +47,7 @@ if __name__=="__main__":
             # Fix arr when empty
             if len(arr)==0: arr=[""]
             # If status flag is 0 set save text to blank
-            if status_st==0: status=saved_df 
+            if status_st==0: status=saved_df
             # Get the terminal size
             rows,columns=get_size()
             # Call screen updater function
@@ -65,6 +65,7 @@ if __name__=="__main__":
                             arr,codec,lnsep = read_UTF8(name)
                             filename,status_st = name,False
                             cursor,line,offset = 1,1,0
+                            indent = taborspace(arr)
                             break
                         except: pass
                 else: kill=True; update_thr.join(); break

@@ -4,7 +4,6 @@ from upd_scr import update_scr,movcr,hcr,print
 from functions1 import get_size,CalcRelLine
 from chg_var_str import chg_var_str
 from time import sleep as delay
-from show_help import show_help
 from functions import str_len
 from threading import Thread
 from os import sep
@@ -148,12 +147,6 @@ def find(arg):
                 p1,cursor = search_substring_rev(arr,find_str,pos,cursor-1)
                 line,offset = CalcRelLine(p1,arr,offset,line,banoff,rows)
                 cursor += 1 # Cursor starts in 1 not 0
-
-            elif key==keys["help"]:
-                text = "^C [Exit], <- [Previous], -> [Next]"       
-                args = (filename,black,bnc,slc,reset,rows,banoff,arr,columns,\
-                        status,offset,line,banner,status_st,keys,read_key,text)
-                show_help(args)
    
         except: pass
 

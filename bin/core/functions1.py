@@ -106,10 +106,10 @@ def get_str(arr,key,select,cursor,line,offset,banoff,indent,rows,keys):
             arr[pos] = p1+out_lines[0]
         else: arr[pos] = p1+out_lines[0]+p2
         if len(out_lines) > 1:
+            cursor = len(out_lines[-1])+1
             if not select: out_lines[-1] += p2
             arr[pos+1:pos+1] = out_lines[1:]
             line,offset = calc_displacement(out_lines,line,banoff,offset,rows,1)
-            cursor = len(out_lines[-1])+1
         else: cursor += len(out_lines[0])
     return arr, cursor, line, offset, select
 
@@ -135,4 +135,12 @@ def read_UTF8(path):
         file,codec = file.read(),"latin_1"
         
     return file.split(lnsep), codec, lnsep
+
+# Detect if indent is tab or space
+def taborspace(contents):
+    sp_cnt,tab_cnt = 0,0
+    for x in contents:
+        if x.startswith(" "*4): sp_cnt+=1
+        if x.startswith("\t"): tab_cnt+=1
+    return " "*4 if sp_cnt>tab_cnt else "\t"
 

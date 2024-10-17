@@ -3,7 +3,6 @@
 from functions1 import decode, get_size, read_UTF8
 from upd_scr import menu_updsrc
 from time import sleep as delay
-from show_help import show_help
 from threading import Thread
 from glob import glob
 from os import sep
@@ -148,12 +147,6 @@ def save_as(arg):
                 out.write(lnsep.join(output)); out.close()
                 status,status_st = bnc+"ADDED",True
                 break
-
-            elif key==keys["help"]:
-                text = "^C [Exit], ^S [Save], Tab/Ret [Navigate], ^B [BackUp], ^A [Append], ^P [Prepend]"       
-                args = (filename,black,bnc,slc,reset,rows,banoff,arr,columns,\
-                        status,offset,line,banner,status_st,keys,read_key,text)
-                show_help(args)
             
             else: #Rest of keys
                 if wrtptr<((columns+2)*rows+1):
