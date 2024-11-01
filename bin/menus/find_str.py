@@ -1,6 +1,6 @@
 # Code by Sergio00166
 
-from upd_scr import update_scr,movcr,hcr,print
+from upd_scr import update_scr,movcr,hcr,scr,print
 from functions1 import get_size,CalcRelLine
 from chg_var_str import chg_var_str
 from time import sleep as delay
@@ -52,6 +52,7 @@ def updscr_thr():
 def exit():
     global fd, old_settings, run, kill, thr
     run=False; kill=True; thr.join()
+    print(scr) # Show cursor again
     if not sep == chr(92): tcsetattr(fd,TCSADRAIN,old_settings)
 
 def search_substring(lst, substring, start_list_pos=0, start_string_pos=0):

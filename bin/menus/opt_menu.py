@@ -1,6 +1,6 @@
 # Code by Sergio00166
 
-from upd_scr import menu_updsrc,hcr,print
+from upd_scr import menu_updsrc,hcr,scr,print
 from chg_var_str import chg_var_str
 from time import sleep as delay
 from functions1 import get_size
@@ -38,6 +38,7 @@ def updscr_thr():
 def exit():
     global fd, old_settings, run, kill, thr
     run=False; kill=True; thr.join()
+    print(scr) # Show cursor again
     if not sep == chr(92): tcsetattr(fd,TCSADRAIN,old_settings)
 
 

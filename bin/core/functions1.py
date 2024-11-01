@@ -92,26 +92,39 @@ def select_add_start_str(arr,line,offset,select,text,remove=False):
     else: p1 = [x[len(text):] if x.startswith(text) else x for x in p1]   
     return p0+p1+p2 # Reconstruct the arr
 
+
 def get_str(arr,key,select,cursor,line,offset,banoff,indent,rows,keys):
-    out,skip = decode(key),False   
+    out = decode(key)
     if select:
-        if not out=="\t": select,arr,line,offset = del_sel(select,arr,banoff,True)
-        else: arr,skip = select_add_start_str(arr,line,offset,select,indent),True      
-    if not skip:
-        pos=line+offset-banoff; text=arr[pos]
-        p1,p2 = text[:cursor-1], text[cursor-1:]
-        out=out.replace("\t",indent)
-        out_lines = resplit(r'[\n\r]',out)
-        if not select and len(out_lines)>1:
-            arr[pos] = p1+out_lines[0]
-        else: arr[pos] = p1+out_lines[0]+p2
-        if len(out_lines) > 1:
-            cursor = len(out_lines[-1])+1
-            if not select: out_lines[-1] += p2
-            arr[pos+1:pos+1] = out_lines[1:]
-            line,offset = calc_displacement(out_lines,line,banoff,offset,rows,1)
-        else: cursor += len(out_lines[0])
+        if out=="\t":
+            args = (arr,line,offset,select,indent)
+            arr = select_add_start_str(*args)
+            return arr, cursor, line, offset, select
+        else:
+            args = (select,arr,banoff,True)
+            select,arr,line,offset = del_sel(*args)
+            cursor = 1 # Reset cursor value
+
+    pos = line+offset-banoff
+    text = arr[pos] # Get current line
+    p1,p2 = text[:cursor-1],text[cursor-1:]
+    out = out.replace("\t",indent)
+    out_lines = resplit(r'[\n\r]',out)
+
+    if not select and len(out_lines)>1:
+        arr[pos] = p1+out_lines[0]
+    else: arr[pos] = p1+out_lines[0]+p2
+
+    if len(out_lines) > 1:
+        cursor = len(out_lines[-1])+1
+        if not select: out_lines[-1] += p2
+        arr[pos+1:pos+1] = out_lines[1:]
+        args = (out_lines,line,banoff,offset,rows,1)
+        line,offset = calc_displacement(*args)
+    else: cursor += len(out_lines[0])
+
     return arr, cursor, line, offset, select
+
 
 def detect_line_ending_char(file_path):
     c = open(file_path, 'rb').read()

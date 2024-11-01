@@ -8,8 +8,7 @@ from os import sep
 
 # Some ANSII ctrl codes
 movcr = "\r\033[%d;%dH"
-cls = "\r\033[3J"
-cls += movcr%(1,1)
+cls = movcr%(1,1)
 scr = "\r\x1b[?25h"
 hcr = "\r\x1b[?25l"
 
@@ -87,10 +86,7 @@ def update_scr(black,bnc,slc,reset,status,banoff,offset,line,cursor,arr,banner,\
         # the tty cursor, then move the cursor to the
         # desired line, the show the cursor and move
         # it horizontally and then print to stdout
-        line += banoff
-        menu += movcr%(line,1)+scr
-        menu += movcr%(line,cursor)
-        print(hcr+menu)
+        print(menu+movcr%(line+banoff,cursor))
         # If we are using this in the find
         # function return the relative cursor
         if hlg_str!="": return cursor

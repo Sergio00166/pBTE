@@ -78,7 +78,7 @@ def backspace(cursor,offset,line,arr,banoff,select):
                 if offset==0: line -= 1
                 else: offset -= 1
         arr[line+offset-banoff] = text
-    else: select,arr,line,offset = del_sel(select,arr,banoff)
+    else: select,arr,line,offset,cursor = *del_sel(select,arr,banoff),1
     return line, offset, arr, cursor, select
 
 def supr(cursor,offset,banoff,arr,line,select):
@@ -94,7 +94,7 @@ def supr(cursor,offset,banoff,arr,line,select):
             arr.pop(line+offset-banoff+1)
             text = text+seltext
         arr[line+offset-banoff] = text
-    else: select,arr,line,offset = del_sel(select,arr,banoff)
+    else: select,arr,line,offset,cursor = *del_sel(select,arr,banoff),1
     return arr, line, offset, select
 
 def comment_func(arr,line,offset,banoff,select,comment,cursor,indent):
