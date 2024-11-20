@@ -107,7 +107,7 @@ def opt_menu(arg):
 
             elif key==keys["arr_left"]:
                 wrtptr -= columns
-                wrtptr = max(wrtptr,0)
+                wrtptr = max(wrtptr,1)
                 
             elif key==keys["arr_right"]:
                 wrtptr += columns+2
