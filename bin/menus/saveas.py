@@ -95,12 +95,16 @@ def save_as(arg):
             
             #Ctrl + S (confirms) or Ctrl + B backup
             elif key==keys["ctrl+s"] or key==keys["ctrl+b"]:
-                if key==keys["ctrl+b"] and filewrite==filename: filewrite+=".bak"
-                out=open(filewrite,"w",encoding=codec,newline='')
-                out.write(lnsep.join(arr)); out.close(); status_st=True
-                if key==keys["ctrl+b"]: status="BCKPd"
-                else: status,filename = saved_txt,filewrite
-                break
+                old_filewrite = filewrite
+                try:
+                    if key==keys["ctrl+b"] and filewrite==filename: filewrite+=".bak"
+                    out=open(filewrite,"w",encoding=codec,newline='')
+                    out.write(lnsep.join(arr)); out.close()
+                    if key==keys["ctrl+b"]: status="BCKPd"
+                    else: status,filename = saved_txt,filewrite
+                    status_st=True; break # Exit the menu
+                except: filewrite = old_filewrite
+                
                 
             elif key==keys["ctrl+c"]: break
         
