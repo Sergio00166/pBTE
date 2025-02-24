@@ -25,6 +25,8 @@ Currently ctrl+Z is not available a workaround is using ctrl+a and then ctrl+b t
 - `^I` [Indent],    `^K` [Comment]
 - `^U` [Uncomment], `^F` [Find]
 - `^R` [Replace],   `^J` [non-move NL]
+- `^ Arrow up/down` [Select lines]
+- `^ Page up/down` [Select lines in blocks]
 
 #### OpenFile Menu:
 - `^C` [Exit], `^O` [Open file]
