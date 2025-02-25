@@ -16,6 +16,44 @@ def print(text):
     stdout.write(text)
     stdout.flush()
 
+def text_selection(arr,cursor,all_file,select,rows,banoff,line,black,slc,reset):
+    # Get values from the select list
+    start=select[0][0]; end=select[1][0]
+    if line < rows+banoff:
+        end+=select[1][1]-select[0][1]
+    start-=select[1][1]-select[0][1]
+    # Fix start value
+    if start<0: start=0
+    # Split lines
+    all_file=all_file.split("\n")
+    # Get the text that is upper the selected region
+    p0="\n".join(all_file[:start])
+    # Get the text that is below the selected region
+    p2="\n".join(all_file[end:])
+    # Get the text that is selected
+    p1=all_file[start:end]; out=[]
+    # Get the len of the higligh ascii code
+    lenght=len(black+"*"+reset)
+    # For each line of p1
+    for x in p1:
+        x=rscp(x,[black,reset,slc])
+        # Checks if the line rendered continues to the right
+        # (having the flag that marks that)
+        if x.endswith(black+">"+reset):
+            out.append(x[:-lenght]+reset+">"+black)
+        # Checks if the line rendered continues to the left
+        # (having the flag that marks that)
+        elif x.startswith(black+"<"+reset):
+            out.append(x[:-lenght]+reset+"<"+black)
+        # If none of the above simply add is to out dic
+        else: out.append(x)
+    # Create a string from the list
+    p1="\n".join(out)
+    # Now create the all file string. Adding the
+    # ascii chars to p1 (the selected string)
+    return p0+black+p1+reset+p2
+
+
 def update_scr(black,bnc,slc,reset,status,banoff,offset,line,cursor,arr,banner,\
                filename,rows,columns,status_st,rrw=False,select=[],hlg_str=""):
     # Create the string that represents on which line we are
@@ -40,43 +78,13 @@ def update_scr(black,bnc,slc,reset,status,banoff,offset,line,cursor,arr,banner,\
     if hlg_str!="": all_file = all_file.replace(hlg_str,black+hlg_str+reset) 
     # Initialize the menu with all the banner
     menu=cls+bnc+outb+" "*fix
-    # Highlight selector
+    # Hightligh the selected text
     if len(select)>0:
-        # Get values from the select list
-        start=select[0][0]; end=select[1][0]
-        if line < rows+banoff:
-            end+=select[1][1]-select[0][1]
-        start-=select[1][1]-select[0][1]
-        # Fix start value
-        if start<0: start=0
-        # Split lines
-        all_file=all_file.split("\n")
-        # Get the text that is upper the selected region
-        p0="\n".join(all_file[:start])
-        # Get the text that is below the selected region
-        p2="\n".join(all_file[end:])
-        # Get the text that is selected
-        p1=all_file[start:end]; out=[]
-        # Get the len of the higligh ascii code
-        lenght=len(black+"*"+reset)
-        # For each line of p1
-        for x in p1:
-            x=rscp(x,[black,reset,slc])
-            # Checks if the line rendered continues to the right
-            # (having the flag that marks that)
-            if x.endswith(black+">"+reset):
-                out.append(x[:-lenght]+reset+">"+black)
-            # Checks if the line rendered continues to the left
-            # (having the flag that marks that)
-            elif x.startswith(black+"<"+reset):
-                out.append(x[:-lenght]+reset+"<"+black)
-            # If none of the above simply add is to out dic
-            else: out.append(x)
-        # Create a string from the list
-        p1="\n".join(out)
-        # Now create the all file string. Adding the
-        # ascii chars to p1 (the selected string)
-        all_file=p0+black+p1+reset+p2
+        all_file = text_selection(
+            arr[offset:rows+offset+banoff],
+            cursor,all_file,select,rows,
+            banoff,line,black,slc,reset
+        )
     # Now concatenate all to create the screen
     menu+=filename+" "+reset+"\n"+all_file
     # If raw mode is specified return the screen string
