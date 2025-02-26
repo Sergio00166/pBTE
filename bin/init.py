@@ -9,7 +9,7 @@ if not __name__=="__main__":
 
     # Add all file structure
     root = path[0]+sep+"bin"+sep
-    path.append(path[0]+sep+"lib.zip")
+    path.append(sep.join([path[0],"bin","lib.zip"]))
     path.append(root+"core")
     path.append(root+"menus")
     
