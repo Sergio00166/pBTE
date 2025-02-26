@@ -1,11 +1,9 @@
 # Code by Sergio00166
 
-from os import sep
-from os.path import split as psplit
-from multiprocessing import cpu_count, Pool
 from re import split as resplit
 from data import ascii_no_lfcr
 from scr_funcs import get_size
+from os import sep
 
 bom_map = {
     b"\xef\xbb\xbf": "utf-8-sig",

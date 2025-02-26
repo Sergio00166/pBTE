@@ -26,8 +26,8 @@ The keyboard mappings are stored in bin/data.py
 - `^I` [Indent],    `^K` [Comment]
 - `^U` [Uncomment], `^F` [Find]
 - `^R` [Replace],   `^J` [non-move NL]
-- `^ Arrow up/down` [Select lines]
-- `^ Page up/down` [Select lines in blocks]
+- `^Y` [Toggle line select mode]
+- `Ctrl + Arrow keys` [Move in batches of 4]
 
 #### OpenFile Menu:
 - `^C` [Exit], `^O` [Open file]

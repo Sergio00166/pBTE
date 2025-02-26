@@ -1,10 +1,9 @@
 # Code by Sergio00166
 
-from os import get_terminal_size, sep
-from sys import path
-path.append(path[0]+sep+"lib.zip")
-from wcwidth import wcwidth
 from data import ascii_map,ascii_replaced
+from os import get_terminal_size, sep
+from os.path import split as psplit
+from wcwidth import wcwidth
 
 
 # Expands tabulators and splits the text in parts and as
