@@ -81,9 +81,8 @@ def update_scr(black,bnc,slc,reset,status,banoff,offset,line,cursor,arr,banner,\
     # Hightligh the selected text
     if len(select)>0:
         all_file = text_selection(
-            arr[offset:rows+offset+banoff],
-            cursor,all_file,select,rows,
-            banoff,line,black,slc,reset
+            all_file,cursor,all_file,select,
+            rows,banoff,line,black,slc,reset
         )
     # Now concatenate all to create the screen
     menu+=filename+" "+reset+"\n"+all_file
