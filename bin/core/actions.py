@@ -1,6 +1,7 @@
 # Code by Sergio00166
 
-from functions1 import *
+from functions import *
+from scr_funcs import fixlenline
 
 
 def down(line,offset,arr,banoff,oldptr,rows,cursor,select,selected):

@@ -1,10 +1,11 @@
 # Code by Sergio00166
 
-from functions1 import decode, get_size
 from upd_scr import menu_updsrc
-from threading import Thread
-from os import sep
 from time import sleep as delay
+from scr_funcs import get_size
+from threading import Thread
+from functions import decode
+from os import sep
 
 
 if not sep==chr(92): #If OS is LINUX

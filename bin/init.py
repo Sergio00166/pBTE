@@ -1,6 +1,6 @@
 # Code by Sergio00166
 
-version="v0.6.9.5"
+version="v0.7.0.0"
      
 if not __name__=="__main__":
 
@@ -14,7 +14,8 @@ if not __name__=="__main__":
     path.append(root+"menus")
     
     from os.path import abspath, isdir
-    from functions1 import get_size,read_UTF8,taborspace
+    from functions import read_UTF8,taborspace
+    from scr_funcs import get_size
     from upd_scr import update_scr
     from keys_func import keys_func
     from colorama import init, Fore, Back, Style, deinit

@@ -1,7 +1,7 @@
 # Code by Sergio00166
 
-from functions1 import cmt_w_ind,write_UTF8
-from functions import str_len
+from functions import cmt_w_ind,write_UTF8
+from scr_funcs import str_len
 from actions import *
 from actions1 import *
 from saveas import save_as
