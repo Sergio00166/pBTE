@@ -106,6 +106,9 @@ def update_scr(
             x + (" " * (columns - str_len(rscp(x, [black, reset], True)) + 2))
             for x in arr
         ]
+    # Add empty lines to fill the height
+    if not len(arr) == rows - banoff:
+        arr += [" " * (columns + 2)] * (rows - len(arr) + 1)
     # Create an string out of the arr
     all_file = "\n".join(arr)
     # This is for the find str function page
