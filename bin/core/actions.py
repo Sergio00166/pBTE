@@ -1,10 +1,11 @@
 # Code by Sergio00166
 
-from functions1 import *
+from functions import *
+from scr_funcs import fixlenline
 
 
-def down(line,offset,arr,banoff,oldptr,rows,cursor,select,selected):
-    if selected:
+def down(line,offset,arr,banoff,oldptr,rows,cursor,select,select_mode):
+    if select_mode:
         selst = [line-banoff,offset]
         fix = line+offset
     if not line+offset==len(arr)+banoff-1:
@@ -12,7 +13,7 @@ def down(line,offset,arr,banoff,oldptr,rows,cursor,select,selected):
         elif not line+offset==len(arr)+1: offset += 1
         text = arr[line+offset-banoff]
         cursor = fixlenline(text,cursor,oldptr)
-    if selected:
+    if select_mode:
         seled = [line-banoff,offset]
         if sum(seled)<fix:
             seled[0] = seled[0]+1
@@ -22,13 +23,13 @@ def down(line,offset,arr,banoff,oldptr,rows,cursor,select,selected):
     else: select = []
     return cursor, oldptr, offset, line, select
 
-def up(line,offset,arr,banoff,oldptr,rows,cursor,select,selected):
-    if selected: seled = [line-banoff,offset]
+def up(line,offset,arr,banoff,oldptr,rows,cursor,select,select_mode):
+    if select_mode: seled = [line-banoff,offset]
     if not line==banoff: line -= 1
     elif offset>0: offset -= 1
     text = arr[line+offset-banoff]
     cursor = fixlenline(text,cursor,oldptr)
-    if selected:
+    if select_mode:
         selst = [line-banoff,offset]
         if len(select)==0:
             select = [selst,seled]
