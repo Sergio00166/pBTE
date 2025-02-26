@@ -16,42 +16,43 @@ def print(text):
     stdout.write(text)
     stdout.flush()
 
-def text_selection(arr,cursor,all_file,select,rows,banoff,line,black,slc,reset):
+
+def text_selection(all_file,select,rows,banoff,line,black,slc,reset,columns):
     # Get values from the select list
-    start=select[0][0]; end=select[1][0]
+    start,end,out = select[0][0],select[1][0],[]
+    # Fix position for the end
     if line < rows+banoff:
-        end+=select[1][1]-select[0][1]
-    start-=select[1][1]-select[0][1]
+        end += select[1][1]-select[0][1]
+    start -= select[1][1]-select[0][1]
     # Fix start value
     if start<0: start=0
-    # Split lines
-    all_file=all_file.split("\n")
     # Get the text that is upper the selected region
-    p0="\n".join(all_file[:start])
+    p0 = all_file[:start]
     # Get the text that is below the selected region
-    p2="\n".join(all_file[end:])
+    p2 = all_file[end:]
     # Get the text that is selected
-    p1=all_file[start:end]; out=[]
+    p1 = all_file[start:end]
     # Get the len of the higligh ascii code
-    lenght=len(black+"*"+reset)
-    # For each line of p1
+    lenght = len(black+"*"+reset)
+
     for x in p1:
-        x=rscp(x,[black,reset,slc])
+        lenght = str_len(rscp(x,[black,reset],True))
+        # Rehighlight ASCII ctrl chars (visual)
+        x = rscp(x,[black,reset,slc])
         # Checks if the line rendered continues to the right
-        # (having the flag that marks that)
         if x.endswith(black+">"+reset):
-            out.append(x[:-lenght]+reset+">"+black)
+            x = x[:-lenght]+reset+">"+black
         # Checks if the line rendered continues to the left
-        # (having the flag that marks that)
         elif x.startswith(black+"<"+reset):
-            out.append(x[:-lenght]+reset+"<"+black)
-        # If none of the above simply add is to out dic
-        else: out.append(x)
-    # Create a string from the list
-    p1="\n".join(out)
-    # Now create the all file string. Adding the
-    # ascii chars to p1 (the selected string)
-    return p0+black+p1+reset+p2
+            x = x[:-lenght]+reset+"<"+black
+        # Add it to list and fill with spaces
+        out.append(black+x+reset+(" "*(columns-lenght+2)))
+
+    # Expand all lines to fill the screen with empty spaces
+    p0 = [x+(" "*(columns-str_len(rscp(x,[black,reset],True))+2)) for x in p0]
+    p2 = [x+(" "*(columns-str_len(rscp(x,[black,reset],True))+2)) for x in p2]
+    return p0+out+p2
+
 
 
 def update_scr(black,bnc,slc,reset,status,banoff,offset,line,cursor,arr,banner,\
@@ -73,19 +74,19 @@ def update_scr(black,bnc,slc,reset,status,banoff,offset,line,cursor,arr,banner,\
     # Get the separation between the Left and the filename
     if not small: fix=columns-len(outb)-len(filename)+1
     # Get the text that will be on screen and update the cursor value
-    all_file,cursor = scr_arr2str(arr,line,offset,cursor,black,reset,columns,rows,banoff)
-    # This is for the find str function page
-    if hlg_str!="": all_file = all_file.replace(hlg_str,black+hlg_str+reset) 
+    arr,cursor = scr_arr2str(arr,line,offset,cursor,black,reset,columns,rows,banoff)
     # Initialize the menu with all the banner
-    menu=cls+bnc+outb+" "*fix
+    menu = cls+bnc+outb+" "*fix
     # Hightligh the selected text
-    if len(select)>0:
-        all_file = text_selection(
-            all_file,cursor,all_file,select,
-            rows,banoff,line,black,slc,reset
-        )
+    if len(select)>0: arr = text_selection(arr,select,rows,banoff,line,black,slc,reset,columns)
+    # Expand all lines to fill the screen with empty spaces
+    else: arr = [x+(" "*(columns-str_len(rscp(x,[black,reset],True))+2)) for x in arr]
+    # Create an string out of the arr
+    all_file = "\n".join(arr)
+    # This is for the find str function page
+    if hlg_str!="": all_file = all_file.replace(hlg_str,black+hlg_str+reset)
     # Now concatenate all to create the screen
-    menu+=filename+" "+reset+"\n"+all_file
+    menu += filename+" "+reset+"\n"+all_file
     # If raw mode is specified return the screen string
     if rrw: return menu
     else:
@@ -94,6 +95,7 @@ def update_scr(black,bnc,slc,reset,status,banoff,offset,line,cursor,arr,banner,\
         # If we are using this in the find
         # function return the relative cursor
         if hlg_str!="": return cursor
+
 
 
 def menu_updsrc(arg,mode=None,updo=False):

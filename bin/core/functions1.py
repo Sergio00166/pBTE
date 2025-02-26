@@ -19,7 +19,6 @@ rev_bom_map = {
 codecs_no_bom = ("utf-8", "utf-16", "latin_1")
 
 
-
 def calc_displacement(data,line,banoff,offset,rows,rect=0):
     line += len(data)-rect
     if line-banoff>rows:
