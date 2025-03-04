@@ -5,6 +5,14 @@ from data import ascii_no_lfcr
 from scr_funcs import get_size
 from os import sep
 
+if sep == chr(92): # Windows
+    from ctypes import windll
+    kbdenc = windll.kernel32.GetConsoleCP()
+    kbdenc = "cp"+str(kbdenc)
+else: # Linux or POSIX
+    from sys import stdin
+    kbdenc = stdin.encoding
+
 bom_map = {
     b"\xef\xbb\xbf": "utf-8-sig",
     b"\xff\xfe": "utf-16-le",
@@ -34,7 +42,7 @@ def cmt_w_ind(string, sepstr):
 
 
 def decode(key):
-    out = key.decode("UTF-8")
+    out = key.decode(kbdenc)
     for x in ascii_no_lfcr:
         if chr(x) in out:
             return ""
