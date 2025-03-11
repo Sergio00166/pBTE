@@ -97,7 +97,7 @@ def scr_arr2str(arr,line,offset,cursor,black,reset,columns,rows,banoff):
     cursor, text = fix_cursor_pos(text,cursor,columns,black,reset)
     arr = arr[offset:rows+offset+banoff]
     arr = fix_arr_line_len(arr,columns,black,reset)
-    arr[line-banoff] = text
+    arr[line-banoff] = text # Unsafe
     return arr, cursor
 
 
