@@ -12,7 +12,7 @@ def wrap(text, columns, tabsize=8, cursor=None):
     buffer,counter,col = "", -1, 0
     result,pos,ptr = [], 0, 0
     extra = cursor!=None
-
+    
     def handle_char(char, char_width):
         nonlocal buffer,counter,col,result,ptr,pos
         if counter + char_width > columns:
