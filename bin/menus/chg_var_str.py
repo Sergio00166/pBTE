@@ -60,8 +60,6 @@ def chg_var_str(arg,kctlc_f=False):
         if len(entered_str)<wrtptr-lenght:
             wrtptr = len(entered_str)+lenght
         try:
-            # Force use LINUX dir separator
-            entered_str=entered_str.replace(chr(92),"/")
             # If OS is LINUX restore TTY to it default values
             if not sep==chr(92):
                 old=(fd,TCSADRAIN,old_settings)
