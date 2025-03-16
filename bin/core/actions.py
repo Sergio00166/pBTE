@@ -111,11 +111,15 @@ def comment_func(arr,line,offset,banoff,select,comment,cursor,indent):
 def uncomment_func(arr,line,offset,banoff,select,comment,cursor,indent):
     orig = arr[line+offset-banoff]
     if not len(select)>0:
-        pos,lenght = line+offset-banoff,len(comment[0])
+        pos = line+offset-banoff
+        lncmt1 = len(comment[0])
+        lncmt2 = len(comment[1])
         p1,p2 = cmt_w_ind(arr[pos], indent)
-        if p2.startswith(comment[0]): p2=p2[lenght:]
-        if p2.endswith(comment[0]): p2=p2[:lenght]
-        arr[pos] = p1+p2 
+        stcmt1 = p2.startswith(comment[0])
+        edcmt2 = p2.endswith(comment[1])
+        if stcmt1: p2 = p2[lncmt1:]
+        if edcmt2: p2 = p2[:-lncmt2] if lncmt2>0 else p2
+        arr[pos] = p1+p2 # Add the indent
     else: arr = select_add_start_str(arr,line,offset,select,comment,True)
     if not orig==arr[line+offset-banoff]: cursor-=len(comment[0])
     return arr,cursor

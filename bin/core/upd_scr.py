@@ -150,13 +150,14 @@ def menu_updsrc(arg, mode=None, updo=False):
             # Set some vars
             filetext, opentxt, wrtptr, lenght = mode
             out = opentxt + filetext
-            # Get raw screen updated
-            menu = update_scr(
-                black,bnc,slc,reset,status,
-                banoff,offset,line,0,arr,
-                banner,filename,rows,
-                columns,status_st,True,
-            )
+            try: # Get raw screen updated
+                menu = update_scr(
+                    black, bnc, slc, reset, status,
+                    banoff, offset, line, 0, arr,
+                    banner, filename, rows,
+                    columns, status_st, True,
+                )
+            except: return rows,columns
             # Cut menu to add the menu bar
             menu = "\n".join(menu.split("\n")[: rows + banoff])
             # Calculate relative cursor pos
@@ -169,5 +170,5 @@ def menu_updsrc(arg, mode=None, updo=False):
             # Print the whole screen and move cursor
             menu = hcr + menu + bnc + out + scr
             print(menu + movcr % (rows + 2, wrtptr))
-    return rows, columns
+    return rows,columns
 
