@@ -144,7 +144,7 @@ def replace(arg):
             if key==keys["ctrl+c"] or not isin_arr(arr,find_str): break
             
             elif key==keys["arr_right"]:
-                cl_line,cursor = search_substring(arr,find_str,pos,cursor)
+                cl_line,cursor = search_substring(arr,find_str,pos,cursor-1)
                 p1 = arr[cl_line][:cursor-len(find_str)]
                 p2 = arr[cl_line][cursor:]
                 arr[cl_line] = p1+replace_str+p2
