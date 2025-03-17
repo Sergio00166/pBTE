@@ -52,11 +52,11 @@ def text_selection(
 
     # Expand all lines to fill the screen with empty spaces
     p0 = [
-        x + (" " * (columns - str_len(rscp(x, [black, reset], True)) + 2))
+        x + ("\u00A0" * (columns - str_len(rscp(x, [black, reset], True)) + 2))
         for x in p0
     ]
     p2 = [
-        x + (" " * (columns - str_len(rscp(x, [black, reset], True)) + 2))
+        x + ("\u00A0" * (columns - str_len(rscp(x, [black, reset], True)) + 2))
         for x in p2
     ]
     return p0 + out + p2
@@ -103,12 +103,12 @@ def update_scr(
     # Expand all lines to fill the screen with empty spaces
     else:
         arr = [
-            x + (" " * (columns - str_len(rscp(x, [black, reset], True)) + 2))
+            x + ("\u00A0" * (columns - str_len(rscp(x, [black, reset], True)) + 2))
             for x in arr
         ]
     # Add empty lines to fill the height
     if not len(arr) == rows - banoff:
-        arr += [" " * (columns + 2)] * (rows - len(arr) + 1)
+        arr += ["\u00A0" * (columns + 2)] * (rows - len(arr) + 1)
     # Create an string out of the arr
     all_file = "\n".join(arr)
     # This is for the find str function page
