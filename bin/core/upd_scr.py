@@ -107,7 +107,7 @@ def update_scr(
             for x in arr
         ]
     # Add empty lines to fill the height
-    if not len(arr) == rows - banoff:
+    if not len(arr)-1 == rows - banoff:
         arr += ["\u00A0" * (columns + 2)] * (rows - len(arr) + 1)
     # Create an string out of the arr
     all_file = "\n".join(arr)
