@@ -94,18 +94,15 @@ def select_add_start_str(arr, line, offset, select, text, remove=False):
         if not remove:
             p1 = [text[0] + x + text[1] for x in p1]
         else:
-            p1 = [
-                (
-                    x[len(text[0]) :]
-                    if len(text[1]) == 0 and x.startswith(text[0])
-                    else (
-                        x[len(text[0]) : -len(text[1])]
-                        if x.startswith(text[0]) and x.endswith(text[1])
-                        else x
-                    )
-                )
-                for x in p1
-            ]
+            p1 = [(
+                x[len(text[0]) :]
+                if len(text[1]) == 0 and x.startswith(text[0])
+                else (
+                    x[len(text[0]) : -len(text[1])]
+                    if x.startswith(text[0]) and x.endswith(text[1])
+                else x )
+            ) for x in p1 ]
+
     elif not remove:
         p1 = [text + x for x in p1]
     else:
