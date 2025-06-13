@@ -15,6 +15,8 @@ def print(text):
     stdout.write(text)
     stdout.flush()
 
+def clean_ansii(x,color,reset):
+    return x.replace(color,"").replace(reset,"")
 
 def text_selection(
     all_file, select, rows, banoff, line, black, slc, reset, columns
@@ -38,7 +40,7 @@ def text_selection(
     lenght = len(black + "*" + reset)
 
     for x in p1:
-        lenght = str_len(rscp(x, [black, reset], True))
+        lenght = str_len(clean_ansii(x,black,reset))
         # Rehighlight ASCII ctrl chars (visual)
         x = rscp(x, [black, reset, slc])
         # Checks if the line rendered continues to the right
@@ -48,17 +50,8 @@ def text_selection(
         elif x.startswith(black + "<" + reset):
             x = x[:-lenght] + reset + "<" + black
         # Add it to list and fill with spaces
-        out.append(black + x + reset + (" " * (columns - lenght + 2)))
+        out.append(black + x + reset)
 
-    # Expand all lines to fill the screen with empty spaces
-    p0 = [
-        x + ("\u00A0" * (columns - str_len(rscp(x, [black, reset], True)) + 2))
-        for x in p0
-    ]
-    p2 = [
-        x + ("\u00A0" * (columns - str_len(rscp(x, [black, reset], True)) + 2))
-        for x in p2
-    ]
     return p0 + out + p2
 
 
@@ -77,48 +70,49 @@ def update_scr(
     # Check if the space for the filename is too small
     lenght = columns - len(outb)
     small = lenght < 24
-    if small:
-        outb, fix, lenght = "", 1, columns
+    if small: outb, fix, lenght = "", 1, columns
+
     # Fix the filename string to fit in the space
     filename = fixfilename(filename, lenght)
     # Use the fucking UNIX path separator
     filename = filename.replace(sep, "/")
     # Calculate blank space of necessary
-    if small:
-        filename += " " * (columns - len(filename))
+    if small: filename += " " * (columns - len(filename))
     # Get the separation between the Left and the filename
-    if not small:
-        fix = columns - len(outb) - len(filename) + 1
+    if not small: fix = columns - len(outb) - len(filename) + 1
+
     # Get the text that will be on screen and update the cursor value
     arr, cursor = scr_arr2str(
         arr, line, offset, cursor, black, reset, columns, rows, banoff
     )
     # Initialize the menu with all the banner
     menu = cls + bnc + outb + " " * fix
+ 
     # Hightligh the selected text
     if len(select) > 0:
         arr = text_selection(
             arr, select, rows, banoff, line, black, slc, reset, columns
         )
-    # Expand all lines to fill the screen with empty spaces
-    else:
-        arr = [
-            x + ("\u00A0" * (columns - str_len(rscp(x, [black, reset], True)) + 2))
-            for x in arr
-        ]
+    # This is for the find str function page
+    elif hlg_str != "":
+        arr = [x.replace(hlg_str, black + hlg_str + reset) for x in arr]
+
     # Add empty lines to fill the height
     if not len(arr)-1 == rows - banoff:
-        arr += ["\u00A0" * (columns + 2)] * (rows - len(arr) + 1)
+        arr += [" "] * (rows - len(arr) + 1)
+    # Expand all lines to fill the screen with empty spaces
+    arr = [
+        x + (" " * (columns - str_len(clean_ansii(x,black,reset)) + 2))
+        for x in arr
+    ]
+
     # Create an string out of the arr
     all_file = "\n".join(arr)
-    # This is for the find str function page
-    if hlg_str != "":
-        all_file = all_file.replace(hlg_str, black + hlg_str + reset)
     # Now concatenate all to create the screen
     menu += filename + " " + reset + "\n" + all_file
+
     # If raw mode is specified return the screen string
-    if rrw:
-        return menu
+    if rrw: return menu
     else:
         mv = movcr % (line + banoff, cursor)
         print(hcr + menu + scr + mv)
@@ -165,7 +159,7 @@ def menu_updsrc(arg, mode=None, updo=False):
                 out, wrtptr - 1, columns, slc, reset + bnc
             )
             # Add blank spaces to shade it
-            ln = str_len(rscp(out, [slc, reset + bnc], True))
+            ln = str_len(clean_ansii(out,slc,reset+bnc))
             out += " " * (columns - ln + 2)
             # Print the whole screen and move cursor
             menu = hcr + menu + bnc + out + scr
