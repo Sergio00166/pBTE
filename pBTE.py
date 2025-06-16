@@ -81,9 +81,7 @@ if __name__=="__main__":
         except: pass
 
 
-    # Clear and reset the terminal
-    if not sep==chr(92):
-        print("\x1b[H\x1b[2J\x1b[3J")
-    print("\r\033c"+"\033[0 q")
+    # Goto old TTY buffer
+    print("\x1b[?1049l", end="") 
     exit(0) # Kill itself
 
