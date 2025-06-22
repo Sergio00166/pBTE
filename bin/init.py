@@ -27,9 +27,9 @@ if not __name__=="__main__":
     # Define colors
     init(autoreset=False,convert=True)
     reset=Style.RESET_ALL
-    bnc=Back.GREEN+Fore.BLACK+Style.DIM
-    black=Back.LIGHTCYAN_EX+Fore.BLACK+Style.DIM
-    slc=Back.LIGHTYELLOW_EX+Fore.BLACK+Style.DIM
+    bnc=Back.GREEN+Fore.BLACK
+    black=Back.LIGHTCYAN_EX+Fore.BLACK
+    slc=Back.LIGHTYELLOW_EX+Fore.BLACK
     deinit(); del init, Fore, Back, Style, deinit
 
     # Create the raw kb reader
