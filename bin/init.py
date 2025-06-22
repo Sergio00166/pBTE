@@ -1,6 +1,6 @@
 # Code by Sergio00166
 
-version="v0.7.2.0"
+version="v0.7.3.0"
      
 if not __name__=="__main__":
 
@@ -27,9 +27,9 @@ if not __name__=="__main__":
     # Define colors
     init(autoreset=False,convert=True)
     reset=Style.RESET_ALL
-    bnc=Back.GREEN+Fore.BLACK+Style.DIM
-    black=Back.LIGHTCYAN_EX+Fore.BLACK+Style.DIM
-    slc=Back.LIGHTYELLOW_EX+Fore.BLACK+Style.DIM
+    bnc=Back.GREEN+Fore.BLACK
+    black=Back.LIGHTCYAN_EX+Fore.BLACK
+    slc=Back.LIGHTYELLOW_EX+Fore.BLACK
     deinit(); del init, Fore, Back, Style, deinit
 
     # Create the raw kb reader
@@ -93,9 +93,8 @@ if not __name__=="__main__":
     comment = ["#",""]
     rows,columns=get_size()
     filename = filename.replace(sep,"/")
-
     status=""; status_st=False
-    print("\033c", end="") # Clear the screen
-    print("\033[1 q", end="") # Change cursor
 
+    # Create a new TTY space
+    print("\x1b[?1049h", end="")
 
