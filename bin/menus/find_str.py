@@ -112,7 +112,6 @@ def find(arg):
     pos = line+offset-banoff
     p1,cursor = search_substring(arr,find_str,pos,cursor)
     line,offset = CalcRelLine(p1,arr,offset,line,banoff,rows)
-    cursor += 1 # Cursor starts in 1 not 0
     
     while True:
         try:
@@ -140,14 +139,12 @@ def find(arg):
             if key==keys["ctrl+c"]: break 
 
             elif key==keys["arr_right"]:
-                p1,cursor = search_substring(arr,find_str,pos,cursor-1)
+                p1,cursor = search_substring(arr,find_str,pos,cursor)
                 line,offset = CalcRelLine(p1,arr,offset,line,banoff,rows)
-                cursor += 1 # Cursor starts in 1 not 0
                 
             elif key==keys["arr_left"]:
-                p1,cursor = search_substring_rev(arr,find_str,pos,cursor-1)
+                p1,cursor = search_substring_rev(arr,find_str,pos,cursor)
                 line,offset = CalcRelLine(p1,arr,offset,line,banoff,rows)
-                cursor += 1 # Cursor starts in 1 not 0
    
         except: pass
 
