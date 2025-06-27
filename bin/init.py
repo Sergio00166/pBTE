@@ -1,6 +1,6 @@
 # Code by Sergio00166
 
-version="v0.7.3.0"
+version="v0.7.4.3"
      
 if not __name__=="__main__":
 
@@ -85,8 +85,8 @@ if not __name__=="__main__":
     #Define a lot of stuff
     select_mode = False
     indent = taborspace(arr)
-    offset=oldptr=0
-    cursor=line=banoff=1
+    cursor,offset,oldptr=0,0,0
+    line,banoff=1,1
     banner=["pBTE",version]
     copy_buffer,select = "",[]
     end,start = 1,0
@@ -94,6 +94,11 @@ if not __name__=="__main__":
     rows,columns=get_size()
     filename = filename.replace(sep,"/")
     status=""; status_st=False
+
+    # Create a new TTY space
+    print("\x1b[?1049h", end="")
+
+
 
     # Create a new TTY space
     print("\x1b[?1049h", end="")

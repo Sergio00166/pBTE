@@ -103,7 +103,7 @@ def open_file(arg):
                 openfile=glob(openfile, recursive=False)[0]
                 arr,codec,lnsep = read_UTF8(openfile)
                 filename,status_st = openfile,False
-                cursor,offset,oldptr,line,select = 1,0,1,1,[]
+                cursor,offset,oldptr,line,select = 0,0,0,1,[]
                 indent = taborspace(arr)
                 break
                 
@@ -144,7 +144,7 @@ def open_file(arg):
             elif key in keys["end"]: wrtptr=len(openfile)+lenght
             
             elif key==keys["ctrl+n"]:
-                cursor,oldptr,offset,line = 1,1,0,1
+                cursor,oldptr,offset,line = 0,0,0,1
                 arr,select,status_st = [""],[],False
                 filename=getcwd()+"/NewFile"
                 break

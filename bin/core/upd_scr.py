@@ -114,7 +114,7 @@ def update_scr(
     # If raw mode is specified return the screen string
     if rrw: return menu
     else:
-        mv = movcr % (line + banoff, cursor)
+        mv = movcr % (line + banoff, cursor+1)
         print(hcr + menu + scr + mv)
         # If we are using this in the find
         # function return the relative cursor
@@ -163,6 +163,6 @@ def menu_updsrc(arg, mode=None, updo=False):
             out += " " * (columns - ln + 2)
             # Print the whole screen and move cursor
             menu = hcr + menu + bnc + out + scr
-            print(menu + movcr % (rows + 2, wrtptr))
+            print(menu + movcr % (rows + 2, wrtptr+1))
     return rows,columns
 

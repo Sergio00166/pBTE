@@ -122,11 +122,11 @@ def get_str(
         else:
             args = (select, arr, banoff, True)
             select, arr, line, offset = del_sel(*args)
-            cursor = 1  # Reset cursor value
+            cursor = 0  # Reset cursor value
 
     pos = line + offset - banoff
     text = arr[pos]  # Get current line
-    p1, p2 = text[: cursor - 1], text[cursor - 1 :]
+    p1, p2 = text[: cursor], text[cursor :]
     out = out.replace("\t", indent)
     out_lines = resplit(r"[\n\r]", out)
 
@@ -136,7 +136,7 @@ def get_str(
         arr[pos] = p1 + out_lines[0] + p2
 
     if len(out_lines) > 1:
-        cursor = len(out_lines[-1]) + 1
+        cursor = len(out_lines[-1])
         if not select:
             out_lines[-1] += p2
         arr[pos + 1 : pos + 1] = out_lines[1:]

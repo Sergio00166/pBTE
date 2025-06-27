@@ -50,11 +50,11 @@ def keys_func(key,cursor,oldptr,line,offset,columns,banoff,arr,rows,filename,
             cursor,oldptr,line,offset = left(*args)
         select=[]
         
-    elif key in keys["start"]: cursor,oldptr,select = 1,1,[]
+    elif key in keys["start"]: cursor,oldptr,select = 0,0,[]
         
     elif key in keys["end"]:
         text=arr[line+offset-banoff]
-        cursor = len(text)+1
+        cursor = len(text)
         oldptr,select = cursor,[]
         
     elif key==keys["repag"]:

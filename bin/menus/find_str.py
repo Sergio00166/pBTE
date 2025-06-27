@@ -76,7 +76,7 @@ def search_substring_rev(lst, substring, start_list_pos=0, start_string_pos=None
 
 def chg_hlg(rel_cursor,find_str):
     pos = rel_cursor-str_len(find_str)
-    mov = movcr%(line+banoff,pos)
+    mov = movcr%(line+banoff,pos+1)
     if pos>0: print(mov+slc+find_str+reset+hcr)
 
 def isin_arr(arr,string):
@@ -112,7 +112,6 @@ def find(arg):
     pos = line+offset-banoff
     p1,cursor = search_substring(arr,find_str,pos,cursor)
     line,offset = CalcRelLine(p1,arr,offset,line,banoff,rows)
-    cursor += 1 # Cursor starts in 1 not 0
     
     while True:
         try:
@@ -140,14 +139,12 @@ def find(arg):
             if key==keys["ctrl+c"]: break 
 
             elif key==keys["arr_right"]:
-                p1,cursor = search_substring(arr,find_str,pos,cursor-1)
+                p1,cursor = search_substring(arr,find_str,pos,cursor)
                 line,offset = CalcRelLine(p1,arr,offset,line,banoff,rows)
-                cursor += 1 # Cursor starts in 1 not 0
                 
             elif key==keys["arr_left"]:
-                p1,cursor = search_substring_rev(arr,find_str,pos,cursor-1)
+                p1,cursor = search_substring_rev(arr,find_str,pos,cursor)
                 line,offset = CalcRelLine(p1,arr,offset,line,banoff,rows)
-                cursor += 1 # Cursor starts in 1 not 0
    
         except: pass
 

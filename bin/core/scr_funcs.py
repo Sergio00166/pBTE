@@ -76,7 +76,7 @@ def str_len(self, tabsize=8):
 def fix_cursor_pos(text,cursor,columns,black,reset):
     text = text[:cursor+columns+2]
     wrapped_text, cursor, pos =\
-    wrap(text,columns,cursor=cursor-1)
+    wrap(text,columns,cursor=cursor)
     if not len(wrapped_text)==0:
         if pos>len(wrapped_text)-1: pos=-1
         text=wrapped_text[pos]
@@ -88,7 +88,7 @@ def fix_cursor_pos(text,cursor,columns,black,reset):
         elif len(wrapped_text)>1:
             text+=black+">"+reset      
     else: text=""
-    return cursor+1, text
+    return cursor, text
 
 
 def scr_arr2str(arr,line,offset,cursor,black,reset,columns,rows,banoff):
@@ -115,7 +115,7 @@ def fixfilename(path, lenght):
 
 
 def fixlenline(text, cursor, oldptr):
-    lenght = len(text) + 1
+    lenght = len(text)
     if cursor > lenght or oldptr > lenght:
         return lenght
     elif oldptr > cursor:

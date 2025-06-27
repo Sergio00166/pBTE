@@ -76,7 +76,7 @@ def search_substring_rev(lst, substring, start_list_pos=0, start_string_pos=None
 
 def chg_hlg(rel_cursor,string):
     pos = rel_cursor-str_len(string)
-    mov = movcr%(line+banoff,pos)
+    mov = movcr%(line+banoff,pos+1)
     if pos>0: print(mov+slc+string+reset+hcr)
 
 def isin_arr(arr,string):
@@ -144,23 +144,21 @@ def replace(arg):
             if key==keys["ctrl+c"] or not isin_arr(arr,find_str): break
             
             elif key==keys["arr_right"]:
-                cl_line,cursor = search_substring(arr,find_str,pos,cursor-1)
+                cl_line,cursor = search_substring(arr,find_str,pos,cursor)
                 p1 = arr[cl_line][:cursor-len(find_str)]
                 p2 = arr[cl_line][cursor:]
                 arr[cl_line] = p1+replace_str+p2
                 cursor = cursor+len(replace_str)-len(find_str)
                 line,offset = CalcRelLine(cl_line,arr,offset,line,banoff,rows)
-                cursor += 1 # Cursor starts in 1 not 0
                 status_st,active = False,True
                 
             elif key==keys["arr_left"]:
-                cl_line,cursor = search_substring_rev(arr,find_str,pos,cursor-1)
+                cl_line,cursor = search_substring_rev(arr,find_str,pos,cursor)
                 p1 = arr[cl_line][:cursor-len(find_str)]
                 p2 = arr[cl_line][cursor:]
                 arr[cl_line] = p1+replace_str+p2
                 cursor = cursor+len(replace_str)-len(find_str)
                 line,offset = CalcRelLine(cl_line,arr,offset,line,banoff,rows)
-                cursor += 1 # Cursor starts in 1 not 0
                 status_st,active = False,True
 
             elif key==keys["ctrl+a"]:

@@ -47,6 +47,7 @@ def chg_var_str(arg,kctlc_f=False):
 
     filename,black,bnc,slc,reset,rows,banoff,arr,columns,status,offset,line,\
     banner,status_st,keys,cursor,select,read_key,entered_str,prt_txt = arg
+    # If cursor is used in this function, ensure it is 0-based everywhere
 
     old_str = entered_str
     lenght=len(prt_txt)+2
