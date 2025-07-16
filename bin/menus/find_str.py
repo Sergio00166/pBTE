@@ -77,7 +77,7 @@ def search_substring_rev(lst, substring, start_list_pos=0, start_string_pos=None
 def chg_hlg(rel_cursor,find_str):
     pos = rel_cursor-str_len(find_str)
     mov = movcr%(line+banoff,pos+1)
-    if pos>0: print(mov+slc+find_str+reset+hcr)
+    if pos>=0: print(mov+slc+find_str+reset+hcr)
 
 def isin_arr(arr,string):
     for x in arr:
