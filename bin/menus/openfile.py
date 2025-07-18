@@ -50,7 +50,7 @@ def open_file(arg):
     banner,status_st,keys,cursor,oldptr,select,read_key,codec,lnsep,indent = arg
 
     openfile = "/".join(filename.split("/")[:-1])+"/"
-    opentxt=" Open: "; lenght=len(opentxt)+2
+    opentxt=" Open: "; lenght=len(opentxt)+1
     wrtptr=lenght+len(openfile)
     thr=Thread(target=updscr_thr)
     run,kill = False,False
@@ -93,7 +93,7 @@ def open_file(arg):
                         cmp_counter+=1
                     else: openfile=content[0]
 
-            elif complete and key==keys['return']:
+            elif complete and key==keys["return"]:
                 wrtptr=len(openfile)+len(opentxt)+2
                 complete=False
 
@@ -126,7 +126,7 @@ def open_file(arg):
                 if not wrtptr==lenght: wrtptr-=1
                 
             elif key==keys["arr_right"]:
-                if not wrtptr>len(openfile)+lenght-1: wrtptr+=1
+                if not wrtptr>len(openfile)+lenght: wrtptr+=1
                     
             elif key==keys["supr"]:
                 if complete:

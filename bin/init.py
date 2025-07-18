@@ -1,6 +1,6 @@
 # Code by Sergio00166
 
-version="v0.7.4.3"
+version="v0.7.4.5"
      
 if not __name__=="__main__":
 
@@ -51,7 +51,7 @@ if not __name__=="__main__":
         def getch():
             old=(fd,TCSADRAIN,old_settings)
             setraw(fd,when=TCSADRAIN)
-            out,rlist = b'',True
+            out,rlist = b"",True
             while rlist:
                 out += read(fd,8)
                 # Check if available data

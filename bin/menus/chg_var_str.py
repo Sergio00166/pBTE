@@ -50,7 +50,7 @@ def chg_var_str(arg,kctlc_f=False):
     # If cursor is used in this function, ensure it is 0-based everywhere
 
     old_str = entered_str
-    lenght=len(prt_txt)+2
+    lenght=len(prt_txt)+1
     wrtptr=lenght+len(entered_str)
     thr=Thread(target=updscr_thr)
     run,kill,kctlc = False,False,False
@@ -96,7 +96,7 @@ def chg_var_str(arg,kctlc_f=False):
                 if not wrtptr==lenght: wrtptr-=1
                 
             elif key==keys["arr_right"]:
-                if not wrtptr>len(entered_str)+lenght-1: wrtptr+=1
+                if not wrtptr>len(entered_str)+lenght: wrtptr+=1
                     
             elif key==keys["supr"]:
                 p1=list(entered_str)

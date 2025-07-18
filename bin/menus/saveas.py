@@ -50,7 +50,7 @@ def save_as(arg):
     filename,black,bnc,slc,reset,rows,banoff,arr,columns,status,offset,\
     line,banner,status_st,keys,read_key,codec,lnsep = arg
 
-    saveastxt=" Save as: "; lenght=len(saveastxt)+2
+    saveastxt=" Save as: "; lenght=len(saveastxt)+1
     filewrite=filename; wrtptr=lenght+len(filewrite)
     thr=Thread(target=updscr_thr)
     run,kill,complete = False,False,False
@@ -130,12 +130,12 @@ def save_as(arg):
                 if not wrtptr==lenght: wrtptr-=1
                 
             elif key==keys["arr_right"]:
-                if not wrtptr>len(filewrite)+lenght-1: wrtptr+=1
+                if not wrtptr>len(filewrite)+lenght: wrtptr+=1
                 
             elif key==keys["supr"]:
                 if complete:
                     filewrite="/".join(filewrite.split("/")[:-1])+"/"
-                    wrtptr-=len(filewrite[-1])-1
+                    wrtptr-=len(filewrite[-1])
                     complete=False
                 else: 
                     p1=list(filewrite)

@@ -89,10 +89,10 @@ def lnsep_menu(arg):
 
             if key==keys["ctrl+c"]: break
 
-            elif key==b'1': lnsep = "\n";   break
-            elif key==b'2': lnsep = "\r\n"; break
-            elif key==b'3': lnsep = "\r";   break
-            elif key==b'4': lnsep = "";     break
+            elif key==b"1": lnsep = "\n";   break
+            elif key==b"2": lnsep = "\r\n"; break
+            elif key==b"3": lnsep = "\r";   break
+            elif key==b"4": lnsep = "";     break
 
             elif key==keys["arr_left"]:
                 wrtptr -= columns
