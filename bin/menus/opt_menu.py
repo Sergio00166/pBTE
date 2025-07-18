@@ -86,35 +86,35 @@ def opt_menu(arg):
 
             if key==keys["ctrl+c"]: break
         
-            elif key==b'\t':
+            elif key==b"\t":
                 indent = " "*4 if indent=="\t" else "\t"
                 break
 
-            elif key==b'c':
+            elif key==b"c":
                 args = (filename,black,bnc,slc,reset,rows,banoff,arr,columns,status,offset,line,\
                         banner,status_st,keys,cursor,select,read_key,comment[0]," Set comment: ")
                 comment[0] = chg_var_str(args)
                 break
 
-            elif key==b'e':
+            elif key==b"e":
                 args = (filename,black,bnc,slc,reset,rows,banoff,arr,columns,status,offset,line,\
                         banner,status_st,keys,cursor,select,read_key,comment[1]," Set end cmt: ")
                 comment[1] = chg_var_str(args)
                 break
 
-            elif key==b'i':
+            elif key==b"i":
                 args = (filename,black,bnc,slc,reset,rows,banoff,arr,columns,status,offset,line,\
                         banner,status_st,keys,cursor,select,read_key,indent," Set indent: ")
                 indent = chg_var_str(args)
                 break
 
-            elif key==b's':
+            elif key==b"s":
                 args = (filename,black,bnc,slc,reset,rows,banoff,arr,\
                 columns,offset,line,banner,keys,cursor,select,read_key,codec)
                 codec = codec_menu(args)
                 break
     
-            elif key==b'l':
+            elif key==b"l":
                 args = (filename,black,bnc,slc,reset,rows,banoff,arr,\
                 columns,offset,line,banner,keys,cursor,select,read_key,lnsep)
                 lnsep = lnsep_menu(args)

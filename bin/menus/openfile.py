@@ -93,7 +93,7 @@ def open_file(arg):
                         cmp_counter+=1
                     else: openfile=content[0]
 
-            elif complete and key==keys['return']:
+            elif complete and key==keys["return"]:
                 wrtptr=len(openfile)+len(opentxt)+2
                 complete=False
 

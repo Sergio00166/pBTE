@@ -27,9 +27,9 @@ def wrap(text, columns, tabsize=8, cursor=None):
         col += char_width
 
     for p,char in enumerate(text):
-        if char == '\t':
+        if char == "\t":
             space_count = tabsize - (col % tabsize)
-            expanded = ' ' * space_count
+            expanded = " " * space_count
             if extra and cursor>p: ptr += space_count
             for x in expanded: handle_char(x, 1)
         else:
@@ -61,9 +61,9 @@ def fix_arr_line_len(arr, columns, black, reset):
 def str_len(self, tabsize=8):
     result,col,lenght = [],0,0
     for char in self:
-        if char == '\t':
+        if char == "\t":
             space_count = tabsize - (col % tabsize)
-            result.append(' ' * space_count)
+            result.append(" " * space_count)
             lenght += space_count
             col += space_count
         else:
@@ -106,7 +106,7 @@ def fixfilename(path, lenght):
     dirname, basename = psplit(path)
     if len(path) <= lenght: return path
     available_lenght = lenght - len(basename) - 1
-    if available_lenght <= 0: return basename[:lenght - 1]+'*'
+    if available_lenght <= 0: return basename[:lenght - 1]+"*"
     parts = dirname.split(sep)
     while len(parts) > 0 and len(sep.join(parts)) > available_lenght: parts.pop(0)
     if len(parts) == 0: compacted_path=basename

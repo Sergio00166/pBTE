@@ -86,12 +86,12 @@ def codec_menu(arg):
 
             if key==keys["ctrl+c"]: break
 
-            elif key==b'1': codec = "latin_1";    break
-            elif key==b'2': codec = "utf-8";      break
-            elif key==b'3': codec = "utf-8-sig";  break
-            elif key==b'4': codec = "utf-16";     break
-            elif key==b'5': codec = "utf-16-be";  break
-            elif key==b'6': codec = "utf-16-le";  break
+            elif key==b"1": codec = "latin_1";    break
+            elif key==b"2": codec = "utf-8";      break
+            elif key==b"3": codec = "utf-8-sig";  break
+            elif key==b"4": codec = "utf-16";     break
+            elif key==b"5": codec = "utf-16-be";  break
+            elif key==b"6": codec = "utf-16-le";  break
 
             elif key==keys["arr_left"]:
                 wrtptr -= columns
