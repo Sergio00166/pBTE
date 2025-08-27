@@ -76,8 +76,7 @@ def update_scr(
         ]
 
     # Pad to full height
-    if not len(screen_lines)-1 == rows - banoff:
-        screen_lines += [" "] * (rows - len(screen_lines) + 1)
+    screen_lines += [" "] * max(0, rows - len(screen_lines) + 1)
 
     # Assemble the full menu
     menu_body = cls + bnc+header + " "*pad + filename + " " + reset
@@ -88,6 +87,7 @@ def update_scr(
     # Print and move cursor
     print(hcr + menu_text + scr + movcr%(line + banoff, cursor+1))
     if hlg_str: return cursor
+
 
 
 def menu_updsrc(args, mode=None, redraw=False):
