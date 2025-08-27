@@ -4,165 +4,148 @@ from scr_funcs import *
 from sys import stdout
 from os import sep
 
-
-# Some ANSII ctrl codes
+# ANSI control codes
 movcr = "\r\033[%d;%dH"
-cls = movcr % (1, 1)
-scr = "\r\x1b[?25h"
-hcr = "\r\x1b[?25l"
+cls   = "\033[2K"
+scr   = "\r\x1b[?25h"
+hcr   = "\r\x1b[?25l"
 
 def print(text):
     stdout.write(text)
     stdout.flush()
 
-def clean_ansii(x,color,reset):
-    return x.replace(color,"").replace(reset,"")
 
-def text_selection(
-    all_file, select, rows, banoff, line, black, slc, reset, columns
-):
-    # Get values from the select list
-    start, end, out = select[0][0], select[1][0], []
-    # Fix position for the end
-    if line < rows + banoff:
-        end += select[1][1] - select[0][1]
-    start -= select[1][1] - select[0][1]
-    # Fix start value
-    if start < 0:
-        start = 0
-    # Get the text that is upper the selected region
-    p0 = all_file[:start]
-    # Get the text that is below the selected region
-    p2 = all_file[end:]
-    # Get the text that is selected
-    p1 = all_file[start:end]
-    # Get the len of the higligh ascii code
-    lenght = len(black + "*" + reset)
+def text_selection(buffer, select, rows, banoff, line, color, sel_color, reset, columns):
+    (start_line, _), (end_line, _) = select
+    span = end_line - _
 
-    for x in p1:
-        lenght = str_len(clean_ansii(x,black,reset))
-        # Rehighlight ASCII ctrl chars (visual)
-        x = rscp(x, [black, reset, slc])
-        # Checks if the line rendered continues to the right
-        if x.endswith(black + ">" + reset):
-            x = x[:-lenght] + reset + ">" + black
-        # Checks if the line rendered continues to the left
-        elif x.startswith(black + "<" + reset):
-            x = x[:-lenght] + reset + "<" + black
-        # Add it to list and fill with spaces
-        out.append(black + x + reset)
+    head = max(start_line - span, 0)
+    tail = end_line + (span if line < rows + banoff else 0)
 
-    return p0 + out + p2
+    highlight, star_len = [], len(color + "*" + reset)
+    for raw in buffer[head:tail]:
+        # Strip and re-apply selection markers
+        clean = rscp(raw, [color, reset, sel_color])
+        if clean.endswith(color + ">" + reset):
+            clean = clean[:-star_len] + reset + ">" + color
+        elif clean.startswith(color + "<" + reset):
+            clean = clean[:-star_len] + reset + "<" + color
+
+        highlight.append(color + clean + reset)
+
+    return buffer[:head] + highlight + buffer[tail:]
 
 
 def update_scr(
-    black,bnc,slc,reset,status,
-    banoff,offset,line,cursor,
-    arr,banner,filename,rows,
-    columns,status_st,rrw=False,
-    select=[],hlg_str="",
+    black, bnc, slc, reset, status,
+    banoff, offset, line, cursor,
+    lines, banner, filename, rows,
+    columns, status_st, rrw=False,
+    select=None, hlg_str=""
 ):
-    # Create the string that represents on which line we are
-    position = " " + str(line + offset - banoff) + "  "
-    # Create a part of the banner (position and status strings)
-    status = " " + banner[1] if not status_st else "  " + status
-    outb = position + " " + banner[0] + status + "    "
-    # Check if the space for the filename is too small
-    lenght = columns - len(outb)
-    small = lenght < 24
-    if small: outb, fix, lenght = "", 1, columns
+    # Header: position + banner text + status
+    pos    = f" {line + offset - banoff}  "
+    stat   = (" " + banner[1]) if not status_st else ("  " + status)
+    header = pos + " " + banner[0] + stat + "    "
 
-    # Fix the filename string to fit in the space
-    filename = fixfilename(filename, lenght)
-    # Use the fucking UNIX path separator
-    filename = filename.replace(sep, "/")
-    # Calculate blank space of necessary
-    if small: filename += " " * (columns - len(filename))
-    # Get the separation between the Left and the filename
-    if not small: fix = columns - len(outb) - len(filename) + 1
-
-    # Get the text that will be on screen and update the cursor value
-    arr, cursor = scr_arr2str(
-        arr, line, offset, cursor, black, reset, columns, rows, banoff
-    )
-    # Initialize the menu with all the banner
-    menu = cls + bnc + outb + " " * fix
- 
-    # Hightligh the selected text
-    if len(select) > 0:
-        arr = text_selection(
-            arr, select, rows, banoff, line, black, slc, reset, columns
-        )
-    # This is for the find str function page
-    elif hlg_str != "":
-        arr = [x.replace(hlg_str, black + hlg_str + reset) for x in arr]
-
-    # Add empty lines to fill the height
-    if not len(arr)-1 == rows - banoff:
-        arr += [" "] * (rows - len(arr) + 1)
-    # Expand all lines to fill the screen with empty spaces
-    arr = [
-        x + (" " * (columns - str_len(clean_ansii(x,black,reset)) + 2))
-        for x in arr
-    ]
-
-    # Create an string out of the arr
-    all_file = "\n".join(arr)
-    # Now concatenate all to create the screen
-    menu += filename + " " + reset + "\n" + all_file
-
-    # If raw mode is specified return the screen string
-    if rrw: return menu
+    avail = columns - len(header)
+    if avail < 24:
+        header = ""
+        filename = fixfilename(filename, columns).replace(sep, "/")
+        filename += " " * (columns - len(filename))
+        pad = 1
     else:
-        mv = movcr % (line + banoff, cursor+1)
-        print(hcr + menu + scr + mv)
-        # If we are using this in the find
-        # function return the relative cursor
-        if hlg_str != "":
-            return cursor
+        filename = fixfilename(filename, avail).replace(sep, "/")
+        pad = columns - len(header) - len(filename) + 1
+
+    # Convert array of lines and adjust cursor
+    screen_lines, cursor = scr_arr2str(
+        lines, line, offset, cursor,
+        black, reset, columns, rows, banoff
+    )
+    # Highlight selection or string if requested
+    if select:
+        screen_lines = text_selection(
+            screen_lines, select, rows, banoff,
+            line, black, slc, reset, columns
+        )
+    elif hlg_str:
+        screen_lines = [
+            ln.replace(hlg_str, black + hlg_str + reset)
+            for ln in screen_lines
+        ]
+
+    # Pad to full height
+    if not len(screen_lines)-1 == rows - banoff:
+        screen_lines += [" "] * (rows - len(screen_lines) + 1)
+
+    # Assemble the full menu
+    menu_body = cls + bnc+header + " "*pad + filename + " " + reset
+    menu_text = menu_body + "\n" + cls + ("\n" + cls).join(screen_lines)
+
+    if rrw: return menu_text
+
+    # Print and move cursor
+    print(hcr + menu_text + scr + movcr%(line + banoff, cursor+1))
+    if hlg_str: return cursor
 
 
-def menu_updsrc(arg, mode=None, updo=False):
-    (  # Extract args
-        black,bnc,slc,reset,status,
-        banoff,offset,line,cursor,
-        arr,banner,filename,
-        rows,columns,status_st,
-    ) = arg
-    # Save old vars and get new values
-    old_rows = rows
-    old_columns = columns
+def menu_updsrc(args, mode=None, redraw=False):
+    (black, bnc, slc, reset, status,
+     banoff, offset, line, cursor,
+     arr, banner, filename,
+     rows, columns, status_st) = args
+
+    old_size = (rows, columns)
     rows, columns = get_size()
-    # Check if terminal is too small
+
+    # Screen too small?
     if rows < 4 or columns < 24:
         print("\r\033cTerminal too small")
-    # Compare the old values with the new ones
-    elif not (old_rows == rows and old_columns == columns) or updo:
-        if not updo:
-            print("\r\033[3J")  # Clear previous content
-        if not mode == None or updo:
-            # Set some vars
-            filetext, opentxt, wrtptr, lenght = mode
-            out = opentxt + filetext
-            try: # Get raw screen updated
-                menu = update_scr(
-                    black, bnc, slc, reset, status,
-                    banoff, offset, line, 0, arr,
-                    banner, filename, rows,
-                    columns, status_st, True,
-                )
-            except: return rows,columns
-            # Cut menu to add the menu bar
-            menu = "\n".join(menu.split("\n")[: rows + banoff])
-            # Calculate relative cursor pos
-            wrtptr, out = fix_cursor_pos(
-                out, wrtptr - 1, columns, slc, reset + bnc
-            )
-            # Add blank spaces to shade it
-            ln = str_len(clean_ansii(out,slc,reset+bnc))
-            out += " " * (columns - ln + 2)
-            # Print the whole screen and move cursor
-            menu = hcr + menu + bnc + out + scr
-            print(menu + movcr % (rows + 2, wrtptr+1))
-    return rows,columns
+        return rows, columns
+
+    # No change in size and not forced redraw
+    if old_size == (rows, columns) and not redraw:
+        return rows, columns
+
+    # Clear if first draw, otherwise bail if no mode
+    if not redraw: print("\r\033[3J")
+    elif not mode: return rows, columns
+
+    filetext, opener, wrtptr, length = mode
+    content = opener + filetext
+
+    # Try building raw menu for sizing
+    try:
+        raw_menu = update_scr(
+            black, bnc, slc, reset, status,
+            banoff, offset, line, 0, arr,
+            banner, filename, rows, columns,
+            status_st, rrw=True
+        )
+    except Exception: return rows, columns
+
+    # Truncate to fit height
+    lines = raw_menu.split("\n")[: rows + banoff]
+    menu = "\n".join(lines)
+
+    # Reposition write pointer in content
+    wrtptr, content = fix_cursor_pos(
+        content, wrtptr - 1, columns, slc, reset + bnc
+    )
+    # Pad content line to full width
+    curr_len = str_len(
+        content.replace(slc, "")
+        .replace(reset + bnc, "")
+    )
+    if curr_len != columns:
+        content += " "*(columns - curr_len + 2)
+
+    print(
+        hcr + menu + "\n"
+        + bnc + content + scr
+        + movcr % (rows + 2, wrtptr + 1)
+    )
+    return rows, columns
+
 
