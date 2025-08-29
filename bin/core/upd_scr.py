@@ -6,7 +6,8 @@ from os import sep
 
 # ANSI control codes
 movcr = "\r\033[%d;%dH"
-cls   = "\033[2K"
+movtl = movcr%(0,0)
+clr   = "\033[2K"
 scr   = "\r\x1b[?25h"
 hcr   = "\r\x1b[?25l"
 
@@ -15,25 +16,27 @@ def print(text):
     stdout.flush()
 
 
-def text_selection(buffer, select, rows, banoff, line, color, sel_color, reset, columns):
-    (start_line, _), (end_line, _) = select
-    span = end_line - _
+def text_selection(all_file, select, rows, banoff, line, black, slc, reset, columns):
+    start, end = select[0][0], select[1][0]
+    delta = select[1][1] - select[0][1]
 
-    head = max(start_line - span, 0)
-    tail = end_line + (span if line < rows + banoff else 0)
+    if line < rows + banoff:
+        end += delta
+    start = max(0, start - delta)
 
-    highlight, star_len = [], len(color + "*" + reset)
-    for raw in buffer[head:tail]:
-        # Strip and re-apply selection markers
-        clean = rscp(raw, [color, reset, sel_color])
-        if clean.endswith(color + ">" + reset):
-            clean = clean[:-star_len] + reset + ">" + color
-        elif clean.startswith(color + "<" + reset):
-            clean = clean[:-star_len] + reset + "<" + color
+    p0, p1, p2 = all_file[:start], all_file[start:end], all_file[end:]
+    out, ctrl_len = [], len(black + "*" + reset)
 
-        highlight.append(color + clean + reset)
+    for x in p1:
+        ctrl_len = str_len(x.replace(black, "").replace(reset, ""))
+        x = rscp(x, [black, reset, slc])
+        if x.endswith(black + ">" + reset):
+            x = x[:-ctrl_len] + reset + ">" + black
+        elif x.startswith(black + "<" + reset):
+            x = x[:-ctrl_len] + reset + "<" + black
+        out.append(black + x + reset)
 
-    return buffer[:head] + highlight + buffer[tail:]
+    return p0 + out + p2
 
 
 def update_scr(
@@ -79,13 +82,16 @@ def update_scr(
     screen_lines += [" "] * max(0, rows - len(screen_lines) + 1)
 
     # Assemble the full menu
-    menu_body = cls + bnc+header + " "*pad + filename + " " + reset
-    menu_text = menu_body + "\n" + cls + ("\n" + cls).join(screen_lines)
+    menu_body = clr + bnc+header + " "*pad + filename + " " + reset
+    menu_text = menu_body + "\n" + clr + ("\n" + clr).join(screen_lines)
 
     if rrw: return menu_text
 
     # Print and move cursor
-    print(hcr + menu_text + scr + movcr%(line + banoff, cursor+1))
+    print(
+        hcr + movtl + menu_text + scr +
+        movcr%(line + banoff, cursor+1)
+    )
     if hlg_str: return cursor
 
 
@@ -115,17 +121,15 @@ def menu_updsrc(args, mode=None, redraw=False):
     filetext, opener, wrtptr, length = mode
     content = opener + filetext
 
-    # Try building raw menu for sizing
-    try:
-        raw_menu = update_scr(
-            black, bnc, slc, reset, status,
-            banoff, offset, line, 0, arr,
-            banner, filename, rows, columns,
-            status_st, rrw=True
-        )
-    except Exception: return rows, columns
+    # Get raw screen string
+    raw_menu = update_scr(
+        black, bnc, slc, reset, status,
+        banoff, offset, line, 0, arr,
+        banner, filename, rows, columns,
+        status_st, rrw=True
+    )
 
-    # Truncate to fit height
+    # Truncate to leave space for menu
     lines = raw_menu.split("\n")[: rows + banoff]
     menu = "\n".join(lines)
 
@@ -141,8 +145,9 @@ def menu_updsrc(args, mode=None, redraw=False):
     if curr_len != columns:
         content += " "*(columns - curr_len + 2)
 
+    # Print and move cursor
     print(
-        hcr + menu + "\n"
+        hcr + movtl +  menu + "\n"
         + bnc + content + scr
         + movcr % (rows + 2, wrtptr + 1)
     )

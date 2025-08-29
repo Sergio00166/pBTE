@@ -1,6 +1,6 @@
 # Code by Sergio00166
 
-version="v0.7.5.1"
+version="v0.7.5.2"
      
 if not __name__=="__main__":
 
