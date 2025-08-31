@@ -1,126 +1,177 @@
 # Code by Sergio00166
 
-from functions import *
-from scr_funcs import fixlenline
+from text_op import *
+from scr_utils import fixlenline
 
 
-def down(line,offset,arr,banoff,oldptr,rows,cursor,select,select_mode):
-    if select_mode:
-        selst = [line-banoff,offset]
-        fix = line+offset
-    if not line+offset==len(arr)+banoff-1:
-        if not line==rows+banoff: line += 1
-        elif not line+offset==len(arr)+1: offset += 1
-        text = arr[line+offset-banoff]
-        cursor = fixlenline(text,cursor,oldptr)
-    if select_mode:
-        seled = [line-banoff,offset]
-        if sum(seled)<fix:
-            seled[0] = seled[0]+1
-        if len(select)==0:
-            select = [selst,seled]
-        else: select[1] = seled
-    else: select = []
-    return cursor, oldptr, offset, line, select
-
-def up(line,offset,arr,banoff,oldptr,rows,cursor,select,select_mode):
-    if select_mode: seled = [line-banoff,offset]
-    if not line==banoff: line -= 1
-    elif offset>0: offset -= 1
-    text = arr[line+offset-banoff]
-    cursor = fixlenline(text,cursor,oldptr)
-    if select_mode:
-        selst = [line-banoff,offset]
-        if len(select)==0:
-            select = [selst,seled]
-        else: select[0] = selst
-    else: select = []
-    return cursor, oldptr, offset, line, select
-
-def left(cursor,oldptr,line,offset,banoff,arr):
-    if not cursor==0:
-        cursor -= 1
-        oldptr = cursor
-    elif line+offset>banoff:
-        if line>1: line -= 1
-        elif offset>0: offset -= 1
-        text = arr[line+offset-banoff]
-        cursor = len(text)
-    return cursor, oldptr, line, offset
-
-def right(cursor,columns,offset,line,banoff,arr,rows,oldptr):
-    text = arr[line+offset-banoff]
-    if not cursor>=len(text):
-        cursor += 1
-        oldptr = cursor
-    elif not offset+line>len(arr)-1:
-        if line>rows: offset += 1
-        else: line += 1
-        cursor = 0
-    return cursor, oldptr, line, offset
-
-def backspace(cursor,offset,line,arr,banoff,select):
-    text=arr[line+offset-banoff]
-    if len(select)==0:
-        if not cursor==0: #Delete char
-            p1 = list(text)+[""]
-            # Fix weird bug
-            try: p1.pop(cursor-1)
-            except: p1.pop(cursor)
-            text = "".join(p1)
-            cursor -= 1
-        else: #move all to previous line
-            if not offset+line==1:
-                seltext = arr[line+offset-banoff-1]
-                arr[line+offset-banoff-1] = seltext+text
-                arr.pop(line+offset-banoff)
-                cursor = len(seltext)
-                text = seltext+text
-                if offset==0: line -= 1
-                else: offset -= 1
-        arr[line+offset-banoff] = text
-    else: select,arr,line,offset,cursor = *del_sel(select,arr,banoff),0
-    return line, offset, arr, cursor, select
-
-def supr(cursor,offset,banoff,arr,line,select):
-    text = arr[line+offset-banoff]
-    if len(select)==0:
-        p1 = list(text)
-        if (cursor)<len(p1) and len(p1)>0:
-            p1.pop(cursor)
-            text = "".join(p1)
-        elif not line+offset==len(arr): #move all to previous line
-            seltext = arr[line+offset-banoff+1]
-            arr[line+offset-banoff+1] = text+seltext
-            arr.pop(line+offset-banoff+1)
-            text = text+seltext
-        arr[line+offset-banoff] = text
-    else: select,arr,line,offset,cursor = *del_sel(select,arr,banoff),0
-    return arr, line, offset, select
-
-def comment_func(arr,line,offset,banoff,select,comment,cursor,indent):
-    orig = arr[line+offset-banoff]
-    if not len(select)>0:
-        pos = line+offset-banoff
-        p1,p2 = cmt_w_ind(arr[pos], indent)
-        arr[pos] = p1+comment[0]+p2+comment[1]            
-    else: arr = select_add_start_str(arr,line,offset,select,comment)
-    if not orig==arr[line+offset-banoff]: cursor+=len(comment[0])
-    return arr,cursor
-
-def uncomment_func(arr,line,offset,banoff,select,comment,cursor,indent):
-    orig = arr[line+offset-banoff]
-    if not len(select)>0:
-        pos = line+offset-banoff
-        lncmt1 = len(comment[0])
-        lncmt2 = len(comment[1])
-        p1,p2 = cmt_w_ind(arr[pos], indent)
-        stcmt1 = p2.startswith(comment[0])
-        edcmt2 = p2.endswith(comment[1])
-        if stcmt1: p2 = p2[lncmt1:]
-        if edcmt2: p2 = p2[:-lncmt2] if lncmt2>0 else p2
-        arr[pos] = p1+p2 # Add the indent
-    else: arr = select_add_start_str(arr,line,offset,select,comment,True)
-    if not orig==arr[line+offset-banoff]: cursor-=len(comment[0])
-    return arr,cursor
+def down(state):
+    """Move cursor down one line"""
+    if state.select_mode:
+        selection_start = [state.line - state.banoff, state.offset]
+        original_position = state.line + state.offset
     
+    # Move down if not at the end
+    if state.line + state.offset != len(state.arr) + state.banoff - 1:
+        if state.line != state.rows + state.banoff:
+            state.line += 1
+        elif state.line + state.offset != len(state.arr) + 1:
+            state.offset += 1
+        
+        # Update cursor position for current line
+        current_text = state.arr[state.line + state.offset - state.banoff]
+        state.cursor = fixlenline(current_text, state.cursor, state.oldptr)
+    
+    # Handle selection mode
+    if state.select_mode:
+        selection_end = [state.line - state.banoff, state.offset]
+        if sum(selection_end) < original_position:
+            selection_end[0] += 1
+        
+        if len(state.select) == 0:
+            state.select = [selection_start, selection_end]
+        else:
+            state.select[1] = selection_end
+    else:   state.select = []
+
+
+def up(state):
+    """Move cursor up one line"""
+    if state.select_mode:
+        selection_end = [state.line - state.banoff, state.offset]
+    
+    # Move up if possible
+    if state.line != state.banoff: state.line -= 1
+    elif state.offset > 0: state.offset -= 1
+    
+    # Update cursor position for current line
+    current_text = state.arr[state.line + state.offset - state.banoff]
+    state.cursor = fixlenline(current_text, state.cursor, state.oldptr)
+    
+    # Handle selection mode
+    if state.select_mode:
+        selection_start = [state.line - state.banoff, state.offset]
+        if len(state.select) == 0:
+            state.select = [selection_start, selection_end]
+        else:
+            state.select[0] = selection_start
+    else:   state.select = []
+
+
+def left(state):
+    """Move cursor left one character"""
+    if state.cursor != 0:
+        state.cursor -= 1
+        state.oldptr = state.cursor
+
+    elif state.line + state.offset > state.banoff:
+        # Move to end of previous line
+        if state.line > 1:     state.line   -= 1
+        elif state.offset > 0: state.offset -= 1
+        
+        current_text = state.arr[state.line + state.offset - state.banoff]
+        state.cursor = len(current_text)
+
+
+def right(state):
+    """Move cursor right one character"""
+    current_text = state.arr[state.line + state.offset - state.banoff]
+    
+    if state.cursor < len(current_text):
+        state.cursor += 1
+        state.oldptr = state.cursor
+    elif state.offset + state.line <= len(state.arr) - 1:
+        # Move to beginning of next line
+        if state.line > state.rows: state.offset += 1
+        else:                       state.line   += 1
+        state.cursor = 0
+
+
+def backspace(state):
+    """Delete character before cursor or merge lines"""
+    current_text = state.arr[state.line + state.offset - state.banoff]
+    
+    if not state.select_mode or len(state.select) == 0:
+        if state.cursor != 0:
+            # Delete character before cursor
+            text_chars = list(current_text) + [""]
+            try:    text_chars.pop(state.cursor - 1)
+            except: text_chars.pop(state.cursor)
+            current_text = "".join(text_chars)
+            state.cursor -= 1
+        else:
+            # Merge with previous line
+            if state.offset + state.line != 1:
+                previous_text = state.arr[state.line + state.offset - state.banoff - 1]
+                state.arr[state.line + state.offset - state.banoff - 1] = previous_text + current_text
+                state.arr.pop(state.line + state.offset - state.banoff)
+                state.cursor = len(previous_text)
+                current_text = previous_text + current_text
+                
+                if state.offset == 0: state.line -= 1
+                else: state.offset -= 1
+        
+        state.arr[state.line + state.offset - state.banoff] = current_text
+    else:
+        # Delete selection
+        del_sel(state)
+        state.cursor = 0
+        state.select_mode = False
+        state.select = []
+    state.status_st = False
+
+
+def newline(state):
+    """Insert newline at cursor position"""
+    current_text = state.arr[state.line + state.offset - state.banoff]
+    
+    if not state.select_mode or len(state.select) == 0:
+        # Split line at cursor
+        before_cursor = current_text[:state.cursor]
+        after_cursor = current_text[state.cursor:]
+        
+        state.arr[state.line + state.offset - state.banoff] = before_cursor
+        state.arr.insert(state.line + state.offset - state.banoff + 1, after_cursor)
+        
+        # Move to new line
+        if state.line < state.rows: state.line   += 1
+        else:                       state.offset += 1
+        state.cursor = 0
+    else:
+        # Replace selection with newline
+        del_sel(state, True)
+        state.cursor = 0
+        state.select_mode = False
+        state.select = []
+
+
+
+def tab(state):
+    """Insert tab or spaces at cursor position"""
+    current_text = state.arr[state.line + state.offset - state.banoff]
+    
+    if not state.select_mode or len(state.select) == 0:
+        # Insert tab/indent at cursor
+        before_cursor = current_text[:state.cursor]
+        after_cursor = current_text[state.cursor:]
+        
+        if state.indent == "tab":
+            new_text = before_cursor + "\t" + after_cursor
+            state.cursor += 1
+        else:
+            new_text = before_cursor + "    " + after_cursor
+            state.cursor += 4
+        
+        state.arr[state.line + state.offset - state.banoff] = new_text
+    else:
+        # Indent selection
+        start_line, start_offset = state.select[0]
+        end_line, end_offset = state.select[1]
+        
+        for i in range(start_line + start_offset, end_line + end_offset + 1):
+            if i < len(state.arr):
+                if state.indent == "tab":
+                    state.arr[i] = "\t" + state.arr[i]
+                else:
+                    state.arr[i] = "    " + state.arr[i]
+
+

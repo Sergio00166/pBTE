@@ -1,7 +1,6 @@
-# Main database for PBTE
+# Code by Sergio00166
 
 from os import sep
-
 
 # Define binary ASCII control chars and it graphical representation
 ascii_map = {
@@ -64,7 +63,6 @@ if sep == chr(92):  # Windows
         "ctrl+f": b"\x06",
         "ctrl+t": b"\x14",
         "ctrl+r": b"\x12",
-        "ctrl+j": b"\n",
         "ctrl+y": b"\x19",
         "arr_up": b"\xe0H",
         "arr_down": b"\xe0P",
@@ -103,7 +101,6 @@ else:  # Linux
         "ctrl+f": b"\x06",
         "ctrl+t": b"\x14",
         "ctrl+r": b"\x12",
-        "ctrl+j": b"\n",
         "ctrl+y": b"\x19",
         "arr_up": b"\x1b[A",
         "arr_down": b"\x1b[B",
@@ -121,3 +118,4 @@ else:  # Linux
         "tab": b"\t",
         "insert": b"2",
     }
+
