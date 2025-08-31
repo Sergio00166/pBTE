@@ -1,87 +1,94 @@
 #!/usr/bin/env python3
 # Code by Sergio00166
 
-def updscr_thr():
-    global black,reset,status,banoff,offset,line,cursor
-    global banner,filename,rows,columns,run_thread,text
-    global kill,p_offset,arr,select
+def update_screen_thread():
+    """Thread function to continuously update screen dimensions"""
+    global app_state, run_thread, kill
     
     while not kill:
         delay(0.01)
         if run_thread:
-            # Save old vars and get new values
-            old_rows=rows; old_columns=columns
-            rows,columns=get_size()
+            # Save old dimensions and get new values
+            old_rows = app_state.rows
+            old_columns = app_state.columns
+            app_state.rows, app_state.columns = get_size()
+            
             # Check if terminal is too small
-            if rows<4 or columns<24: print("\r\033cTerminal too small")
-            # Compare the old values with the new ones
-            elif not (old_rows==rows and old_columns==columns):
-                # Increment the offset if line is geeter than rows
-                if line>rows: offset=offset+(line-rows); line=rows	
-                # If OS is LINUX restore TTY to it default values
-                if not sep==chr(92): tcsetattr(fd, TCSADRAIN, old_settings)
-                print("\r\033[3J") # Clear previous content
-                # Call screen updater function
-                update_scr(black,bnc,slc,reset,status,banoff,offset,line,cursor,\
-                           arr,banner,filename,rows,columns,status_st,False,select)
-                # If OS is LINUX set TTY to raw mode
-                if not sep==chr(92): setraw(fd,when=TCSADRAIN)
+            if app_state.rows < 4 or app_state.columns < 24:
+                print("\r\033cTerminal too small")
+            # Check if dimensions changed
+            elif old_rows != app_state.rows or old_columns != app_state.columns:
+                # Adjust offset if line exceeds visible rows
+                if app_state.line > app_state.rows:
+                    app_state.offset += (app_state.line - app_state.rows)
+                    app_state.line = app_state.rows
+                
+                # Restore TTY to default values on Linux
+                if sep != chr(92):  # Not Windows
+                    tcsetattr(fd, TCSADRAIN, old_settings)
+                
+                print("\r\033[3J")  # Clear previous content
+                update_scr(app_state)
+                
+                # Set TTY to raw mode on Linux
+                if sep != chr(92):  # Not Windows
+                    setraw(fd, when=TCSADRAIN)
 
 
-if __name__=="__main__":
-    
+if __name__ == "__main__":
     from sys import path
     from os import sep
-    # Add the folder to import from here
-    path.append(path[0]+sep+"bin")
+    
+    # Add the bin folder to import path
+    path.append(path[0] + sep + "bin")
     from init import *
     
-    # Run the update Thread
-    update_thr=Thread(target=updscr_thr)
-    run_thread,kill = True,False
-    update_thr.daemon = True
-    update_thr.start()
+    # Start the update thread
+    update_thread = Thread(target=update_screen_thread)
+    run_thread, kill = True, False
+    update_thread.daemon = True
+    update_thread.start()
     
     while True:
-        try:
-            # Fix arr when empty
-            if len(arr)==0: arr=[""]
-            # Get the terminal size
-            rows,columns=get_size()
-            # Call screen updater function
-            update_scr(black,bnc,slc,reset,status,banoff,offset,line,cursor,arr,\
-                       banner,filename,rows,columns,status_st,False,select)
-            # Set time after reading key from keyboard and stopping the update Thread
-            run_thread=True; key=getch(); run_thread=False
-            # If key is Ctrl+Q (quit) open new file from queue or exit
-            if key==keys["ctrl+q"]:
-                if len(files)>0:
-                    # Skip unopenable files
-                    for _ in range(len(files)):
-                        try:
-                            name,files = files[0],files[1:]
-                            arr,codec,lnsep = read_UTF8(name)
-                            filename,status_st = name,False
-                            cursor,line,offset = 1,1,0
-                            indent = taborspace(arr)
-                            break
-                        except: pass
-                else: kill=True; update_thr.join(); break
-
-            #Call keys functions (Yeah, its a lot of args and returned values)
-            args = (
-                key,cursor,oldptr,line,offset,columns,banoff,arr,rows,
-                filename,status,status_st,copy_buffer,black,bnc,slc,reset,
-                indent,banner,getch,keys,select,codec,lnsep,comment,select_mode
-            )
-            cursor,oldptr,line,offset,columns,banoff,arr,rows,filename,status,\
-            status_st,copy_buffer,indent,select,codec,lnsep,comment,select_mode\
-            = keys_func(*args) # Update all values
-                         
+        # Ensure array is never empty
+        if len(app_state.arr) == 0:
+            app_state.arr = [""]
+        
+        # Get terminal size and update screen
+        app_state.rows, app_state.columns = get_size()
+        update_scr(app_state)
+        
+        # Pause update thread while waiting for key input
+        run_thread = True
+        key = getch()
+        run_thread = False
+        
+        # Handle Ctrl+Q (quit) - open next file or exit
+        if key == app_state.keys["ctrl+q"]:
+            if len(files) > 0:
+                # Try to open next file from queue
+                for _ in range(len(files)):
+                    try:
+                        filename, files = files[0], files[1:]
+                        app_state.arr, app_state.codec, app_state.lnsep =\
+                          read_UTF8(filename)
+                        app_state.filename = filename
+                        app_state.status_st = False
+                        app_state.cursor, app_state.offset = 0, 0
+                        app_state.line = app_state.banoff
+                        app_state.indent = taborspace(app_state.arr)
+                        break
+                    except: pass
+            else:
+                kill = True
+                update_thread.join()
+                break
+        
+        # Process key input
+        try: keys_func(app_state, key)
         except: pass
-
-
-    # Goto old TTY buffer
-    print("\x1b[?1049l", end="") 
-    exit(0) # Kill itself
+    
+    # Restore TTY buffer and exit
+    print("\x1b[?1049l", end="")
+    exit(0)
 

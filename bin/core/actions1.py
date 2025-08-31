@@ -1,123 +1,179 @@
 # Code by Sergio00166
 
-from functions import *
+from functions import calc_displacement
 from actions import up,down
+from text_op import *
 
 
-def paste(copy_buffer, arr, line, offset, banoff, cursor, select, rows, status_st):
-    if not len(copy_buffer) == 0:
-        if len(select) == 0:
-            pos = line + offset - banoff
-            text = arr[pos]
-            p1, p2 = text[:cursor], text[cursor:]
-            if isinstance(copy_buffer, list):
-                arr[pos] = p1 + copy_buffer[0]
-                for i, new_line in enumerate(copy_buffer[1:], start=1):
-                    arr.insert(pos + i, new_line)
-                arr[pos + len(copy_buffer) - 1] += p2
-                line, offset = calc_displacement(copy_buffer[1:], line, banoff, offset, rows)
-                cursor = len(copy_buffer[-1])
+def paste(state):
+    if not len(state.copy_buffer) == 0:
+        if not state.select_mode or len(state.select) == 0:
+            pos = state.line + state.offset - state.banoff
+            text = state.arr[pos]
+            p1, p2 = text[:state.cursor], text[state.cursor:]
+            if isinstance(state.copy_buffer, list):
+                state.arr[pos] = p1 + state.copy_buffer[0]
+                for i, new_line in enumerate(state.copy_buffer[1:], start=1):
+                    state.arr.insert(pos + i, new_line)
+                state.arr[pos + len(state.copy_buffer) - 1] += p2
+                calc_displacement(state,state.copy_buffer[1:])
+                state.cursor = len(state.copy_buffer[-1])
             else:
-                arr[pos] = p1 + copy_buffer + p2
-                cursor += len(copy_buffer)
+                state.arr[pos] = p1 + state.copy_buffer + p2
+                state.cursor += len(state.copy_buffer)
         else:
-            start = sum(select[0])
-            select, arr, line, offset = del_sel(select, arr, banoff)
-            if isinstance(copy_buffer, list):
-                for i, new_line in enumerate(copy_buffer):
-                    arr.insert(start + i, new_line)
-                line, offset = calc_displacement(copy_buffer, line, banoff, offset, rows, 1)
-                cursor = len(copy_buffer[-1])
+            start = sum(state.select[0])
+            del_sel(state)
+            if isinstance(state.copy_buffer, list):
+                for i, new_line in enumerate(state.copy_buffer):
+                    state.arr.insert(start + i, new_line)
+                calc_displacement(state, state.copy_buffer, 1)
+                state.cursor = len(state.copy_buffer[-1])
             else:
-                arr.insert(start, copy_buffer)
-                cursor = len(copy_buffer)
-        status_st = False
-    return cursor, arr, copy_buffer, line, offset, select, status_st
+                state.arr.insert(start, state.copy_buffer)
+                state.cursor = len(state.copy_buffer)
+        state.status_st = False
 
 
-def cut(select, arr, line, offset, banoff, copy_buffer, cursor):
-    pos = line + offset - banoff
-    text = arr[pos]
-    if select:
-        start = max(sum(select[0]) - 1, 0)
-        copy_buffer = arr[start:sum(select[1])]
-        if start > 0:
-            copy_buffer = copy_buffer[1:]
-        select, arr, line, offset = del_sel(select, arr, banoff)
+def cut(state):
+    pos = state.line + state.offset - state.banoff
+    text = state.arr[pos]
+
+    if state.select_mode and state.select:
+        start = max(sum(state.select[0]) - 1, 0)
+        state.copy_buffer = state.arr[start:sum(state.select[1])]
+        if start > 0: state.copy_buffer = state.copy_buffer[1:]
+        
+        del_sel(state)
+        state.select = []
+        state.select_mode = False
     else:
-        if cursor == 0:
-            if pos == len(arr) - 1:
+        if state.cursor == 0:
+            if pos == len(state.arr) - 1:
                 if text != "":
-                    copy_buffer = text
-                    arr[pos] = ""
+                    state.copy_buffer = text
+                    state.arr[pos] = ""
             else:
-                copy_buffer = text
-                arr.pop(pos)
-        elif cursor == len(text):
-            if pos < len(arr) - 1:
-                copy_buffer = arr.pop(pos + 1)
+                state.copy_buffer = text
+                state.arr.pop(pos)
+        elif state.cursor == len(text):
+            if pos < len(state.arr) - 1:
+                state.copy_buffer = state.arr.pop(pos + 1)
         else:
-            arr[pos] = text[:cursor]
-            copy_buffer = text[cursor:]
+            state.arr[pos] = text[:state.cursor]
+            state.copy_buffer = text[state.cursor:]
 
-    if isinstance(copy_buffer, list) and len(copy_buffer) == 1:
-        copy_buffer = copy_buffer[0]
-    return copy_buffer, arr, line, offset, select
+    if isinstance(state.copy_buffer, list) and len(state.copy_buffer) == 1:
+        state.copy_buffer = state.copy_buffer[0]
+       
 
 
-def copy(select, arr, line, offset, banoff, cursor):
-    if select:
-        start = max(sum(select[0]) - 1, 0)
-        copy_buffer = arr[start:sum(select[1])]
+def copy(state):
+    if state.select_mode and state.select:
+        start = max(sum(state.select[0]) - 1, 0)
+        state.copy_buffer = state.arr[start:sum(state.select[1])]
         if start > 0:
-            copy_buffer = copy_buffer[1:]
+            state.copy_buffer = state.copy_buffer[1:]
+        
+        state.select = []
+        state.select_mode = False
     else:
-        pos = line + offset - banoff
-        text = arr[pos]
-        if cursor == len(text):
-            if pos < len(arr) - 1:
-                copy_buffer = arr[pos + 1]
-        else:
-            copy_buffer = text[cursor:]
+        pos = state.line + state.offset - state.banoff
+        text = state.arr[pos]
+        if state.cursor == len(text):
+            if pos < len(state.arr) - 1:
+                state.copy_buffer = state.arr[pos + 1]
+        else:   state.copy_buffer = text[state.cursor:]
 
-    if isinstance(copy_buffer, list) and len(copy_buffer) == 1:
-        copy_buffer = copy_buffer[0]
-    return copy_buffer
+    if isinstance(state.copy_buffer, list) and len(state.copy_buffer) == 1:
+        state.copy_buffer = state.copy_buffer[0]
 
 
-def repag(line,offset,banoff,rows,arr,sep,cursor,oldptr,select,selected):
-    for x in range(0,rows):
-        cursor, oldptr, offset, line, select =\
-        up(line,offset,arr,banoff,oldptr,rows,cursor,select,selected)
-    return line, offset, cursor, oldptr, select
+def dedent(state):
+    pos = state.line + state.offset - state.banoff
+    text = state.arr[pos]
+    p1 = text[:state.cursor]
+    p2 = text[state.cursor:]
+    if len(state.indent)>0 and p1.endswith(state.indent):
+        p1 = p1[:-len(state.indent)]
+        state.cursor-=len(state.indent)
+        state.arr[pos] = p1+p2
 
-def avpag(line,offset,banoff,rows,arr,sep,cursor,oldptr,select,selected):
-    for x in range(0,rows):
-        cursor, oldptr, offset, line, select =\
-        down(line,offset,arr,banoff,oldptr,rows,cursor,select,selected)
-    return line, offset, cursor, oldptr, select
 
-def dedent(arr,line,offset,banoff,indent,cursor):
-    text = arr[line+offset-banoff]
-    p1 = text[:cursor]
-    p2 = text[cursor:]
-    if len(indent)>0 and p1.endswith(indent):
-        p1 = p1[:-len(indent)]
-        cursor-=len(indent)
-        arr[line+offset-banoff] = p1+p2
-    return arr,cursor
-
-def newline(cursor,offset,banoff,line,arr,rows,select):
-    if not len(select) == 0:
-        select,arr,line,offset = del_sel(select,arr,banoff)
-        if len(arr)==0: return line,offset,arr,0,select
-    text = arr[line+offset-banoff]
+def newline(state):
+    if state.select_mode and len(state.select) > 0:
+        del_sel(state)
+        if len(state.arr)==0: return
+    text = state.arr[state.line+state.offset-state.banoff]
     if not len(text) == 0:
-        arr.insert(line+offset-banoff,text[:cursor])
-        text = text[cursor:]; cursor = 0
-    else: arr.insert(line+offset-banoff, "")
-    if line>rows: offset += 1
-    else: line += 1
-    arr[line+offset-banoff] = text
-    return line,offset,arr,cursor,select
+        state.arr.insert(state.line+state.offset-state.banoff,text[:state.cursor])
+        text = text[state.cursor:]; state.cursor = 0
+    else: 
+        state.arr.insert(state.line+state.offset-state.banoff, "")
+
+    if state.line>state.rows: state.offset += 1
+    else:                     state.line   += 1
+
+    state.arr[state.line+state.offset-state.banoff] = text
+    state.status_st = False
+
+
+def comment_func(state):
+    """Comment current line or selection"""
+    if not state.select_mode or len(state.select) == 0:
+        # Comment single line
+        pos = state.line + state.offset - state.banoff
+        indent_part, content_part = cmt_w_ind(state.arr[pos], state.indent)
+        state.arr[pos] = indent_part + state.comment[0] + content_part + state.comment[1]
+    else:
+        # Comment selection
+        select_add_start_str(state, state.comment)
+    
+    # Adjust cursor if line changed
+    current_text = state.arr[state.line + state.offset - state.banoff]
+    if len(current_text) > len(state.arr[state.line + state.offset - state.banoff]):
+        state.cursor += len(state.comment[0])
+
+
+def uncomment_func(state):
+    """Uncomment current line or selection"""
+    if not state.select_mode or len(state.select) == 0:
+        # Uncomment single line
+        pos = state.line + state.offset - state.banoff
+        indent_part, content_part = cmt_w_ind(state.arr[pos], state.indent)
+        
+        comment_start_len = len(state.comment[0])
+        comment_end_len = len(state.comment[1])
+        
+        # Remove comment markers
+        if content_part.startswith(state.comment[0]):
+            content_part = content_part[comment_start_len:]
+        if content_part.endswith(state.comment[1]):
+            content_part = content_part[:-comment_end_len] if comment_end_len > 0 else content_part
+        
+        state.arr[pos] = indent_part + content_part
+    else:
+        # Uncomment selection
+        select_add_start_str(state, state.comment, True)
+    
+    # Adjust cursor if line changed
+    current_text = state.arr[state.line + state.offset - state.banoff]
+    if len(current_text) < len(state.arr[state.line + state.offset - state.banoff]):
+        state.cursor -= len(state.comment[0])
+    
+
+def supr(state):
+    """Delete character after cursor"""
+    current_text = state.arr[state.line + state.offset - state.banoff]
+    
+    if not state.select_mode or len(state.select) == 0:
+        text_chars = list(current_text)
+        if state.cursor < len(text_chars) and len(text_chars) > 0:
+            text_chars.pop(state.cursor)
+            current_text = "".join(text_chars)
+            state.arr[state.line + state.offset - state.banoff] = current_text
+    else:
+        # Delete selection
+        del_sel(state)
+        state.cursor = 0
 

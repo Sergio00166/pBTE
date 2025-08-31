@@ -1,105 +1,101 @@
 # Code by Sergio00166
 
-version="v0.7.4.5"
-     
-if not __name__=="__main__":
+VERSION = "v0.8.0.0"
 
-    from os import getcwd, sep, read, environ
+if not __name__ == "__main__":
+    from os import getcwd, sep, environ
     from sys import argv, path
 
-    # Add all file structure
-    root = path[0]+sep+"bin"+sep
-    path.append(sep.join([path[0],"bin","lib.zip"]))
-    path.append(root+"core")
-    path.append(root+"menus")
-    
-    from os.path import abspath, isdir
-    from functions import read_UTF8,taborspace
-    from scr_funcs import get_size
-    from upd_scr import update_scr
-    from keys_func import keys_func
+    # Add all file structure to import path
+    root = path[0] + sep + "bin" + sep
+    path.append(sep.join([path[0], "bin", "lib.zip"]))
+    path.append(root + "core")
+    path.append(root + "menus")
+
     from colorama import init, Fore, Back, Style, deinit
-    from threading import Thread
+    from functions import read_UTF8, taborspace
+    from os.path import abspath, isdir, join
+    from types import SimpleNamespace
+    from keys_func import keys_func
     from time import sleep as delay
+    from scr_utils import get_size
+    from upd_scr import update_scr
+    from threading import Thread
+    from inputs import getch
     from glob import glob
     from data import keys
 
-    # Define colors
-    init(autoreset=False,convert=True)
-    reset=Style.RESET_ALL
-    bnc=Back.GREEN+Fore.BLACK
-    black=Back.LIGHTCYAN_EX+Fore.BLACK
-    slc=Back.LIGHTYELLOW_EX+Fore.BLACK
-    deinit(); del init, Fore, Back, Style, deinit
+    if not sep == chr(92):  # If OS is LINUX
+        # Get default values for TTY
+        from termios import TCSADRAIN, tcsetattr, tcgetattr
+        from sys import stdin
+        from tty import setraw
 
-    # Create the raw kb reader
-    if sep==chr(92):
-        from msvcrt import getch\
-             as gch, kbhit
-        
-        def getch():
-            out = gch()
-            while kbhit(): out+=gch()
-            return out
-    else:
-        #Get default values for TTY
-        from termios import TCSADRAIN,tcsetattr,tcgetattr
-        from sys import stdin; from tty import setraw
-        from select import select as slsl
-        fd = stdin.fileno(); old_settings = tcgetattr(fd)
+        fd = stdin.fileno()
+        old_settings = tcgetattr(fd)
 
-        def getch():
-            old=(fd,TCSADRAIN,old_settings)
-            setraw(fd,when=TCSADRAIN)
-            out,rlist = b"",True
-            while rlist:
-                out += read(fd,8)
-                # Check if available data
-                rlist = slsl([fd],[],[],0)[0]
-            # Set TTY to default
-            tcsetattr(*old)
-            return out
-
-
-    # Check if we have arguments via cli, if not create an empty one
-    filename = getcwd()+sep+"NewFile"
-    # Fix when current dir is root
+    # --- Default file values ---
+    filename = getcwd() + sep + "NewFile"
     if filename.startswith("//"):
         filename = filename[1:]
-    arr,codec,lnsep = [""],"UTF-8","\n"
-    if not len(argv)==1:
-        files = [glob(x,recursive=False) for x in argv[1:]]
+
+    arr, codec, lnsep, files = [""], "UTF-8", "\n", []
+
+    # --- Load file if passed as argument ---
+    if len(argv) > 1:
+        files = [glob(x, recursive=False) for x in argv[1:]]
         files = [abspath(i) for x in files for i in x if not isdir(i)]
-        files = [x.replace(sep,"/") for x in files]
-        if len(files)>0:
-            # Skip unopenable files
-            for _ in range(len(files)):
-                try:
-                    name,files = files[0],files[1:]
-                    arr,codec,lnsep = read_UTF8(name)
-                    filename = name
-                    break
-                except: pass
-    else: files=[]
+        files = [x.replace(sep, "/") for x in files]
+        for _ in range(len(files)):
+            try:
+                name, files = files[0], files[1:]
+                arr, codec, lnsep = read_UTF8(name)
+                filename = name
+                break
+            except: pass
 
-    #Define a lot of stuff
-    select_mode = False
-    indent = taborspace(arr)
-    cursor,offset,oldptr=0,0,0
-    line,banoff=1,1
-    banner=["pBTE",version]
-    copy_buffer,select = "",[]
-    end,start = 1,0
-    comment = ["#",""]
-    rows,columns=get_size()
-    filename = filename.replace(sep,"/")
-    status=""; status_st=False
+    init(autoreset=False, convert=True)
+    rows, columns = get_size()
 
-    # Create a new TTY space
+    # --- Application state ---
+    app_state = SimpleNamespace(
+        # Colors
+        black = Back.LIGHTCYAN_EX + Fore.BLACK,
+        bnc = Back.GREEN + Fore.BLACK,
+        slc = Back.LIGHTYELLOW_EX + Fore.BLACK,
+        reset = Style.RESET_ALL,
+        # Info
+        banner = ["pBTE", VERSION],
+        # File
+        filename = filename,
+        arr = arr,
+        codec = codec,
+        lnsep = lnsep,
+        # Editor
+        comment = ["#", ""],
+        indent = taborspace(arr),
+        # Cursor
+        cursor=0,
+        oldptr=0,
+        line=1,
+        offset=0,
+        banoff=1,
+        # Display
+        rows=rows,
+        columns=columns,
+        # Selection
+        select=[],
+        select_mode=False,
+        copy_buffer="",
+        # Status
+        status="",
+        status_st=False,
+        # Keys
+        keys=keys
+    )
+    deinit()
+
+    # --- Switch to alternate screen buffer ---
     print("\x1b[?1049h", end="")
-
-
-
-    # Create a new TTY space
-    print("\x1b[?1049h", end="")
+    
 

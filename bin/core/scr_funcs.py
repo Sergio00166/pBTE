@@ -1,9 +1,9 @@
 # Code by Sergio00166
 
-from data import ascii_map,ascii_replaced
-from os import get_terminal_size, sep
 from os.path import split as psplit
 from wcwidth import wcwidth
+from os import sep
+from scr_utils import *
 
 
 # Expands tabulators and splits the text in parts and as
@@ -42,35 +42,27 @@ def wrap(text, columns, tabsize=8, cursor=None):
     return (result,ptr,pos) if extra else (result)
 
 
-def fix_arr_line_len(arr, columns, black, reset):
-    out=[]; fix=0//(columns+2)
-    for text in arr:
-        text = text[:columns+2]
-        wrapped_text = wrap(text,columns)
-        if len(wrapped_text)==0: wrapped_text=""
-        elif fix==len(wrapped_text):
-            text=wrapped_text[fix-1]
-        else: text=wrapped_text[fix]
-        text=sscp(text,[black,reset])
-        if (len(wrapped_text)-fix)>1:
-            text+=black+">"+reset
-        out.append(text)   
-    return out
+def fix_arr_line_len(state, sub_arr):
+    """Wrap and style each line in sub_arr based on state settings"""
+    fix, out = 0 // (state.columns + 2), []
 
-# Expands tabs and gets real string lenght
-def str_len(self, tabsize=8):
-    result,col,lenght = [],0,0
-    for char in self:
-        if char == "\t":
-            space_count = tabsize - (col % tabsize)
-            result.append(" " * space_count)
-            lenght += space_count
-            col += space_count
+    for text in sub_arr:
+        text = text[:state.columns + 2]
+        wrapped_text = wrap(text, state.columns)
+
+        if len(wrapped_text) == 0:
+            text = ""
+        elif fix == len(wrapped_text):
+            text = wrapped_text[fix - 1]
         else:
-            result.append(char)
-            char_width = wcwidth(char)
-            lenght += char_width
-    return lenght
+            text = wrapped_text[fix]
+
+        text = sscp(text, [state.black, state.reset])
+        if (len(wrapped_text) - fix) > 1:
+            text += state.black + ">" + state.reset
+
+        out.append(text)
+    return out
 
 
 def fix_cursor_pos(text,cursor,columns,black,reset):
@@ -91,14 +83,22 @@ def fix_cursor_pos(text,cursor,columns,black,reset):
     return cursor, text
 
 
-def scr_arr2str(arr,line,offset,cursor,black,reset,columns,rows,banoff):
-    uptr=cursor; out_arr=[]; sp=black+"<"+reset
-    text = arr[line+offset-banoff]
-    cursor, text = fix_cursor_pos(text,cursor,columns,black,reset)
-    arr = arr[offset:rows+offset+banoff]
-    arr = fix_arr_line_len(arr,columns,black,reset)
-    arr[line-banoff] = text # Unsafe
-    return arr, cursor
+def scr_arr2str(state):
+    """Prepare a styled slice of the screen array and update cursor position"""
+    # Extract the relevant line for cursor adjustment
+    text = state.arr[state.line + state.offset - state.banoff]
+    # Adjust cursor and line text
+    cursor, text = fix_cursor_pos(
+        text, state.cursor, state.columns, state.black, state.reset
+    )
+    # Work on a slice of the array without modifying the original
+    sub_arr = state.arr[state.offset : state.offset + state.rows + state.banoff]
+    sub_arr = fix_arr_line_len(state, sub_arr)
+
+    # Replace the line where the cursor is
+    sub_arr[state.line - state.banoff] = text
+    return sub_arr, cursor
+
 
 
 def fixfilename(path, lenght):
@@ -114,41 +114,3 @@ def fixfilename(path, lenght):
     return compacted_path
 
 
-def fixlenline(text, cursor, oldptr):
-    lenght = len(text)
-    if cursor > lenght or oldptr > lenght:
-        return lenght
-    elif oldptr > cursor:
-        return oldptr
-    else:
-        return cursor
-
-def get_size():
-    size = get_terminal_size()
-    return size[1] - 2, size[0] - 2
-
-
-# Replaces ascii control chars to the highlighted visual version
-def sscp(arg,color):
-    global ascii_map
-    b, r = color; ext = []
-    for x in arg:
-        if ord(x) in ascii_map:
-            ext.append(b+ascii_map[ord(x)]+r)
-        elif str_len(x)>0: ext.append(x)
-        else: ext.append(b+"�"+r)
-    return "".join(ext)
-
-# Inverts the highlight (for the highlight selector)
-def rscp(arg,color):
-    global ascii_replaced
-    if len(color)==3:
-        b,r,c = color
-        b1 = r+b
-        r1 = r+c
-    else:
-        b,r = color
-        b1,r1 = b,r
-    for x in ascii_replaced:
-        arg=arg.replace(b+x+r, r1+x+b1)
-    return arg

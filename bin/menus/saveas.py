@@ -1,173 +1,234 @@
 # Code by Sergio00166
 
-from functions import decode,read_UTF8,write_UTF8
+from functions import read_UTF8, write_UTF8
+from types import SimpleNamespace
+from inputs import decode, getch
 from upd_scr import menu_updsrc
 from time import sleep as delay
-from scr_funcs import get_size
+from scr_utils import get_size
 from threading import Thread
 from glob import glob
 from os import sep
 
 
-if not sep==chr(92): #If OS is LINUX
-    #Get default values for TTY
-    from termios import TCSADRAIN,tcsetattr,tcgetattr
-    from sys import stdin; from tty import setraw
-    fd = stdin.fileno(); old_settings = tcgetattr(fd)
+if not sep == chr(92):  # If OS is LINUX
+    # Get default values for TTY
+    from termios import TCSADRAIN, tcsetattr, tcgetattr
+    from sys import stdin
+    from tty import setraw
 
-def updscr_thr():
-    global saveastxt,filewrite,rows,columns,black,reset,status,banoff
-    global lenght,wrtptr,offset,line,arr,banner,filename,rows,columns
-    global run, kill, fd, old_settings, status_st, bnc, slc
-    
-    while not kill:
+    fd = stdin.fileno()
+    old_settings = tcgetattr(fd)
+
+
+def updscr_thr(app_state, menu_state):
+    global fd, old_settings
+
+    while not menu_state.kill:
         delay(0.01)
-        if run:
+        if menu_state.run:
             # If OS is LINUX restore TTY to it default values
-            if not sep==chr(92):
-                old=(fd,TCSADRAIN,old_settings)
+            if not sep == chr(92):
+                old = (fd, TCSADRAIN, old_settings)
                 tcsetattr(fd, TCSADRAIN, old_settings)
             # Call Screen updater
-            mode=(filewrite,saveastxt,wrtptr,lenght)
-            arg=(black,bnc,slc,reset,status,banoff,offset,line,\
-            wrtptr,arr,banner,filename,rows,columns,status_st)
-            rows,columns = menu_updsrc(arg,mode)
+            mode = (
+                menu_state.filewrite,
+                menu_state.saveastxt,
+                menu_state.wrtptr,
+                menu_state.lenght
+            )
+            menu_updsrc(app_state, mode)
             # If OS is LINUX set TTY to raw mode
-            if not sep==chr(92): setraw(fd,when=TCSADRAIN)
+            if not sep == chr(92):
+                setraw(fd, when=TCSADRAIN)
 
 
-def exit():
-    global fd, old_settings, run, kill, thr
-    run=False; kill=True; thr.join()
-    if not sep == chr(92): tcsetattr(fd,TCSADRAIN,old_settings)
+def exit(menu_state):
+    global fd, old_settings
+    menu_state.run = False
+    menu_state.kill = True
+    thr.join()
+    if not sep == chr(92):
+        tcsetattr(fd, TCSADRAIN, old_settings)
 
 
-def save_as(arg):
-    global saveastxt,filewrite,rows,columns,black,reset,status,banoff
-    global lenght,wrtptr,offset,line,arr,banner,filename,rows,columns
-    global run, kill, fd, thr, old_settings, status_st, bnc, slc
+def save_as(app_state):
+    global fd, thr, old_settings
 
-    filename,black,bnc,slc,reset,rows,banoff,arr,columns,status,offset,\
-    line,banner,status_st,keys,read_key,codec,lnsep = arg
+    # Create menu state object
+    menu_state = SimpleNamespace(
+        saveastxt = " Save as: ",
+        filewrite = app_state.filename,
+        lenght = 0,
+        wrtptr = 0,
+        complete = False,
+        cmp_counter = 0,
+        run = False,
+        kill = False
+    )
+    menu_state.lenght = len(menu_state.saveastxt) + 1
+    menu_state.wrtptr = menu_state.lenght + len(menu_state.filewrite)
 
-    saveastxt=" Save as: "; lenght=len(saveastxt)+1
-    filewrite=filename; wrtptr=lenght+len(filewrite)
-    thr=Thread(target=updscr_thr)
-    run,kill,complete = False,False,False
-    thr.daemon=True; thr.start()
-    cmp_counter = 0
-    
+    thr = Thread(target=updscr_thr, args=(app_state, menu_state))
+    menu_state.run, menu_state.kill = False, False
+    thr.daemon = True
+    thr.start()
+
     while True:
         # Fix when the cursor is out
-        if len(filewrite)<wrtptr-lenght:
-            wrtptr = len(filewrite)+lenght
+        if len(menu_state.filewrite) < menu_state.wrtptr - menu_state.lenght:
+            menu_state.wrtptr = len(menu_state.filewrite) + menu_state.lenght
         try:
             # Force use LINUX dir separator
-            filewrite=filewrite.replace(chr(92),"/")
+            menu_state.filewrite = menu_state.filewrite.replace(chr(92), "/")
             # If OS is LINUX restore TTY to it default values
-            if not sep==chr(92):
-                old=(fd,TCSADRAIN,old_settings)
+            if not sep == chr(92):
+                old = (fd, TCSADRAIN, old_settings)
                 tcsetattr(fd, TCSADRAIN, old_settings)
             # Call Screen updater
-            mode=(filewrite,saveastxt,wrtptr,lenght)
-            arg=(black,bnc,slc,reset,status,banoff,offset,line,\
-            wrtptr,arr,banner,filename,rows,columns,status_st)
-            rows,columns = menu_updsrc(arg,mode,True)
+            mode = (
+                menu_state.filewrite,
+                menu_state.saveastxt,
+                menu_state.wrtptr,
+                menu_state.lenght,
+            )
+            menu_updsrc(app_state, mode, True)
             # If OS is LINUX set TTY to raw mode
-            if not sep==chr(92): setraw(fd,when=TCSADRAIN)
-            
-            run=True #Start update screen thread
-            key=read_key() #Map keys
-            run=False #Stop update screen thread
+            if not sep == chr(92):
+                setraw(fd, when=TCSADRAIN)
+
+            menu_state.run = True  # Start update screen thread
+            key = getch()  # Map keys
+            menu_state.run = False  # Stop update screen thread
 
             # Reset error message
-            if status=="ERROR": status_st = False
+            if app_state.status == "ERROR":
+                app_state.status_st = False
 
-            if key==keys["tab"]:
-                if not (len(filewrite)==0 or (sep==chr(92) and not ":/" in filewrite)):
-                    if not complete: content=glob(filewrite+"*",recursive=False)
-                    if len(content)>0: complete=True
-                    if cmp_counter>=len(content): cmp_counter = 0
-                    if complete:
-                        filewrite=content[cmp_counter]
-                        cmp_counter+=1
-                    else: filewrite=content[0]
+            if key == app_state.keys["tab"]:
+                if not (
+                    len(menu_state.filewrite) == 0
+                    or (sep == chr(92) and not ":/" in menu_state.filewrite)
+                ):
+                    if not menu_state.complete:
+                        content = glob(menu_state.filewrite + "*", recursive=False)
+                    if len(content) > 0:
+                        menu_state.complete = True
+                    if menu_state.cmp_counter >= len(content):
+                        menu_state.cmp_counter = 0
+                    if menu_state.complete:
+                        menu_state.filewrite = content[menu_state.cmp_counter]
+                        menu_state.cmp_counter += 1
+                    else:
+                        menu_state.filewrite = content[0]
 
-            elif complete and key==keys["return"]:
-                wrtptr=len(filewrite)+len(saveastxt)+2
-                complete=False
-            
-            #Ctrl + S (confirms) or Ctrl + B backup
-            elif key==keys["ctrl+s"] or key==keys["ctrl+b"]:
-                old_filewrite = filewrite
+            elif menu_state.complete and key == app_state.keys["return"]:
+                menu_state.wrtptr = (
+                    len(menu_state.filewrite) + len(menu_state.saveastxt) + 2
+                )
+                menu_state.complete = False
+
+            elif key == app_state.keys["return"]: pass
+
+            # Ctrl + S (confirms) or Ctrl + B backup
+            elif key in (
+                app_state.keys["ctrl+s"], 
+                app_state.keys["ctrl+b"]
+            ):
+                save_file = menu_state.filewrite +\
+                    (".bak" if key == app_state.keys["ctrl+b"] else "")
                 try:
-                    if key==keys["ctrl+b"] and filewrite==filename: filewrite+=".bak"
-                    write_UTF8(filewrite,codec,lnsep,arr)
-                    if key==keys["ctrl+b"]: status="BCKPd"
-                    else: status,filename = "SAVED",filewrite
-                    status_st=True; break # Exit the menu
+                    write_UTF8(
+                        save_file, 
+                        app_state.codec,
+                        app_state.lnsep,
+                        app_state.arr
+                    )
+                    if key == app_state.keys["ctrl+b"]:
+                        app_state.status = "BCKPd"
+                    else:
+                        app_state.status = "SAVED"
+                        app_state.filename = menu_state.filewrite
+                    app_state.status_st = True
+                    break
                 except:
-                    filewrite = old_filewrite
-                    raise OSError
-                
-                
-            elif key==keys["ctrl+c"]: break
+                    app_state.status, app_state.status_st = "ERROR", True
+
+            elif key in (
+                app_state.keys["ctrl+p"],
+                app_state.keys["ctrl+a"]
+            ):
+                tmp, codec, lnsep = read_UTF8(menu_state.filewrite)
         
-            elif key==keys["delete"]:
-                if not wrtptr==lenght:
-                    if complete:
-                        filewrite=filewrite.split("/")[:-1]
-                        filewrite="/".join(filewrite)+"/"
-                        wrtptr-=len(filewrite[-1])-1
-                        complete=False
-                    else: 
-                        p1=list(filewrite)
-                        p1.pop(wrtptr-lenght-1)
-                        filewrite="".join(p1)
-                        wrtptr-=1
+                if key == app_state.keys["ctrl+a"]:
+                    output = list(app_state.arr + tmp)
+                elif key == app_state.keys["ctrl+p"]:
+                    output = list(app_state.tmp + arr)
 
-            elif key==keys["arr_left"]:
-                if not wrtptr==lenght: wrtptr-=1
-                
-            elif key==keys["arr_right"]:
-                if not wrtptr>len(filewrite)+lenght: wrtptr+=1
-                
-            elif key==keys["supr"]:
-                if complete:
-                    filewrite="/".join(filewrite.split("/")[:-1])+"/"
-                    wrtptr-=len(filewrite[-1])
-                    complete=False
-                else: 
-                    p1=list(filewrite)
-                    p1.pop(wrtptr-lenght)
-                    filewrite="".join(p1)                   
-
-            elif key in keys["start"]: wrtptr=lenght
-                
-            elif key in keys["end"]: wrtptr=len(filewrite)+lenght
-         
-            elif key==keys["return"]: pass
-
-            elif key==keys["ctrl+p"] or key==keys["ctrl+a"]:
-                tmp,codec,lnsep = read_UTF8(filewrite)
-                if key==keys["ctrl+a"]: output=list(arr+tmp)
-                elif key==keys["ctrl+p"]: output=list(tmp+arr)
-                write_UTF8(filewrite,codec,lnsep,output)
-                status,status_st = bnc+"ADDED",True
+                write_UTF8(
+                    menu_state.filewrite, 
+                    codec, lnsep, output
+                )
+                app_state.status = app_state.bnc + "ADDED"
+                app_state.status_st = True
                 break
-            
-            else: #Rest of keys
-                if wrtptr<((columns+2)*rows+1):
-                    out=decode(key)
-                    p1=filewrite[:wrtptr-lenght]
-                    p2=filewrite[wrtptr-lenght:]
-                    filewrite=p1+out+p2
-                    wrtptr+=len(out)
 
-        except OSError: status,status_st = "ERROR",True
+            elif key == app_state.keys["ctrl+c"]: break
+
+            elif key == app_state.keys["delete"]:
+                if not menu_state.wrtptr == menu_state.lenght:
+                    if menu_state.complete:
+                        menu_state.filewrite = menu_state.filewrite.split("/")[:-1]
+                        menu_state.filewrite = "/".join(menu_state.filewrite) + "/"
+                        menu_state.wrtptr -= len(menu_state.filewrite[-1]) - 1
+                        menu_state.complete = False
+                    else:
+                        p1 = list(menu_state.filewrite)
+                        p1.pop(menu_state.wrtptr - menu_state.lenght - 1)
+                        menu_state.filewrite = "".join(p1)
+                        menu_state.wrtptr -= 1
+
+            elif key == app_state.keys["arr_left"]:
+                if not menu_state.wrtptr == menu_state.lenght:
+                    menu_state.wrtptr -= 1
+
+            elif key == app_state.keys["arr_right"]:
+                if (
+                    not menu_state.wrtptr
+                    > len(menu_state.filewrite) + menu_state.lenght
+                ):
+                    menu_state.wrtptr += 1
+
+            elif key == app_state.keys["supr"]:
+                if menu_state.complete:
+                    menu_state.filewrite = menu_state.filewrite.split("/")[:-1]
+                    menu_state.filewrite = "/".join(menu_state.filewrite) + "/"
+                    menu_state.wrtptr -= len(menu_state.filewrite[-1]) - 1
+                    menu_state.complete = False
+                else:
+                    p1 = list(menu_state.filewrite)
+                    p1.pop(menu_state.wrtptr - menu_state.lenght)
+                    menu_state.filewrite = "".join(p1)
+
+            elif key in app_state.keys["start"]:
+                menu_state.wrtptr = menu_state.lenght
+
+            elif key in app_state.keys["end"]:
+                menu_state.wrtptr = len(menu_state.filewrite) + menu_state.lenght
+
+            else:  # Rest of keys
+                if menu_state.wrtptr < ((app_state.columns + 2) * app_state.rows + 1):
+                    out = decode(key)
+                    p1 = menu_state.filewrite[: menu_state.wrtptr - menu_state.lenght]
+                    p2 = menu_state.filewrite[menu_state.wrtptr - menu_state.lenght :]
+                    menu_state.filewrite = p1 + out + p2
+                    menu_state.wrtptr += len(out)
+                    menu_state.complete = False
+
+        except OSError:
+            app_state.status, app_state.status_st = "ERROR", True
         except: pass
-        
-    exit() # Reset
-    # Fix when current dir is root
-    if filename.startswith("//"): filename = filename[1:]
-    return status_st, filename, status, codec, lnsep
+
+    exit(menu_state)  # Reset
+

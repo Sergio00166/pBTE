@@ -1,152 +1,150 @@
 # Code by Sergio00166
 
-from upd_scr import update_scr,movcr,hcr,scr,print
-from scr_funcs import get_size,str_len
+from text_op import search_substring, search_substring_rev
+from scr_utils import get_size, str_len, movcr
+from scr_utils import hcr, scr, print
+from upd_scr import update_scr
 from chg_var_str import chg_var_str
-from functions import CalcRelLine
+from functions import calc_rel_line
+from types import SimpleNamespace
 from time import sleep as delay
 from threading import Thread
+from inputs import getch
 from os import sep
 
 
-if not sep==chr(92): #If OS is LINUX
-    #Get default values for TTY
-    from termios import TCSADRAIN,tcsetattr,tcgetattr
-    from sys import stdin; from tty import setraw
-    fd = stdin.fileno(); old_settings = tcgetattr(fd)
+if not sep == chr(92):  # If OS is LINUX
+    # Get default values for TTY
+    from termios import TCSADRAIN, tcsetattr, tcgetattr
+    from sys import stdin
+    from tty import setraw
+
+    fd = stdin.fileno()
+    old_settings = tcgetattr(fd)
 
 
-def updscr_thr():
-    global rows,columns,black,reset,status,banoff,cursor
-    global offset,line,banner,filename,rows,columns
-    global kill,fd,thr,old_settings,status_st,bnc,slc
-    global find_str,rel_cursor,run,arr
+def updscr_thr(app_state, menu_state):
+    global fd, old_settings
 
-    while not kill:
+    while not menu_state.kill:
         delay(0.01)
-        if run:
+        if menu_state.run:
             # If OS is LINUX restore TTY to it default values
-            if not sep==chr(92):
-                old=(fd,TCSADRAIN,old_settings)
+            if not sep == chr(92):
+                old = (fd, TCSADRAIN, old_settings)
                 tcsetattr(fd, TCSADRAIN, old_settings)
             # Save old vars and get new values
-            old_rows=rows; old_columns=columns
-            rows,columns=get_size()
+            old_rows = app_state.rows
+            old_columns = app_state.columns
+            app_state.rows, app_state.columns = get_size()
             # Check if terminal is too small
-            if rows<4 or columns<24: print("\r\033cTerminal too small")
+            if app_state.rows < 4 or app_state.columns < 24:
+                print("\r\033cTerminal too small")
             # Compare the old values with the new ones
-            elif not (old_rows==rows and old_columns==columns):
+            elif not (old_rows == app_state.rows and old_columns == app_state.columns):
                 # Increment the offset if line is geeter than rows
-                if line>rows: offset=offset+(line-rows); line=rows
+                if app_state.line > app_state.rows:
+                    app_state.offset = app_state.offset + (
+                        app_state.line - app_state.rows
+                    )
+                    app_state.line = app_state.rows
                 # If OS is LINUX restore TTY to it default values
-                if not sep==chr(92): tcsetattr(fd, TCSADRAIN, old_settings)
+                if not sep == chr(92):
+                    tcsetattr(fd, TCSADRAIN, old_settings)
                 # Call screen updater function
-                rel_cursor = update_scr(
-                black,bnc,slc,reset,status,banoff,offset,line,cursor,arr,\
-                banner,filename,rows,columns,status_st,False,[],find_str)
-                chg_hlg(rel_cursor,find_str)
+                rel_cursor = update_scr(app_state, False, menu_state.find_str)
+                chg_hlg(rel_cursor, menu_state.find_str, app_state)
             # If OS is LINUX set TTY to raw mode
-            if not sep==chr(92): setraw(fd,when=TCSADRAIN)
+            if not sep == chr(92):
+                setraw(fd, when=TCSADRAIN)
 
 
-def exit():
-    global fd, old_settings, run, kill, thr
-    run=False; kill=True; thr.join()
-    print(scr) # Show cursor again
-    if not sep == chr(92): tcsetattr(fd,TCSADRAIN,old_settings)
+def exit(menu_state):
+    global fd, old_settings
+    menu_state.run = False
+    menu_state.kill = True
+    thr.join()
+    print(scr)  # Show cursor again
+    if not sep == chr(92):
+        tcsetattr(fd, TCSADRAIN, old_settings)
 
-def search_substring(lst, substring, start_list_pos=0, start_string_pos=0):
-    list_lenght,i = len(lst),start_list_pos
-    while True:
-        start = start_string_pos if i == start_list_pos else 0
-        for j in range(start, len(lst[i])):
-            if lst[i][j:j+len(substring)] == substring:
-                return i, j+len(substring)
-        i,start_string_pos = (i+1)%list_lenght,0
 
-def search_substring_rev(lst, substring, start_list_pos=0, start_string_pos=None):
-    list_lenght,i = len(lst),start_list_pos
-    while True:
-        start = start_string_pos if i == start_list_pos else len(lst[i])
-        if start_string_pos is None: start = len(lst[i])
-        else: start = start_string_pos-len(find_str)
-        for j in range(start, -1, -1):
-            if lst[i][j-len(substring):j] == substring: return i, j
-        i,start_string_pos = (i-1)%list_lenght,None
+def chg_hlg(rel_cursor, find_str, app_state):
+    pos = rel_cursor - str_len(find_str)
+    mov = movcr % (app_state.line + app_state.banoff, pos + 1)
+    if pos >= 0:
+        print(mov + app_state.slc + find_str + app_state.reset + hcr)
 
-def chg_hlg(rel_cursor,find_str):
-    pos = rel_cursor-str_len(find_str)
-    mov = movcr%(line+banoff,pos+1)
-    if pos>=0: print(mov+slc+find_str+reset+hcr)
 
-def isin_arr(arr,string):
+def isin_arr(arr, string):
     for x in arr:
-        if string in x: return True
+        if string in x: 
+            return True
     return False
 
 
-def find(arg):
-    global rows,columns,black,reset,status,banoff,cursor
-    global offset,line,banner,filename,rows,columns
-    global kill,fd,thr,old_settings,status_st,bnc,slc
-    global find_str,rel_cursor,run,arr
+def find(app_state):
+    global fd, old_settings, thr
 
-    filename,black,bnc,slc,reset,rows,banoff,arr,columns,\
-    status,offset,line,banner,status_st,keys,read_key,cursor = arg
-
-    args = (filename,black,bnc,slc,reset,rows,banoff,arr,columns,status,offset,\
-            line,banner,status_st,keys,cursor,[],read_key,""," Find: ")
-
-    try: find_str = chg_var_str(args,True)
-    except KeyboardInterrupt: return cursor,line,offset
+    try: 
+        find_str = chg_var_str(app_state, "", " Find: ", True)
+    except KeyboardInterrupt: return
 
     # Check if the str exists in arr
-    if not isin_arr(arr,find_str) or find_str=="":
-        return cursor,line,offset
+    if not isin_arr(app_state.arr, find_str) or find_str == "": return
 
-    thr=Thread(target=updscr_thr)
-    run,kill = False,False
-    thr.daemon = True; thr.start()
+    # Create menu state object
+    menu_state = SimpleNamespace(find_str=find_str, run=False, kill=False)
+
+    thr = Thread(target=updscr_thr, args=(app_state, menu_state))
+    menu_state.run, menu_state.kill = False, False
+    thr.daemon = True
+    thr.start()
 
     # Find and move cursor to the fist one
-    pos = line+offset-banoff
-    p1,cursor = search_substring(arr,find_str,pos,cursor)
-    line,offset = CalcRelLine(p1,arr,offset,line,banoff,rows)
-    
+    pos = app_state.line + app_state.offset - app_state.banoff
+    p1, app_state.cursor = search_substring(
+        app_state.arr, menu_state.find_str, pos, app_state.cursor
+    )
+    calc_rel_line(app_state, p1)
+
     while True:
         try:
             # If OS is LINUX restore TTY to it default values
-            if not sep==chr(92):
-                old=(fd,TCSADRAIN,old_settings)
+            if not sep == chr(92):
+                old = (fd, TCSADRAIN, old_settings)
                 tcsetattr(fd, TCSADRAIN, old_settings)
             # Call Screen updater
-            rows,columns=get_size()
+            app_state.rows, app_state.columns = get_size()
             # Call screen updater function
-            rel_cursor = update_scr(
-            black,bnc,slc,reset,status,banoff,offset,line,cursor,arr,\
-            banner,filename,rows,columns,status_st,False,[],find_str)
-            chg_hlg(rel_cursor,find_str)
+            rel_cursor = update_scr(app_state, False, menu_state.find_str)
+            chg_hlg(rel_cursor, menu_state.find_str, app_state)
             # If OS is LINUX set TTY to raw mode
-            if not sep==chr(92): setraw(fd,when=TCSADRAIN)
-            
-            run=True #Start update screen thread
-            key=read_key() #Map keys
-            run=False #Stop update screen thread
+            if not sep == chr(92):
+                setraw(fd, when=TCSADRAIN)
 
-            pos = line+offset-banoff
+            menu_state.run = True  # Start update screen thread
+            key = getch()  # Map keys
+            menu_state.run = False  # Stop update screen thread
+
+            pos = app_state.line + app_state.offset - app_state.banoff
 
             # Stop executing this process
-            if key==keys["ctrl+c"]: break 
+            if key == app_state.keys["ctrl+c"]: break
 
-            elif key==keys["arr_right"]:
-                p1,cursor = search_substring(arr,find_str,pos,cursor)
-                line,offset = CalcRelLine(p1,arr,offset,line,banoff,rows)
-                
-            elif key==keys["arr_left"]:
-                p1,cursor = search_substring_rev(arr,find_str,pos,cursor)
-                line,offset = CalcRelLine(p1,arr,offset,line,banoff,rows)
-   
+            elif key == app_state.keys["arr_right"]:
+                p1, app_state.cursor = search_substring(
+                    app_state.arr, menu_state.find_str, pos, app_state.cursor
+                )
+                calc_rel_line(app_state, p1)
+
+            elif key == app_state.keys["arr_left"]:
+                p1, app_state.cursor = search_substring_rev(
+                    app_state.arr, menu_state.find_str, pos, app_state.cursor
+                )
+                calc_rel_line(app_state, p1)
+
         except: pass
 
-    exit() # Reset
-    return cursor,line,offset
+    exit(menu_state)  # Reset
+
