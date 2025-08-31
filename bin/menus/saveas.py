@@ -129,6 +129,8 @@ def save_as(app_state):
                 )
                 menu_state.complete = False
 
+            elif key == app_state.keys["return"]: pass
+
             # Ctrl + S (confirms) or Ctrl + B backup
             elif key in (
                 app_state.keys["ctrl+s"], 
