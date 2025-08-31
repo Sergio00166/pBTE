@@ -135,7 +135,7 @@ def save_as(app_state):
                 app_state.keys["ctrl+b"]
             ):
                 save_file = menu_state.filewrite +\
-                    ".bak" if key == app_state.keys["ctrl+b"] else ""
+                    (".bak" if key == app_state.keys["ctrl+b"] else "")
                 try:
                     write_UTF8(
                         save_file, 
