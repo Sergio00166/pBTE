@@ -1,6 +1,6 @@
 # Code by Sergio00166
 
-from functions import read_UTF8, write_UTF8
+from functions import write_UTF8
 from types import SimpleNamespace
 from inputs import decode, getch
 from upd_scr import menu_updsrc
@@ -139,12 +139,8 @@ def save_as(app_state):
                 save_file = menu_state.filewrite +\
                     (".bak" if key == app_state.keys["ctrl+b"] else "")
                 try:
-                    write_UTF8(
-                        save_file, 
-                        app_state.codec,
-                        app_state.lnsep,
-                        app_state.arr
-                    )
+                    write_UTF8(app_state, save_file)
+
                     if key == app_state.keys["ctrl+b"]:
                         app_state.status = "BCKPd"
                     else:
@@ -154,25 +150,6 @@ def save_as(app_state):
                     break
                 except:
                     app_state.status, app_state.status_st = "ERROR", True
-
-            elif key in (
-                app_state.keys["ctrl+p"],
-                app_state.keys["ctrl+a"]
-            ):
-                tmp, codec, lnsep = read_UTF8(menu_state.filewrite)
-        
-                if key == app_state.keys["ctrl+a"]:
-                    output = list(app_state.arr + tmp)
-                elif key == app_state.keys["ctrl+p"]:
-                    output = list(app_state.tmp + arr)
-
-                write_UTF8(
-                    menu_state.filewrite, 
-                    codec, lnsep, output
-                )
-                app_state.status = app_state.bnc + "ADDED"
-                app_state.status_st = True
-                break
 
             elif key == app_state.keys["ctrl+c"]: break
 
