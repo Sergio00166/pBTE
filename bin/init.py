@@ -82,7 +82,7 @@ if not __name__ == "__main__":
         files = [x.replace(sep, "/") for x in files]
         for _ in range(len(files)):
             try:
-                read_UTF8(state, files[0])
+                read_UTF8(app_state, files[0])
                 filename = files[0]
                 files = files[1:]
                 break
