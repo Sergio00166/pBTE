@@ -114,8 +114,6 @@ bin/data.py
 - `^S`: Save file
 - `Tab` / `Enter`: Autocomplete filenames
 - `^B`: Back up
-- `^A`: Append
-- `^P`: Prepend
 
 ### Find Menu
 - `^C`: Exit

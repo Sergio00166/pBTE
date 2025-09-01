@@ -83,7 +83,7 @@ def keys_func(state, key):
     # Save file
     elif key == state.keys["ctrl+s"]:
         try:
-            write_UTF8(state,state.filename)
+            write_UTF8(state)
             state.status = "SAVED"
         except:
             state.status = "ERROR"

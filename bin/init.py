@@ -1,6 +1,6 @@
 # Code by Sergio00166
 
-VERSION = "v0.8.0.0"
+VERSION = "v0.8.0.2"
 
 if not __name__ == "__main__":
     from os import getcwd, sep, environ
@@ -13,9 +13,9 @@ if not __name__ == "__main__":
     path.append(root + "menus")
 
     from colorama import init, Fore, Back, Style, deinit
-    from functions import read_UTF8, taborspace
     from os.path import abspath, isdir, join
     from types import SimpleNamespace
+    from functions import read_UTF8
     from keys_func import keys_func
     from time import sleep as delay
     from scr_utils import get_size
@@ -34,26 +34,6 @@ if not __name__ == "__main__":
         fd = stdin.fileno()
         old_settings = tcgetattr(fd)
 
-    # --- Default file values ---
-    filename = getcwd() + sep + "NewFile"
-    if filename.startswith("//"):
-        filename = filename[1:]
-
-    arr, codec, lnsep, files = [""], "UTF-8", "\n", []
-
-    # --- Load file if passed as argument ---
-    if len(argv) > 1:
-        files = [glob(x, recursive=False) for x in argv[1:]]
-        files = [abspath(i) for x in files for i in x if not isdir(i)]
-        files = [x.replace(sep, "/") for x in files]
-        for _ in range(len(files)):
-            try:
-                name, files = files[0], files[1:]
-                arr, codec, lnsep = read_UTF8(name)
-                filename = name
-                break
-            except: pass
-
     init(autoreset=False, convert=True)
     rows, columns = get_size()
 
@@ -67,13 +47,13 @@ if not __name__ == "__main__":
         # Info
         banner = ["pBTE", VERSION],
         # File
-        filename = filename,
-        arr = arr,
-        codec = codec,
-        lnsep = lnsep,
+        filename = join(getcwd(), "NewFile"),
+        arr = [""],
+        codec = "UTF-8",
+        lnsep = "\n",
         # Editor
         comment = ["#", ""],
-        indent = taborspace(arr),
+        indent = "\t",
         # Cursor
         cursor=0,
         oldptr=0,
@@ -94,6 +74,19 @@ if not __name__ == "__main__":
         keys=keys
     )
     deinit()
+
+    # --- Load file if passed as argument ---
+    if len(argv) > 1:
+        files = [glob(x, recursive=False) for x in argv[1:]]
+        files = [abspath(i) for x in files for i in x if not isdir(i)]
+        files = [x.replace(sep, "/") for x in files]
+        for _ in range(len(files)):
+            try:
+                read_UTF8(app_state, files[0])
+                files = files[1:]
+                break
+            except: pass
+    else: files = []
 
     # --- Switch to alternate screen buffer ---
     print("\x1b[?1049h", end="")

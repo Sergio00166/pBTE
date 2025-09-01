@@ -1,6 +1,6 @@
 # Code by Sergio00166
 
-from functions import read_UTF8, taborspace
+from functions import read_UTF8
 from types import SimpleNamespace
 from inputs import decode, getch
 from upd_scr import menu_updsrc
@@ -137,10 +137,7 @@ def open_file(app_state):
 
             elif key == app_state.keys["ctrl+o"]:
                 menu_state.openfile = glob(menu_state.openfile, recursive=False)[0]
-                app_state.arr, app_state.codec, app_state.lnsep =\
-                    read_UTF8(menu_state.openfile)
-                app_state.indent = taborspace(app_state.arr)
-                app_state.filename = menu_state.openfile
+                read_UTF8(app_state, menu_state.openfile)
                 app_state.cursor, app_state.offset = 0,0
                 app_state.oldptr, app_state.line   = 0,1
                 app_state.status_st = False

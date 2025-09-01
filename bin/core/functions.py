@@ -68,37 +68,45 @@ def detect_line_ending_char(c):
         return "\n"
 
 
-def read_UTF8(path):
+def read_UTF8(state, path):
     data, codec = open(path, "rb").read(), None
 
     for bom, encoding in BOM_MAP.items():
         if data.startswith(bom):
-            data, codec = data[len(bom) :], encoding
+            data, codec = data[len(bom):], encoding
             break
+
     if codec:
         data = data.decode(codec)
-        lnsep = detect_line_ending_char(data)
-        data = data.split(lnsep)
-        return data, codec, lnsep
+        state.lnsep = detect_line_ending_char(data)
+        state.arr = data.split(state.lnsep)
+        state.indent = taborspace(state.arr)
+        state.filename = path
+        state.codec = codec
+        return
 
     for codec in CODECS_NO_BOM:
         try:
             data = data.decode(codec)
-            lnsep = detect_line_ending_char(data)
-            data = data.split(lnsep)
-            return data, codec, lnsep
+            state.lnsep = detect_line_ending_char(data)
+            state.arr = data.split(state.lnsep)
+            state.indent = taborspace(state.arr)
+            state.filename = path
+            state.codec = codec
+            return
         except: pass
 
     raise UnicodeError
 
 
-def write_UTF8(path, codec, lnsep, data):
+def write_UTF8(state, path=None):
+    if path is None: path = state.filename
     file = open(path, "wb")
-    data = lnsep.join(data).encode(codec)
-    if codec in REV_BOM_MAP:
-        bom = REV_BOM_MAP[codec]
+    data = state.lnsep.join(state.arr)
+    data = data.encode(state.codec)
+    if state.codec in REV_BOM_MAP:
+        bom = REV_BOM_MAP[state.codec]
         data = bom + data
     file.write(data)
-    file.close()
 
 
