@@ -81,9 +81,9 @@ def read_UTF8(state, path):
         state.lnsep = detect_line_ending_char(data)
         state.arr = data.split(state.lnsep)
         state.indent = taborspace(state.arr)
+        state.filename = path
         state.codec = codec
         return
-
 
     for codec in CODECS_NO_BOM:
         try:
@@ -91,6 +91,7 @@ def read_UTF8(state, path):
             state.lnsep = detect_line_ending_char(data)
             state.arr = data.split(state.lnsep)
             state.indent = taborspace(state.arr)
+            state.filename = path
             state.codec = codec
             return
         except: pass

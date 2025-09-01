@@ -83,7 +83,6 @@ if not __name__ == "__main__":
         for _ in range(len(files)):
             try:
                 read_UTF8(app_state, files[0])
-                filename = files[0]
                 files = files[1:]
                 break
             except: pass

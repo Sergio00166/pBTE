@@ -138,7 +138,6 @@ def open_file(app_state):
             elif key == app_state.keys["ctrl+o"]:
                 menu_state.openfile = glob(menu_state.openfile, recursive=False)[0]
                 read_UTF8(app_state, menu_state.openfile)
-                app_state.filename = menu_state.openfile
                 app_state.cursor, app_state.offset = 0,0
                 app_state.oldptr, app_state.line   = 0,1
                 app_state.status_st = False
