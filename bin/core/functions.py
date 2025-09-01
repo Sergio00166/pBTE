@@ -99,7 +99,7 @@ def write_UTF8(state, path=None):
     if path is None: path = state.filename
     file = open(path, "wb")
     data = state.lnsep.join(state.arr)
-          .encode(state.codec)
+    data = data.encode(state.codec)
     if state.codec in REV_BOM_MAP:
         bom = REV_BOM_MAP[state.codec]
         data = bom + data
