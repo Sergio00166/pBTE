@@ -1,6 +1,6 @@
 # Code by Sergio00166
 
-VERSION = "v0.8.0.1"
+VERSION = "v0.8.0.2"
 
 if not __name__ == "__main__":
     from os import getcwd, sep, environ
@@ -13,9 +13,9 @@ if not __name__ == "__main__":
     path.append(root + "menus")
 
     from colorama import init, Fore, Back, Style, deinit
-    from functions import read_UTF8, taborspace
     from os.path import abspath, isdir, join
     from types import SimpleNamespace
+    from functions import read_UTF8
     from keys_func import keys_func
     from time import sleep as delay
     from scr_utils import get_size
@@ -53,7 +53,7 @@ if not __name__ == "__main__":
         lnsep = "\n",
         # Editor
         comment = ["#", ""],
-        indent = taborspace(arr),
+        indent = "\t",
         # Cursor
         cursor=0,
         oldptr=0,

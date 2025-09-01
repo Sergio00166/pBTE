@@ -80,19 +80,22 @@ def read_UTF8(state, path):
         data = data.decode(codec)
         state.lnsep = detect_line_ending_char(data)
         state.arr = data.split(state.lnsep)
+        state.indent = taborspace(state.arr)
         state.codec = codec
-    else:
-        raise UnicodeError
+        return
+
 
     for codec in CODECS_NO_BOM:
         try:
             data = data.decode(codec)
             state.lnsep = detect_line_ending_char(data)
             state.arr = data.split(state.lnsep)
+            state.indent = taborspace(state.arr)
             state.codec = codec
             return
-        except:
-            raise UnicodeError
+        except: pass
+
+    raise UnicodeError
 
 
 def write_UTF8(state, path=None):
