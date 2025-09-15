@@ -70,13 +70,10 @@ if __name__ == "__main__":
                 for _ in range(len(files)):
                     try:
                         filename, files = files[0], files[1:]
-                        app_state.arr, app_state.codec, app_state.lnsep =\
-                          read_UTF8(filename)
-                        app_state.filename = filename
+                        read_UTF8(app_state, filename)
                         app_state.status_st = False
                         app_state.cursor, app_state.offset = 0, 0
                         app_state.line = app_state.banoff
-                        app_state.indent = taborspace(app_state.arr)
                         break
                     except: pass
             else:
@@ -85,8 +82,7 @@ if __name__ == "__main__":
                 break
         
         # Process key input
-        try: keys_func(app_state, key)
-        except: pass
+        keys_func(app_state, key)
     
     # Restore TTY buffer and exit
     print("\x1b[?1049l", end="")

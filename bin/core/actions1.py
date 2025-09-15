@@ -163,17 +163,27 @@ def uncomment_func(state):
     
 
 def supr(state):
-    """Delete character after cursor"""
-    current_text = state.arr[state.line + state.offset - state.banoff]
-    
+    """Delete character after cursor (like the 'Delete' key)"""
+    idx = state.line + state.offset - state.banoff
+    current_text = state.arr[idx]
+
     if not state.select_mode or len(state.select) == 0:
         text_chars = list(current_text)
+
         if state.cursor < len(text_chars) and len(text_chars) > 0:
+            # Normal delete of a character
             text_chars.pop(state.cursor)
             current_text = "".join(text_chars)
-            state.arr[state.line + state.offset - state.banoff] = current_text
+            state.arr[idx] = current_text
+
+        elif state.cursor >= len(text_chars) and idx + 1 < len(state.arr):
+            # Cursor is at end of line → join with next line
+            next_line = state.arr[idx + 1]
+            merged_line = current_text + next_line
+            state.arr[idx] = merged_line
+            state.arr.pop(idx + 1)
     else:
-        # Delete selection
         del_sel(state)
         state.cursor = 0
+
 
