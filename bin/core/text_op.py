@@ -18,15 +18,21 @@ def del_sel(state, blank=False):
     before_selection = state.arr[:start_pos]
     after_selection = state.arr[end_pos:]
 
-    # Update line and offset in state (if needed elsewhere)
-    state.line = state.select[0][0] + state.banoff
-    state.offset = state.select[0][1]
-
     # Mutate state.arr in-place
-    if blank:
-        state.arr = before_selection + [""] + after_selection
-    else:
-        state.arr = before_selection + after_selection
+    state.arr = before_selection + ([""] if blank else []) + after_selection
+
+    # Base values
+    line   = state.select[0][0] + state.banoff
+    offset = state.select[0][1]
+
+    # Break condition into parts
+    past_bottom = line + offset - state.banoff > len(state.arr) - 1
+    too_low     = line > state.banoff and past_bottom
+
+    # Update values
+    state.line   = line   - (too_low and offset == 0)
+    state.offset = offset - (too_low and offset > 0)
+    state.select = []
 
 
 def select_add_start_str(state, text, remove=False):

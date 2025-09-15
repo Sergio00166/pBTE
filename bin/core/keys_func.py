@@ -28,6 +28,7 @@ def keys_func(state, key):
         state.keys["ctrl+o"]: open_file,
         state.keys["ctrl+f"]: find,
         state.keys["ctrl+r"]: replace,
+        state.keys["ctrl+d"]: dedent,
         state.keys["ctrl+k"]: comment_func,
         state.keys["ctrl+u"]: uncomment_func,
         state.keys["ctrl+t"]: opt_menu
