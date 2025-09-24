@@ -50,39 +50,41 @@ if __name__ == "__main__":
     update_thread.start()
     
     while True:
-        # Ensure array is never empty
-        if len(app_state.arr) == 0:
-            app_state.arr = [""]
-        
-        # Get terminal size and update screen
-        app_state.rows, app_state.columns = get_size()
-        update_scr(app_state)
-        
-        # Pause update thread while waiting for key input
-        run_thread = True
-        key = getch()
-        run_thread = False
-        
-        # Handle Ctrl+Q (quit) - open next file or exit
-        if key == app_state.keys["ctrl+q"]:
-            if len(files) > 0:
-                # Try to open next file from queue
-                for _ in range(len(files)):
-                    try:
-                        filename, files = files[0], files[1:]
-                        read_UTF8(app_state, filename)
-                        app_state.status_st = False
-                        app_state.cursor, app_state.offset = 0, 0
-                        app_state.line = app_state.banoff
-                        break
-                    except: pass
-            else:
-                kill = True
-                update_thread.join()
-                break
-        
-        # Process key input
-        keys_func(app_state, key)
+        try:
+            # Ensure array is never empty
+            if len(app_state.arr) == 0:
+                app_state.arr = [""]
+            
+            # Get terminal size and update screen
+            app_state.rows, app_state.columns = get_size()
+            update_scr(app_state)
+            
+            # Pause update thread while waiting for key input
+            run_thread = True
+            key = getch()
+            run_thread = False
+            
+            # Handle Ctrl+Q (quit) - open next file or exit
+            if key == app_state.keys["ctrl+q"]:
+                if len(files) > 0:
+                    # Try to open next file from queue
+                    for _ in range(len(files)):
+                        try:
+                            filename, files = files[0], files[1:]
+                            read_UTF8(app_state, filename)
+                            app_state.status_st = False
+                            app_state.cursor, app_state.offset = 0, 0
+                            app_state.line = app_state.banoff
+                            break
+                        except: pass
+                else:
+                    kill = True
+                    update_thread.join()
+                    break
+            
+            # Process key input
+            keys_func(app_state, key)
+        except: pass
     
     # Restore TTY buffer and exit
     print("\x1b[?1049l", end="")
