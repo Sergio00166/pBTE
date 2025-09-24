@@ -6,8 +6,7 @@ from os import sep
 from scr_utils import *
 
 
-# Expands tabulators and splits the text in parts and as
-# optional calculates the position and relative cursor
+# Expands tabulators and splits the text in parts
 def wrap(text, columns, tabsize=8, cursor=None):
     buffer,counter,col = "", -1, 0
     result,pos,ptr = [], 0, 0
@@ -43,7 +42,6 @@ def wrap(text, columns, tabsize=8, cursor=None):
 
 
 def fix_arr_line_len(state, sub_arr):
-    """Wrap and style each line in sub_arr based on state settings"""
     fix, out = 0 // (state.columns + 2), []
 
     for text in sub_arr:
@@ -84,18 +82,12 @@ def fix_cursor_pos(text,cursor,columns,black,reset):
 
 
 def scr_arr2str(state):
-    """Prepare a styled slice of the screen array and update cursor position"""
-    # Extract the relevant line for cursor adjustment
     text = state.arr[state.line + state.offset - state.banoff]
-    # Adjust cursor and line text
     cursor, text = fix_cursor_pos(
         text, state.cursor, state.columns, state.black, state.reset
     )
-    # Work on a slice of the array without modifying the original
     sub_arr = state.arr[state.offset : state.offset + state.rows + state.banoff]
     sub_arr = fix_arr_line_len(state, sub_arr)
-
-    # Replace the line where the cursor is
     sub_arr[state.line - state.banoff] = text
     return sub_arr, cursor
 

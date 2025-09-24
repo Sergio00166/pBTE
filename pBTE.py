@@ -2,7 +2,6 @@
 # Code by Sergio00166
 
 def update_screen_thread():
-    """Thread function to continuously update screen dimensions"""
     global app_state, run_thread, kill
     
     while not kill:
@@ -12,27 +11,23 @@ def update_screen_thread():
             old_rows = app_state.rows
             old_columns = app_state.columns
             app_state.rows, app_state.columns = get_size()
-            
-            # Check if terminal is too small
+
             if app_state.rows < 4 or app_state.columns < 24:
                 print("\r\033cTerminal too small")
-            # Check if dimensions changed
+    
             elif old_rows != app_state.rows or old_columns != app_state.columns:
-                # Adjust offset if line exceeds visible rows
                 if app_state.line > app_state.rows:
                     app_state.offset += (app_state.line - app_state.rows)
                     app_state.line = app_state.rows
                 
-                # Restore TTY to default values on Linux
-                if sep != chr(92):  # Not Windows
+                # Restore TTY to default values
+                if sep != chr(92):
                     tcsetattr(fd, TCSADRAIN, old_settings)
                 
                 print("\r\033[3J")  # Clear previous content
                 update_scr(app_state)
                 
-                # Set TTY to raw mode on Linux
-                if sep != chr(92):  # Not Windows
-                    setraw(fd, when=TCSADRAIN)
+                if sep != chr(92): setraw(fd, when=TCSADRAIN)
 
 
 if __name__ == "__main__":
@@ -42,8 +37,7 @@ if __name__ == "__main__":
     # Add the bin folder to import path
     path.append(path[0] + sep + "bin")
     from init import *
-    
-    # Start the update thread
+
     update_thread = Thread(target=update_screen_thread)
     run_thread, kill = True, False
     update_thread.daemon = True
@@ -51,20 +45,16 @@ if __name__ == "__main__":
     
     while True:
         try:
-            # Ensure array is never empty
             if len(app_state.arr) == 0:
                 app_state.arr = [""]
-            
-            # Get terminal size and update screen
+
             app_state.rows, app_state.columns = get_size()
             update_scr(app_state)
-            
-            # Pause update thread while waiting for key input
+
             run_thread = True
             key = getch()
             run_thread = False
-            
-            # Handle Ctrl+Q (quit) - open next file or exit
+
             if key == app_state.keys["ctrl+q"]:
                 if len(files) > 0:
                     # Try to open next file from queue
@@ -81,8 +71,7 @@ if __name__ == "__main__":
                     kill = True
                     update_thread.join()
                     break
-            
-            # Process key input
+
             keys_func(app_state, key)
         except: pass
     
