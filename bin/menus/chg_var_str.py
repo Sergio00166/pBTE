@@ -9,8 +9,7 @@ from threading import Thread
 from os import sep
 
 
-if not sep == chr(92):  # If OS is LINUX
-    # Get default values for TTY
+if sep != chr(92):
     from termios import TCSADRAIN, tcsetattr, tcgetattr
     from sys import stdin
     from tty import setraw
@@ -25,11 +24,9 @@ def updscr_thr(app_state, menu_state):
     while not menu_state.kill:
         delay(0.01)
         if menu_state.run:
-            # If OS is LINUX restore TTY to it default values
-            if not sep == chr(92):
+            if sep != chr(92):
                 old = (fd, TCSADRAIN, old_settings)
                 tcsetattr(fd, TCSADRAIN, old_settings)
-            # Call Screen updater
             mode = (
                 menu_state.entered_str,
                 menu_state.prt_txt,
@@ -37,9 +34,8 @@ def updscr_thr(app_state, menu_state):
                 menu_state.lenght,
             )
             menu_updsrc(app_state, mode)
-            # If OS is LINUX set TTY to raw mode
-            if not sep == chr(92):
-                setraw(fd, when=TCSADRAIN)
+
+            if sep != chr(92): setraw(fd, when=TCSADRAIN)
 
 
 def exit(menu_state):
@@ -47,14 +43,12 @@ def exit(menu_state):
     menu_state.run = False
     menu_state.kill = True
     thr.join()
-    if not sep == chr(92):
-        tcsetattr(fd, TCSADRAIN, old_settings)
+    if sep != chr(92): tcsetattr(fd, TCSADRAIN, old_settings)
 
 
 def chg_var_str(app_state, entered_str, prt_txt, kctlc_f=False):
     global fd, old_settings, thr
 
-    # Create menu state object
     menu_state = SimpleNamespace(
         entered_str=entered_str,
         prt_txt=prt_txt,
@@ -64,7 +58,6 @@ def chg_var_str(app_state, entered_str, prt_txt, kctlc_f=False):
         run=False,
         kill=False,
     )
-
     old_str = menu_state.entered_str
     thr = Thread(target=updscr_thr, args=(app_state, menu_state))
     menu_state.run, menu_state.kill, menu_state.kctlc = False, False, False
@@ -72,15 +65,12 @@ def chg_var_str(app_state, entered_str, prt_txt, kctlc_f=False):
     thr.start()
 
     while True:
-        # Fix when the cursor is out
         if len(menu_state.entered_str) < menu_state.wrtptr - menu_state.lenght:
             menu_state.wrtptr = len(menu_state.entered_str) + menu_state.lenght
         try:
-            # If OS is LINUX restore TTY to it default values
-            if not sep == chr(92):
+            if sep != chr(92):
                 old = (fd, TCSADRAIN, old_settings)
                 tcsetattr(fd, TCSADRAIN, old_settings)
-            # Call Screen updater
             mode = (
                 menu_state.entered_str,
                 menu_state.prt_txt,
@@ -88,13 +78,11 @@ def chg_var_str(app_state, entered_str, prt_txt, kctlc_f=False):
                 menu_state.lenght,
             )
             menu_updsrc(app_state, mode, True)
-            # If OS is LINUX set TTY to raw mode
-            if not sep == chr(92):
-                setraw(fd, when=TCSADRAIN)
+            if sep != chr(92): setraw(fd, when=TCSADRAIN)
 
-            menu_state.run = True  # Start update screen thread
-            key = getch()  # Map keys
-            menu_state.run = False  # Stop update screen thread
+            menu_state.run = True
+            key = getch()
+            menu_state.run = False
 
             if key == app_state.keys["return"]: break
 
@@ -133,7 +121,7 @@ def chg_var_str(app_state, entered_str, prt_txt, kctlc_f=False):
             elif key in app_state.keys["end"]:
                 menu_state.wrtptr = len(menu_state.entered_str) + menu_state.lenght
 
-            else:  # Rest of keys
+            else:
                 if menu_state.wrtptr < ((app_state.columns + 2) * app_state.rows + 1):
                     out = decode(key)
                     p1 = menu_state.entered_str[: menu_state.wrtptr - menu_state.lenght]
@@ -143,8 +131,9 @@ def chg_var_str(app_state, entered_str, prt_txt, kctlc_f=False):
                     complete = False
         except: pass
 
-    exit(menu_state)  # Reset
+    exit(menu_state)
     if menu_state.kctlc:
         raise KeyboardInterrupt
     return menu_state.entered_str
 
+ 

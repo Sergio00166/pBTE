@@ -2,7 +2,6 @@
 
 
 def cmt_w_ind(string, sepstr):
-    """Extract indentation and content from string"""
     pos, length = 0, len(sepstr)
     while string.startswith(sepstr, pos):
         pos += length
@@ -10,39 +9,30 @@ def cmt_w_ind(string, sepstr):
 
 
 def del_sel(state, blank=False):
-    """Delete selected text in-place using state"""
     start_pos = sum(state.select[0])
     end_pos = sum(state.select[1])
 
-    # Split array around selection
     before_selection = state.arr[:start_pos]
     after_selection = state.arr[end_pos:]
 
-    # Mutate state.arr in-place
     state.arr = before_selection + ([""] if blank else []) + after_selection
 
-    # Base values
     line   = state.select[0][0] + state.banoff
     offset = state.select[0][1]
 
-    # Break condition into parts
     past_bottom = line + offset - state.banoff > len(state.arr) - 1
     too_low     = line > state.banoff and past_bottom
 
-    # Update values
     state.line   = line   - (too_low and offset == 0)
     state.offset = offset - (too_low and offset > 0)
     state.select = []
 
 
 def select_add_start_str(state, text, remove=False):
-    # Calculate selection bounds
     start = sum(state.select[0])
     end = sum(state.select[1])
-    # Slice the selected region
     p1 = state.arr[start:end]
 
-    # Apply formatting or removal
     if isinstance(text, list):
         if not remove:
             state.arr[start:end] = [text[0] + x + text[1] for x in p1]
@@ -86,6 +76,4 @@ def search_substring_rev(lst, substring, start_list_pos=0, start_string_pos=None
                 return i, j
         i, start_string_pos = (i - 1) % list_lenght, None
 
-
-
-
+ 

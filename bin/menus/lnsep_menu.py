@@ -11,8 +11,7 @@ from inputs import getch
 from os import sep
 
 
-if not sep == chr(92):  # If OS is LINUX
-    # Get default values for TTY
+if sep != chr(92):
     from termios import TCSADRAIN, tcsetattr, tcgetattr
     from sys import stdin
     from tty import setraw
@@ -27,17 +26,14 @@ def updscr_thr(app_state, menu_state):
     while not menu_state.kill:
         delay(0.01)
         if menu_state.run:
-            # If OS is LINUX restore TTY to it default values
-            if not sep == chr(92):
+            if sep != chr(92):
                 old = (fd, TCSADRAIN, old_settings)
                 tcsetattr(fd, TCSADRAIN, old_settings)
-            # Call Screen updater
+
             mode = (menu_state.text, "", menu_state.wrtptr, 0)
             menu_updsrc(app_state, mode)
-            print(hcr)  # Hide the cursor
-            # If OS is LINUX set TTY to raw mode
-            if not sep == chr(92):
-                setraw(fd, when=TCSADRAIN)
+            print(hcr)
+            if sep != chr(92): setraw(fd, when=TCSADRAIN)
 
 
 def exit(menu_state):
@@ -45,15 +41,13 @@ def exit(menu_state):
     menu_state.run = False
     menu_state.kill = True
     thr.join()
-    print(scr)  # Show cursor again
-    if not sep == chr(92):
-        tcsetattr(fd, TCSADRAIN, old_settings)
+    print(scr)
+    if sep != chr(92): tcsetattr(fd, TCSADRAIN, old_settings)
 
 
 def lnsep_menu(app_state):
     global fd, old_settings, thr
 
-    # Create menu state object
     menu_state = SimpleNamespace(text="", wrtptr=1, run=False, kill=False)
 
     app_state.status_st = True
@@ -70,30 +64,25 @@ def lnsep_menu(app_state):
     menu_state.run, menu_state.kill = False, False
     thr.daemon = True
     thr.start()
-    print(hcr)  # Hide the cursor
+    print(hcr)
 
     while True:
-        # Fix when the cursor is out
         if len(menu_state.text) < menu_state.wrtptr:
             menu_state.wrtptr = len(menu_state.text)
         try:
-            # Force use LINUX dir separator
             menu_state.text = menu_state.text.replace(chr(92), "/")
-            # If OS is LINUX restore TTY to it default values
-            if not sep == chr(92):
+            if sep != chr(92):
                 old = (fd, TCSADRAIN, old_settings)
                 tcsetattr(fd, TCSADRAIN, old_settings)
-            # Call Screen updater
+
             mode = (menu_state.text, "", menu_state.wrtptr, 0)
             menu_updsrc(app_state, mode, True)
-            print(hcr)  # Hide the cursor
-            # If OS is LINUX set TTY to raw mode
-            if not sep == chr(92):
-                setraw(fd, when=TCSADRAIN)
+            print(hcr)
+            if sep != chr(92): setraw(fd, when=TCSADRAIN)
 
-            menu_state.run = True  # Start update screen thread
-            key = getch()  # Map keys
-            menu_state.run = False  # Stop update screen thread
+            menu_state.run = True
+            key = getch()
+            menu_state.run = False
 
             if key == app_state.keys["ctrl+c"]: break
             elif key == b"1": app_state.lnsep = "\n";     break
@@ -111,7 +100,7 @@ def lnsep_menu(app_state):
 
         except: pass
 
-    # Reset and hide status
     app_state.status_st = False
     exit(menu_state)
-    
+
+ 

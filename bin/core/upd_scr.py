@@ -5,7 +5,6 @@ from os import sep
 
 
 def update_scr(state, rrw=False, hlg_str=""):
-    # Header: position + banner text + status
     pos    = f" {state.line + state.offset - state.banoff}  "
     stat   = (" " + state.banner[1]) if not state.status_st else ("  " + state.status)
     header = pos + " " + state.banner[0] + stat + "    "
@@ -19,9 +18,7 @@ def update_scr(state, rrw=False, hlg_str=""):
         filename = fixfilename(state.filename, avail).replace(sep, "/")
         pad = state.columns - len(header) - len(filename) + 1
 
-    # Convert array of lines and adjust cursor
     screen_lines, cursor = scr_arr2str(state)
-    # Highlight selection or string if requested
     if state.select_mode and state.select:
         screen_lines = text_selection(state, screen_lines)
     elif hlg_str:
@@ -30,16 +27,11 @@ def update_scr(state, rrw=False, hlg_str=""):
             for ln in screen_lines
         ]
 
-    # Pad to full height
     screen_lines += [" "] * max(0, state.rows - len(screen_lines) + 1)
-
-    # Assemble the full menu
     menu_body = clr + state.bnc+header + " "*pad + filename + " " + state.reset
     menu_text = menu_body + "\n" + clr + ("\n" + clr).join(screen_lines)
 
     if rrw: return menu_text
-
-    # Print and move cursor
     print(
         hcr + movtl + menu_text + scr +
         movcr%(state.line + state.banoff, cursor+1)
@@ -84,3 +76,4 @@ def menu_updsrc(app_state, mode=None, redraw=False):
         movcr % (app_state.rows + 2, wrtptr + 1)
     )
 
+ 

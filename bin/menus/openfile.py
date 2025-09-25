@@ -12,8 +12,7 @@ from os import getcwd, sep
 from glob import glob
 
 
-if not sep == chr(92):  # If OS is LINUX
-    # Get default values for TTY
+if sep != chr(92):
     from termios import TCSADRAIN, tcsetattr, tcgetattr
     from sys import stdin
     from tty import setraw
@@ -28,11 +27,9 @@ def updscr_thr(app_state, menu_state):
     while not menu_state.kill:
         delay(0.01)
         if menu_state.run:
-            # If OS is LINUX restore TTY to it default values
-            if not sep == chr(92):
+            if sep != chr(92):
                 old = (fd, TCSADRAIN, old_settings)
                 tcsetattr(fd, TCSADRAIN, old_settings)
-            # Call Screen updater
             mode = (
                 menu_state.openfile,
                 menu_state.opentxt,
@@ -40,9 +37,7 @@ def updscr_thr(app_state, menu_state):
                 menu_state.lenght
             )
             menu_updsrc(app_state, mode)
-            # If OS is LINUX set TTY to raw mode
-            if not sep == chr(92):
-                setraw(fd, when=TCSADRAIN)
+            if sep != chr(92): setraw(fd, when=TCSADRAIN)
 
 
 def exit(menu_state):
@@ -50,14 +45,12 @@ def exit(menu_state):
     menu_state.run = False
     menu_state.kill = True
     thr.join()
-    if not sep == chr(92):
-        tcsetattr(fd, TCSADRAIN, old_settings)
+    if sep != chr(92): tcsetattr(fd, TCSADRAIN, old_settings)
 
 
 def open_file(app_state):
     global fd, old_settings, thr
 
-    # Create menu state object
     menu_state = SimpleNamespace(
         openfile = dirname(app_state.filename),
         opentxt = " Open: ",
@@ -80,17 +73,14 @@ def open_file(app_state):
     thr.start()
 
     while True:
-        # Fix when the cursor is out
         if len(menu_state.openfile) < menu_state.wrtptr - menu_state.lenght:
             menu_state.wrtptr = len(menu_state.openfile) + menu_state.lenght
         try:
-            # Force use LINUX dir separator
             menu_state.openfile = menu_state.openfile.replace(chr(92), "/")
-            # If OS is LINUX restore TTY to it default values
-            if not sep == chr(92):
+            if sep != chr(92):
                 old = (fd, TCSADRAIN, old_settings)
                 tcsetattr(fd, TCSADRAIN, old_settings)
-            # Call Screen updater
+
             mode = (
                 menu_state.openfile,
                 menu_state.opentxt,
@@ -98,15 +88,12 @@ def open_file(app_state):
                 menu_state.lenght,
             )
             menu_updsrc(app_state, mode, True)
-            # If OS is LINUX set TTY to raw mode
-            if not sep == chr(92):
-                setraw(fd, when=TCSADRAIN)
+            if sep != chr(92): setraw(fd, when=TCSADRAIN)
 
-            menu_state.run = True  # Start update screen thread
-            key = getch()  # Map keys
-            menu_state.run = False  # Stop update screen thread
+            menu_state.run = True 
+            key = getch()
+            menu_state.run = False
 
-            # Reset error message
             if app_state.status == "ERROR":
                 app_state.status_st = False
 
@@ -193,7 +180,7 @@ def open_file(app_state):
                 app_state.filename = getcwd() + "/NewFile"
                 break
 
-            else:  # Rest of keys
+            else:
                 if menu_state.wrtptr < ((app_state.columns + 2) * app_state.rows + 1):
                     out = decode(key)
                     p1 = menu_state.openfile[: menu_state.wrtptr - menu_state.lenght]
@@ -206,8 +193,8 @@ def open_file(app_state):
             app_state.status, app_state.status_st = "ERROR", True
         except: pass
 
-    exit(menu_state)  # Reset
-    # Fix when current dir is root
+    exit(menu_state)
     if app_state.filename.startswith("//"):
         app_state.filename = app_state.filename[1:]
 
+ 

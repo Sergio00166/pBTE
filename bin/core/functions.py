@@ -17,7 +17,6 @@ CODECS_NO_BOM = ("utf-8", "utf-16", "latin_1")
 
 
 def calc_displacement(state, data, rect=0):
-    """Update state.line and state.offset after inserting data"""
     state.line += len(data) - rect
 
     overflow = state.line - state.banoff - state.rows
@@ -27,7 +26,6 @@ def calc_displacement(state, data, rect=0):
 
 
 def calc_rel_line(state, target_line):
-    """Calculate relative line position"""
     if target_line == "-": 
         target_line = len(state.arr) - 1
     else:
@@ -43,7 +41,6 @@ def calc_rel_line(state, target_line):
     state.offset = max(new_offset, 0)
 
 
-# Detect if indent is tab or space
 def taborspace(contents):
     sp_cnt, tab_cnt = 0, 0
     for x in contents:
@@ -109,4 +106,4 @@ def write_UTF8(state, path=None):
         data = bom + data
     file.write(data)
 
-
+ 

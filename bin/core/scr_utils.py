@@ -18,7 +18,6 @@ def print(text):
 
 
 def text_selection(state, all_file):
-    """Apply selection styling to a slice of all_file based on state"""
     start, end = state.select[0][0], state.select[1][0]
     delta = state.select[1][1] - state.select[0][1]
 
@@ -42,7 +41,6 @@ def text_selection(state, all_file):
     return p0 + out + p2
 
 
-# Expands tabs and gets real string lenght
 def str_len(self, tabsize=8):
     result,col,lenght = [],0,0
     for char in self:
@@ -73,7 +71,6 @@ def fixlenline(text, cursor, oldptr):
         return cursor
 
 
-# Replaces ascii control chars to the highlighted visual version
 def sscp(arg,color):
     global ascii_map
     b, r = color; ext = []
@@ -84,7 +81,7 @@ def sscp(arg,color):
         else: ext.append(b+"�"+r)
     return "".join(ext)
 
-# Inverts the highlight (for the highlight selector)
+
 def rscp(arg,color):
     global ascii_replaced
     if len(color)==3:
@@ -98,4 +95,4 @@ def rscp(arg,color):
         arg=arg.replace(b+x+r, r1+x+b1)
     return arg
 
-
+ 
