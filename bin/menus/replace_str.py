@@ -114,7 +114,7 @@ def replace(app_state):
 
             app_state.rows, app_state.columns = get_size()
             rel_cursor = update_scr(app_state, False, menu_state.find_str)
-    
+
             if menu_state.active:
                 chg_hlg(rel_cursor, menu_state.replace_str, app_state)
                 menu_state.active = False
@@ -179,3 +179,4 @@ def replace(app_state):
 
     exit(menu_state)
 
+ 

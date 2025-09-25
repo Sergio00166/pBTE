@@ -77,5 +77,5 @@ if not __name__ == "__main__":
 
     # Change TTY buffer
     print("\x1b[?1049h", end="")
-    
 
+ 

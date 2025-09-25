@@ -95,4 +95,4 @@ def rscp(arg,color):
         arg=arg.replace(b+x+r, r1+x+b1)
     return arg
 
-
+ 

@@ -37,11 +37,11 @@ else:  # Linux or POSIX
         old = (fd, TCSADRAIN, old_settings)
         setraw(fd, when=TCSADRAIN)
         out, rlist = b"", True
-        
+
         while rlist:
             out += read(fd, 8)
             rlist = slsl([fd], [], [], 0)[0]
-        
+
         tcsetattr(*old)
         return out
 
@@ -56,7 +56,7 @@ def decode(key):
 
 def handle_text_input(state, key):
     out = decode(key)
-    
+
     if state.select_mode and state.select:
         if out == "\t":
             select_add_start_str(state, state.indent)
@@ -65,19 +65,19 @@ def handle_text_input(state, key):
             args = (state.select, state.arr, state.banoff, True)
             del_sel(state)
             state.cursor = 0
-    
+
     pos = state.line + state.offset - state.banoff
     text = state.arr[pos]
     before_cursor, after_cursor = text[:state.cursor], text[state.cursor:]
 
     out = out.replace("\t", state.indent)
     out_lines = resplit(r"[\n\r]", out)
-    
+
     if not (state.select_mode and state.select) and len(out_lines) > 1:
         state.arr[pos] = before_cursor + out_lines[0]
     else:
         state.arr[pos] = before_cursor + out_lines[0] + after_cursor
-    
+
     if len(out_lines) > 1:
         state.cursor = len(out_lines[-1])
         if not (state.select_mode and state.select):
@@ -92,3 +92,4 @@ def handle_text_input(state, key):
     state.select_mode = False
     state.select = []
 
+ 

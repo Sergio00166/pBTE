@@ -76,3 +76,4 @@ def menu_updsrc(app_state, mode=None, redraw=False):
         movcr % (app_state.rows + 2, wrtptr + 1)
     )
 
+ 

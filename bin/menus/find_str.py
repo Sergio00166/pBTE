@@ -128,6 +128,6 @@ def find(app_state):
                 calc_rel_line(app_state, p1)
 
         except: pass
-
     exit(menu_state)
 
+ 

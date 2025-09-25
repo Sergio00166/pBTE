@@ -136,3 +136,4 @@ def chg_var_str(app_state, entered_str, prt_txt, kctlc_f=False):
         raise KeyboardInterrupt
     return menu_state.entered_str
 
+ 

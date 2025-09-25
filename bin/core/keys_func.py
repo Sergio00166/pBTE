@@ -86,8 +86,9 @@ def keys_func(state, key):
             target_line = int(user_input)
         else:
             target_line = state.line + state.offset - state.banoff
-        
+
         calc_rel_line(state, target_line)
 
     else: handle_text_input(state, key)
 
+ 

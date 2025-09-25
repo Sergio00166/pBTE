@@ -197,3 +197,4 @@ def open_file(app_state):
     if app_state.filename.startswith("//"):
         app_state.filename = app_state.filename[1:]
 
+ 

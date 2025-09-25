@@ -43,7 +43,7 @@ def cut(state):
         start = max(sum(state.select[0]) - 1, 0)
         state.copy_buffer = state.arr[start:sum(state.select[1])]
         if start > 0: state.copy_buffer = state.copy_buffer[1:]
-        
+
         del_sel(state)
         state.select = []
         state.select_mode = False
@@ -65,7 +65,6 @@ def cut(state):
 
     if isinstance(state.copy_buffer, list) and len(state.copy_buffer) == 1:
         state.copy_buffer = state.copy_buffer[0]
-       
 
 
 def copy(state):
@@ -74,7 +73,7 @@ def copy(state):
         state.copy_buffer = state.arr[start:sum(state.select[1])]
         if start > 0:
             state.copy_buffer = state.copy_buffer[1:]
-        
+
         state.select = []
         state.select_mode = False
     else:
@@ -87,35 +86,6 @@ def copy(state):
 
     if isinstance(state.copy_buffer, list) and len(state.copy_buffer) == 1:
         state.copy_buffer = state.copy_buffer[0]
-
-
-def dedent(state):
-    pos = state.line + state.offset - state.banoff
-    text = state.arr[pos]
-    p1 = text[:state.cursor]
-    p2 = text[state.cursor:]
-    if len(state.indent)>0 and p1.endswith(state.indent):
-        p1 = p1[:-len(state.indent)]
-        state.cursor-=len(state.indent)
-        state.arr[pos] = p1+p2
-
-
-def newline(state):
-    if state.select_mode and len(state.select) > 0:
-        del_sel(state)
-        if len(state.arr)==0: return
-    text = state.arr[state.line+state.offset-state.banoff]
-    if not len(text) == 0:
-        state.arr.insert(state.line+state.offset-state.banoff,text[:state.cursor])
-        text = text[state.cursor:]; state.cursor = 0
-    else: 
-        state.arr.insert(state.line+state.offset-state.banoff, "")
-
-    if state.line>state.rows: state.offset += 1
-    else:                     state.line   += 1
-
-    state.arr[state.line+state.offset-state.banoff] = text
-    state.status_st = False
 
 
 def comment_func(state):
@@ -135,23 +105,23 @@ def uncomment_func(state):
     if not state.select_mode or len(state.select) == 0:
         pos = state.line + state.offset - state.banoff
         indent_part, content_part = cmt_w_ind(state.arr[pos], state.indent)
-        
+
         comment_start_len = len(state.comment[0])
         comment_end_len = len(state.comment[1])
-        
+
         if content_part.startswith(state.comment[0]):
             content_part = content_part[comment_start_len:]
         if content_part.endswith(state.comment[1]):
             content_part = content_part[:-comment_end_len] if comment_end_len > 0 else content_part
-        
+
         state.arr[pos] = indent_part + content_part
     else:
         select_add_start_str(state, state.comment, True)
-    
+
     current_text = state.arr[state.line + state.offset - state.banoff]
     if len(current_text) < len(state.arr[state.line + state.offset - state.banoff]):
         state.cursor -= len(state.comment[0])
-    
+
 
 def supr(state):
     idx = state.line + state.offset - state.banoff
@@ -174,4 +144,4 @@ def supr(state):
         del_sel(state)
         state.cursor = 0
 
-
+ 

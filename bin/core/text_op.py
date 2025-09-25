@@ -76,6 +76,4 @@ def search_substring_rev(lst, substring, start_list_pos=0, start_string_pos=None
                 return i, j
         i, start_string_pos = (i - 1) % list_lenght, None
 
-
-
-
+ 

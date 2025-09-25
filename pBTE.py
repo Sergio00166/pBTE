@@ -3,7 +3,7 @@
 
 def update_screen_thread():
     global app_state, run_thread, kill
-    
+
     while not kill:
         delay(0.01)
         if run_thread:
@@ -14,26 +14,26 @@ def update_screen_thread():
 
             if app_state.rows < 4 or app_state.columns < 24:
                 print("\r\033cTerminal too small")
-    
+
             elif old_rows != app_state.rows or old_columns != app_state.columns:
                 if app_state.line > app_state.rows:
                     app_state.offset += (app_state.line - app_state.rows)
                     app_state.line = app_state.rows
-                
+
                 # Restore TTY to default values
                 if sep != chr(92):
                     tcsetattr(fd, TCSADRAIN, old_settings)
-                
+
                 print("\r\033[3J")  # Clear previous content
                 update_scr(app_state)
-                
+
                 if sep != chr(92): setraw(fd, when=TCSADRAIN)
 
 
 if __name__ == "__main__":
     from sys import path
     from os import sep
-    
+
     # Add the bin folder to import path
     path.append(path[0] + sep + "bin")
     from init import *
@@ -42,7 +42,7 @@ if __name__ == "__main__":
     run_thread, kill = True, False
     update_thread.daemon = True
     update_thread.start()
-    
+
     while True:
         try:
             if len(app_state.arr) == 0:
@@ -74,8 +74,9 @@ if __name__ == "__main__":
 
             keys_func(app_state, key)
         except: pass
-    
+
     # Restore TTY buffer and exit
     print("\x1b[?1049l", end="")
     exit(0)
 
+ 

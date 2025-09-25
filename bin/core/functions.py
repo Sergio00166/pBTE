@@ -106,4 +106,4 @@ def write_UTF8(state, path=None):
         data = bom + data
     file.write(data)
 
-
+ 
