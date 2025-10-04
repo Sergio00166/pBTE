@@ -29,7 +29,7 @@
 - Text search (`Find`) and batch replacement (`Replace`)
 - Indentation, dedentation, commenting/uncommenting lines
 - Go-to-line functionality
-- Toggleable line-selection mode
+- Toggleable selection mode
 - Batch cursor movements with Ctrl + arrow keys
 
 ---
