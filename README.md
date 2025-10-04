@@ -1,6 +1,6 @@
 # pBTE
 
-**pBTE** (python-based Basic Text Editor) is a lightweight, cross-platform terminal editor written in Python. It minimizes external dependencies while providing essential editing features, Unicode support, and customizable key mappings.
+**pBTE** (python-based Basic Text Editor) is a lightweight, cross-platform terminal editor written in Python. It minimizes external dependencies while providing essential editing features and Unicode support.
 
 ---
 
