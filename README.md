@@ -129,4 +129,4 @@ bin/data.py
 ---
 
 ## License
-GPL License. See the `LICENSE` file for details.
+GPLv3 License. See the `LICENSE` file for details.
