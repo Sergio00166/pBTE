@@ -129,25 +129,28 @@ def dedent(state):
     text = state.arr[pos]
     p1 = text[:state.cursor]
     p2 = text[state.cursor:]
-    if len(state.indent)>0 and p1.endswith(state.indent):
+
+    if len(state.indent) > 0 and p1.endswith(state.indent):
         p1 = p1[:-len(state.indent)]
-        state.cursor-=len(state.indent)
-        state.arr[pos] = p1+p2
+        state.cursor -= len(state.indent)
+        state.arr[pos] = p1 + p2
 
 
 def newline(state):
     if state.select_mode and len(state.select) > 0:
         del_sel(state)
         if len(state.arr)==0: return
+
     text = state.arr[state.line+state.offset-state.banoff]
+ 
     if not len(text) == 0:
         state.arr.insert(state.line+state.offset-state.banoff,text[:state.cursor])
         text = text[state.cursor:]; state.cursor = 0
-    else: 
+    else:
         state.arr.insert(state.line+state.offset-state.banoff, "")
 
-    if state.line>state.rows: state.offset += 1
-    else:                     state.line   += 1
+    if state.line > state.rows: state.offset += 1
+    else:                       state.line   += 1
 
     state.arr[state.line+state.offset-state.banoff] = text
     state.status_st = False

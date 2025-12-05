@@ -26,13 +26,13 @@ def calc_displacement(state, data, rect=0):
 
 
 def calc_rel_line(state, target_line):
-    if target_line == "-": 
+    if target_line == "-":
         target_line = len(state.arr) - 1
     else:
         try: target_line = int(target_line)
         except: return
 
-    if target_line >= len(state.arr): return 
+    if target_line >= len(state.arr): return
 
     part = state.rows // 2
     new_offset = target_line - part
@@ -44,10 +44,9 @@ def calc_rel_line(state, target_line):
 def taborspace(contents):
     sp_cnt, tab_cnt = 0, 0
     for x in contents:
-        if x.startswith(" " * 4):
-            sp_cnt += 1
-        if x.startswith("\t"):
-            tab_cnt += 1
+        if x.startswith(" " * 4): sp_cnt  += 1
+        if x.startswith("\t"):    tab_cnt += 1
+
     return " " * 4 if sp_cnt > tab_cnt else "\t"
 
 
@@ -57,12 +56,10 @@ def detect_line_ending_char(c):
     c = c.replace("\r\n", "")
     cr = c.count("\r")
     lf = c.count("\n")
-    if crlf > cr and crlf > lf:
-        return "\r\n"
-    elif cr > lf:
-        return "\r"
-    else:
-        return "\n"
+
+    if crlf > max(cr, lf): return "\r\n"
+    elif cr > lf:          return "\r"
+    else:                  return "\n"
 
 
 def read_UTF8(state, path):

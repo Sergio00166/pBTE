@@ -1,6 +1,6 @@
 # Code by Sergio00166
 
-VERSION = "v0.8.0.6"
+VERSION = "v0.8.0.7"
 
 if not __name__ == "__main__":
     from os import getcwd, sep, environ

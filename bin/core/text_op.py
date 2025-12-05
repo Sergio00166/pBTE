@@ -52,7 +52,6 @@ def select_add_start_str(state, text, remove=False):
         state.arr[start:end] = [x[len(text):] if x.startswith(text) else x for x in p1]
 
 
-
 def search_substring(lst, substring, start_list_pos=0, start_string_pos=0):
     list_lenght, i = len(lst), start_list_pos
     while True:
@@ -67,13 +66,13 @@ def search_substring_rev(lst, substring, start_list_pos=0, start_string_pos=None
     list_lenght, i = len(lst), start_list_pos
     while True:
         start = start_string_pos if i == start_list_pos else len(lst[i])
-        if start_string_pos is None:
-            start = len(lst[i])
-        else:
-            start = start_string_pos - len(find_str)
+
+        if start_string_pos is None: start = len(lst[i])
+        else: start = start_string_pos - len(find_str)
+
         for j in range(start, -1, -1):
-            if lst[i][j - len(substring) : j] == substring:
-                return i, j
+            if lst[i][j - len(substring) : j] == substring: return i, j
+
         i, start_string_pos = (i - 1) % list_lenght, None
 
  

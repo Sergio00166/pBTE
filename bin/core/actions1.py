@@ -11,10 +11,12 @@ def paste(state):
             pos = state.line + state.offset - state.banoff
             text = state.arr[pos]
             p1, p2 = text[:state.cursor], text[state.cursor:]
+
             if isinstance(state.copy_buffer, list):
                 state.arr[pos] = p1 + state.copy_buffer[0]
                 for i, new_line in enumerate(state.copy_buffer[1:], start=1):
                     state.arr.insert(pos + i, new_line)
+
                 state.arr[pos + len(state.copy_buffer) - 1] += p2
                 calc_displacement(state,state.copy_buffer[1:])
                 state.cursor = len(state.copy_buffer[-1])
@@ -24,9 +26,11 @@ def paste(state):
         else:
             start = sum(state.select[0])
             del_sel(state)
+
             if isinstance(state.copy_buffer, list):
                 for i, new_line in enumerate(state.copy_buffer):
                     state.arr.insert(start + i, new_line)
+
                 calc_displacement(state, state.copy_buffer, 1)
                 state.cursor = len(state.copy_buffer[-1])
             else:
@@ -56,6 +60,7 @@ def cut(state):
             else:
                 state.copy_buffer = text
                 state.arr.pop(pos)
+
         elif state.cursor == len(text):
             if pos < len(state.arr) - 1:
                 state.copy_buffer = state.arr.pop(pos + 1)
@@ -71,6 +76,7 @@ def copy(state):
     if state.select_mode and state.select:
         start = max(sum(state.select[0]) - 1, 0)
         state.copy_buffer = state.arr[start:sum(state.select[1])]
+
         if start > 0:
             state.copy_buffer = state.copy_buffer[1:]
 
@@ -79,6 +85,7 @@ def copy(state):
     else:
         pos = state.line + state.offset - state.banoff
         text = state.arr[pos]
+
         if state.cursor == len(text):
             if pos < len(state.arr) - 1:
                 state.copy_buffer = state.arr[pos + 1]

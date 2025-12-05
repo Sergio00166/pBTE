@@ -49,8 +49,7 @@ else:  # Linux or POSIX
 def decode(key):
     out = key.decode(kbdenc)
     for x in ascii_no_lfcr:
-        if chr(x) in out:
-            return ""
+        if chr(x) in out: return ""
     return out
 
 
