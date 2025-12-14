@@ -92,7 +92,7 @@ def chg_var_str(app_state, entered_str, prt_txt, kctlc_f=False):
                     menu_state.kctlc = True
                 break
 
-            elif key == app_state.keys["delete"]:
+            elif key == app_state.keys["backspace"]:
                 if not menu_state.wrtptr == menu_state.lenght:
                     p1 = list(menu_state.entered_str)
                     p1.pop(menu_state.wrtptr - menu_state.lenght - 1)
@@ -110,7 +110,7 @@ def chg_var_str(app_state, entered_str, prt_txt, kctlc_f=False):
                 ):
                     menu_state.wrtptr += 1
 
-            elif key == app_state.keys["supr"]:
+            elif key == app_state.keys["delete"]:
                 p1 = list(menu_state.entered_str)
                 p1.pop(menu_state.wrtptr - menu_state.lenght)
                 menu_state.entered_str = "".join(p1)

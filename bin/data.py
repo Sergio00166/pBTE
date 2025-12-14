@@ -45,7 +45,7 @@ ascii_no_lfcr = [x for x in ascii_map if chr(x) not in ["\n", "\r"]]
 # Here we have all the mapped scape codes for the keys
 if sep == chr(92):  # Windows
     keys = {
-        "delete": b"\x08",
+        "backspace": b"\x08",
         "return": b"\r",
         "ctrl+s": b"\x13",
         "ctrl+d": b"\x04",
@@ -72,18 +72,18 @@ if sep == chr(92):  # Windows
         "ctrl+arr_down": b"\xe0\x91",
         "ctrl+arr_left": b"\xe0s",
         "ctrl+arr_right": b"\xe0t",
-        "supr": b"\xe0S",
+        "delete": b"\xe0S",
         "start": [b"\xe0G"],
         "end": [b"\xe0O"],
-        "repag": b"\xe0I",
-        "avpag": b"\xe0Q",
+        "pageup": b"\xe0I",
+        "pagedown": b"\xe0Q",
         "tab": b"\t",
         "insert": b"\xe0R",
     }
 
 else:  # Linux
     keys = {
-        "delete": b"\x7f",
+        "backspace": b"\x7f",
         "return": b"\r",
         "ctrl+s": b"\x13",
         "ctrl+d": b"\x04",
@@ -110,11 +110,11 @@ else:  # Linux
         "ctrl+arr_down": b"\x1b[1;5B",
         "ctrl+arr_left": b"\x1b[1;5D",
         "ctrl+arr_right": b"\x1b[1;5C",
-        "supr": b"\x1b[3~",
+        "delete": b"\x1b[3~",
         "start": [b"\x1b[H",b"\x1b[1~"],
         "end": [b"\x1b[F",b"\x1b[4~"],
-        "repag": b"\x1b[5~",
-        "avpag": b"\x1b[6~",
+        "pageup": b"\x1b[5~",
+        "pagedown": b"\x1b[6~",
         "tab": b"\t",
         "insert": b"2",
     }

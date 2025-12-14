@@ -134,7 +134,7 @@ def open_file(app_state):
             elif key == app_state.keys["ctrl+c"]:
                 break
 
-            elif key == app_state.keys["delete"]:
+            elif key == app_state.keys["backspace"]:
                 if not menu_state.wrtptr == menu_state.lenght:
                     if menu_state.complete:
                         menu_state.openfile = menu_state.openfile.split("/")[:-1]
@@ -155,7 +155,7 @@ def open_file(app_state):
                 if not menu_state.wrtptr > len(menu_state.openfile) + menu_state.lenght:
                     menu_state.wrtptr += 1
 
-            elif key == app_state.keys["supr"]:
+            elif key == app_state.keys["delete"]:
                 if menu_state.complete:
                     menu_state.openfile = menu_state.openfile.split("/")[:-1]
                     menu_state.openfile = "/".join(menu_state.openfile) + "/"

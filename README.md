@@ -58,7 +58,7 @@ Tested on:
 - Linux
 - macOS
 
-Key remapping can be configured in `bin/data.py` if needed.
+#### Key mapping can be configured in `bin/data.py` if needed.
 
 ---
 

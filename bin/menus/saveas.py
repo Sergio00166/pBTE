@@ -139,7 +139,7 @@ def save_as(app_state):
 
             elif key == app_state.keys["ctrl+c"]: break
 
-            elif key == app_state.keys["delete"]:
+            elif key == app_state.keys["backspace"]:
                 if not menu_state.wrtptr == menu_state.lenght:
                     if menu_state.complete:
                         menu_state.filewrite = menu_state.filewrite.split("/")[:-1]
@@ -163,7 +163,7 @@ def save_as(app_state):
                 ):
                     menu_state.wrtptr += 1
 
-            elif key == app_state.keys["supr"]:
+            elif key == app_state.keys["delete"]:
                 if menu_state.complete:
                     menu_state.filewrite = menu_state.filewrite.split("/")[:-1]
                     menu_state.filewrite = "/".join(menu_state.filewrite) + "/"

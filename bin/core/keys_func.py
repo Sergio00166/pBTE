@@ -19,8 +19,8 @@ def keys_func(state, key):
         state.keys["ctrl+x"]: cut,
         state.keys["ctrl+c"]: copy,
         state.keys["ctrl+p"]: paste,
-        state.keys["delete"]: backspace,
-        state.keys["supr"]:   supr,
+        state.keys["backspace"]: backspace,
+        state.keys["delete"]:   supr,
         state.keys["return"]: newline,
         state.keys["ctrl+a"]: save_as,
         state.keys["ctrl+o"]: open_file,
@@ -64,10 +64,10 @@ def keys_func(state, key):
         state.cursor = len(current_text)
         state.oldptr, state.select = state.cursor, []
 
-    elif key == state.keys["repag"]:
+    elif key == state.keys["pageup"]:
         for _ in range(state.rows): up(state)
 
-    elif key == state.keys["avpag"]:
+    elif key == state.keys["pagedown"]:
         for _ in range(state.rows): down(state)
 
     elif key == state.keys["ctrl+s"]:
