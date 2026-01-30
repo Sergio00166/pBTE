@@ -22,7 +22,7 @@ def text_selection(state, all_file):
     delta = state.select[1][1] - state.select[0][1]
 
     if state.line < state.rows + state.banoff: end += delta
-    start,out = max(0, start - delta), []
+    start, out = max(0, start - delta), []
 
     p0, p1, p2 = all_file[:start], all_file[start:end], all_file[end:]
     ctrl_len = len(state.black + "*" + state.reset)
@@ -33,6 +33,7 @@ def text_selection(state, all_file):
 
         if x.endswith(state.black + ">" + state.reset):
             x = x[:-ctrl_len] + state.reset + ">" + state.black
+
         elif x.startswith(state.black + "<" + state.reset):
             x = x[:-ctrl_len] + state.reset + "<" + state.black
 
@@ -41,7 +42,8 @@ def text_selection(state, all_file):
 
 
 def str_len(self, tabsize=8):
-    result,col,lenght = [],0,0
+    result, col, lenght = [], 0, 0
+
     for char in self:
         if char == "\t":
             space_count = tabsize - (col % tabsize)
@@ -70,26 +72,30 @@ def fixlenline(text, cursor, oldptr):
 def sscp(arg,color):
     global ascii_map
     b, r = color; ext = []
+
     for x in arg:
         if ord(x) in ascii_map:
             ext.append(b+ascii_map[ord(x)]+r)
 
         elif str_len(x)>0: ext.append(x)
         else: ext.append(b+"�"+r)
+
     return "".join(ext)
 
 
 def rscp(arg,color):
     global ascii_replaced
-    if len(color)==3:
-        b,r,c = color
-        b1 = r+b
-        r1 = r+c
+
+    if len(color) == 3:
+        b, r, c = color
+        b1 = r + b
+        r1 = r + c
     else:
-        b,r = color
-        b1,r1 = b,r
+        b, r = color
+        b1, r1 = b, r
+
     for x in ascii_replaced:
-        arg=arg.replace(b+x+r, r1+x+b1)
+        arg = arg.replace(b + x + r, r1 + x + b1)
     return arg
 
  

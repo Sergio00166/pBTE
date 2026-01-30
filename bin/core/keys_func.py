@@ -20,7 +20,7 @@ def keys_func(state, key):
         state.keys["ctrl+c"]: copy,
         state.keys["ctrl+p"]: paste,
         state.keys["backspace"]: backspace,
-        state.keys["delete"]:   supr,
+        state.keys["delete"]: supr,
         state.keys["return"]: newline,
         state.keys["ctrl+a"]: save_as,
         state.keys["ctrl+o"]: open_file,
@@ -29,7 +29,8 @@ def keys_func(state, key):
         state.keys["ctrl+d"]: dedent,
         state.keys["ctrl+k"]: comment_func,
         state.keys["ctrl+u"]: uncomment_func,
-        state.keys["ctrl+t"]: opt_menu
+        state.keys["ctrl+t"]: opt_menu,
+        state.keys["tab"]: indent
     }   
     if key in action_map: action_map[key](state)
 
@@ -80,10 +81,13 @@ def keys_func(state, key):
 
     elif key == state.keys["ctrl+g"]:
         user_input = chg_var_str(state, "", " Go to: ")
+
         if user_input == "-":
             target_line = len(state.arr) - 1
+
         elif user_input.isdigit():
             target_line = int(user_input)
+
         else:
             target_line = state.line + state.offset - state.banoff
 

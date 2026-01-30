@@ -106,8 +106,10 @@ def open_file(app_state):
                         content = glob(menu_state.openfile + "*", recursive=False)
                     if len(content) > 0:
                         menu_state.complete = True
+
                     if menu_state.cmp_counter >= len(content):
                         menu_state.cmp_counter = 0
+
                     if menu_state.complete:
                         menu_state.openfile = content[menu_state.cmp_counter]
                         menu_state.cmp_counter += 1
@@ -136,6 +138,7 @@ def open_file(app_state):
 
             elif key == app_state.keys["backspace"]:
                 if not menu_state.wrtptr == menu_state.lenght:
+
                     if menu_state.complete:
                         menu_state.openfile = menu_state.openfile.split("/")[:-1]
                         menu_state.openfile = "/".join(menu_state.openfile) + "/"
@@ -156,6 +159,7 @@ def open_file(app_state):
                     menu_state.wrtptr += 1
 
             elif key == app_state.keys["delete"]:
+
                 if menu_state.complete:
                     menu_state.openfile = menu_state.openfile.split("/")[:-1]
                     menu_state.openfile = "/".join(menu_state.openfile) + "/"

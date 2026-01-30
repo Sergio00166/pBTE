@@ -100,10 +100,13 @@ def save_as(app_state):
                 ):
                     if not menu_state.complete:
                         content = glob(menu_state.filewrite + "*", recursive=False)
+
                     if len(content) > 0:
                         menu_state.complete = True
+
                     if menu_state.cmp_counter >= len(content):
                         menu_state.cmp_counter = 0
+
                     if menu_state.complete:
                         menu_state.filewrite = content[menu_state.cmp_counter]
                         menu_state.cmp_counter += 1
@@ -141,6 +144,7 @@ def save_as(app_state):
 
             elif key == app_state.keys["backspace"]:
                 if not menu_state.wrtptr == menu_state.lenght:
+
                     if menu_state.complete:
                         menu_state.filewrite = menu_state.filewrite.split("/")[:-1]
                         menu_state.filewrite = "/".join(menu_state.filewrite) + "/"

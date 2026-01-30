@@ -131,6 +131,7 @@ def replace(app_state):
             ):  break
 
             elif key == app_state.keys["arr_right"]:
+
                 cl_line, app_state.cursor = search_substring(
                     app_state.arr, menu_state.find_str, pos, app_state.cursor
                 )
@@ -139,6 +140,7 @@ def replace(app_state):
                 ]
                 p2 = app_state.arr[cl_line][app_state.cursor :]
                 app_state.arr[cl_line] = p1 + menu_state.replace_str + p2
+
                 app_state.cursor = (
                     app_state.cursor
                     + len(menu_state.replace_str)

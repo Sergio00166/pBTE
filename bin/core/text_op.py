@@ -29,10 +29,12 @@ def del_sel(state, blank=False):
 
 
 def select_add_start_str(state, text, remove=False):
+    if not isinstance(text, list): text = [text, ""]
+
     start = sum(state.select[0])
     end = sum(state.select[1])
     p1 = state.arr[start:end]
-
+    
     if isinstance(text, list):
         if not remove:
             state.arr[start:end] = [text[0] + x + text[1] for x in p1]
@@ -54,11 +56,14 @@ def select_add_start_str(state, text, remove=False):
 
 def search_substring(lst, substring, start_list_pos=0, start_string_pos=0):
     list_lenght, i = len(lst), start_list_pos
+
     while True:
         start = start_string_pos if i == start_list_pos else 0
         for j in range(start, len(lst[i])):
+
             if lst[i][j : j + len(substring)] == substring:
                 return i, j + len(substring)
+
         i, start_string_pos = (i + 1) % list_lenght, 0
 
 

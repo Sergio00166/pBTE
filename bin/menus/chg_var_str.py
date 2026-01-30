@@ -50,13 +50,13 @@ def chg_var_str(app_state, entered_str, prt_txt, kctlc_f=False):
     global fd, old_settings, thr
 
     menu_state = SimpleNamespace(
-        entered_str=entered_str,
-        prt_txt=prt_txt,
-        lenght=len(prt_txt) + 1,
-        wrtptr=len(prt_txt) + 1 + len(entered_str),
-        kctlc=False,
-        run=False,
-        kill=False,
+        entered_str = entered_str,
+        prt_txt = prt_txt,
+        lenght = len(prt_txt) + 1,
+        wrtptr = len(prt_txt) + 1 + len(entered_str),
+        kctlc = False,
+        run = False,
+        kill = False,
     )
     old_str = menu_state.entered_str
     thr = Thread(target=updscr_thr, args=(app_state, menu_state))

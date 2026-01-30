@@ -57,13 +57,8 @@ def handle_text_input(state, key):
     out = decode(key)
 
     if state.select_mode and state.select:
-        if out == "\t":
-            select_add_start_str(state, state.indent)
-            return
-        else:
-            args = (state.select, state.arr, state.banoff, True)
-            del_sel(state)
-            state.cursor = 0
+        del_sel(state, True)
+        state.cursor = 0
 
     pos = state.line + state.offset - state.banoff
     text = state.arr[pos]
@@ -79,10 +74,11 @@ def handle_text_input(state, key):
 
     if len(out_lines) > 1:
         state.cursor = len(out_lines[-1])
+
         if not (state.select_mode and state.select):
             out_lines[-1] += after_cursor
-        state.arr[pos + 1:pos + 1] = out_lines[1:]
 
+        state.arr[pos + 1:pos + 1] = out_lines[1:]
         calc_displacement(state, out_lines, 1)
     else:
         state.cursor += len(out_lines[0])

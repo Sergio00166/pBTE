@@ -10,22 +10,25 @@ from scr_utils import *
 def wrap(text, columns, tabsize=8, cursor=None):
     buffer,counter,col = "", -1, 0
     result,pos,ptr = [], 0, 0
-    extra = cursor!=None
+    extra = cursor != None
 
     def handle_char(char, char_width):
-        nonlocal buffer,counter,col,result,ptr,pos
+        nonlocal buffer, counter, col, result, ptr, pos
+
         if counter + char_width > columns:
             result.append(buffer)
-            if ptr-counter>0:
+            if ptr - counter > 0:
                 ptr -= counter
                 pos += 1
+
             buffer, counter = char, char_width
         else:
             buffer += char
             counter += char_width
+
         col += char_width
 
-    for p,char in enumerate(text):
+    for p, char in enumerate(text):
         if char == "\t":
             space_count = tabsize - (col % tabsize)
             expanded = " " * space_count

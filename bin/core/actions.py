@@ -75,7 +75,8 @@ def right(state):
 
 
 def backspace(state):
-    current_text = state.arr[state.line + state.offset - state.banoff]
+    pos = state.line + state.offset - state.banoff
+    current_text = state.arr[pos]
 
     if not state.select_mode or len(state.select) == 0:
         if state.cursor != 0:
@@ -86,9 +87,10 @@ def backspace(state):
             state.cursor -= 1
 
         elif state.offset + state.line != 1:
-            previous_text = state.arr[state.line + state.offset - state.banoff - 1]
-            state.arr[state.line + state.offset - state.banoff - 1] = previous_text + current_text
-            state.arr.pop(state.line + state.offset - state.banoff)
+            previous_text = state.arr[pos - 1]
+            state.arr[pos - 1] = previous_text + current_text
+
+            state.arr.pop(pos)
             state.cursor = len(previous_text)
             current_text = previous_text + current_text
 
@@ -102,6 +104,28 @@ def backspace(state):
         state.select_mode = False
         state.select = []
     state.status_st = False
+
+
+def supr(state):
+    idx = state.line + state.offset - state.banoff
+    current_text = state.arr[idx]
+
+    if not state.select_mode or len(state.select) == 0:
+        text_chars = list(current_text)
+
+        if state.cursor < len(text_chars) and len(text_chars) > 0:
+            text_chars.pop(state.cursor)
+            current_text = "".join(text_chars)
+            state.arr[idx] = current_text
+
+        elif state.cursor >= len(text_chars) and idx + 1 < len(state.arr):
+            next_line = state.arr[idx + 1]
+            merged_line = current_text + next_line
+            state.arr[idx] = merged_line
+            state.arr.pop(idx + 1)
+    else:
+        del_sel(state)
+        state.cursor = 0
 
 
 def newline(state):
@@ -124,22 +148,10 @@ def newline(state):
         state.select = []
 
 
-def dedent(state):
-    pos = state.line + state.offset - state.banoff
-    text = state.arr[pos]
-    p1 = text[:state.cursor]
-    p2 = text[state.cursor:]
-
-    if len(state.indent) > 0 and p1.endswith(state.indent):
-        p1 = p1[:-len(state.indent)]
-        state.cursor -= len(state.indent)
-        state.arr[pos] = p1 + p2
-
-
 def newline(state):
     if state.select_mode and len(state.select) > 0:
         del_sel(state)
-        if len(state.arr)==0: return
+        if len(state.arr) == 0: return
 
     text = state.arr[state.line+state.offset-state.banoff]
  

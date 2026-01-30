@@ -74,7 +74,7 @@ python bin/pbte.py [path/to/file]
 ---
 
 ## Configuration
-To change keyboard bindings, edit the mappings in:
+To change the keyboard-mapped scape codes, edit them inside:
 ```
 bin/data.py
 ```
