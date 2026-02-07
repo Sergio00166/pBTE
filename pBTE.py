@@ -35,7 +35,7 @@ if __name__ == "__main__":
     from os import sep
 
     # Add the bin folder to import path
-    path.append(path[0] + sep + "bin")
+    path.append(f"{path[0]}{sep}bin")
     from init import *
 
     update_thread = Thread(target=update_screen_thread)

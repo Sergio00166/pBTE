@@ -75,7 +75,7 @@ def chg_hlg(rel_cursor, string, app_state):
     pos = rel_cursor - str_len(string)
     mov = movcr % (app_state.line + app_state.banoff, pos + 1)
     if pos >= 0:
-        print(mov + app_state.slc + string + app_state.reset + hcr)
+        print(f"{mov}{app_state.slc}{string}{app_state.reset}{hcr}")
 
 
 def replace(app_state):

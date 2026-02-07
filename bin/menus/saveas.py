@@ -189,7 +189,7 @@ def save_as(app_state):
                     out = decode(key)
                     p1 = menu_state.filewrite[: menu_state.wrtptr - menu_state.lenght]
                     p2 = menu_state.filewrite[menu_state.wrtptr - menu_state.lenght :]
-                    menu_state.filewrite = p1 + out + p2
+                    menu_state.filewrite = f"{p1}{out}{p2}"
                     menu_state.wrtptr += len(out)
                     menu_state.complete = False
 

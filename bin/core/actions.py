@@ -129,14 +129,15 @@ def supr(state):
 
 
 def newline(state):
-    current_text = state.arr[state.line + state.offset - state.banoff]
+    pos = state.line + state.offset - state.banoff
+    current_text = state.arr[pos]
 
     if not state.select_mode or len(state.select) == 0:
         before_cursor = current_text[:state.cursor]
         after_cursor = current_text[state.cursor:]
 
-        state.arr[state.line + state.offset - state.banoff] = before_cursor
-        state.arr.insert(state.line + state.offset - state.banoff + 1, after_cursor)
+        state.arr[pos] = before_cursor
+        state.arr.insert(pos + 1, after_cursor)
 
         if state.line < state.rows: state.line   += 1
         else:                       state.offset += 1
@@ -153,18 +154,19 @@ def newline(state):
         del_sel(state)
         if len(state.arr) == 0: return
 
+    pos = state.line + state.offset - state.banoff
     text = state.arr[state.line+state.offset-state.banoff]
  
     if not len(text) == 0:
-        state.arr.insert(state.line+state.offset-state.banoff,text[:state.cursor])
+        state.arr.insert(pos, text[:state.cursor])
         text = text[state.cursor:]; state.cursor = 0
     else:
-        state.arr.insert(state.line+state.offset-state.banoff, "")
+        state.arr.insert(pos, "")
 
     if state.line > state.rows: state.offset += 1
     else:                       state.line   += 1
 
-    state.arr[state.line+state.offset-state.banoff] = text
+    state.arr[state.line + state.offset - state.banoff] = text
     state.status_st = False
 
  

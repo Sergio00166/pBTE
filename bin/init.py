@@ -1,6 +1,6 @@
 # Code by Sergio00166
 
-VERSION = "v0.8.1.0"
+VERSION = "v0.8.1.1"
 
 if not __name__ == "__main__":
     from os import getcwd, sep, environ
@@ -47,19 +47,19 @@ if not __name__ == "__main__":
         lnsep = "\n",
         comment = ["#", ""],
         indent = "\t",
-        cursor=0,
-        oldptr=0,
-        line=1,
-        offset=0,
-        banoff=1,
-        rows=rows,
-        columns=columns,
-        select=[],
-        select_mode=False,
-        copy_buffer="",
-        status="",
-        status_st=False,
-        keys=keys
+        cursor = 0,
+        oldptr = 0,
+        line = 1,
+        offset = 0,
+        banoff = 1,
+        rows = rows,
+        columns = columns,
+        select = [],
+        select_mode = False,
+        copy_buffer = "",
+        status = "",
+        status_st = False,
+        keys = keys
     )
     deinit()
 

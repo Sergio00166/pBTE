@@ -10,6 +10,8 @@ from threading import Thread
 from inputs import getch
 from os import sep
 
+menu_text = "1 (ASCII), 2 (UTF8), 3 (UTF8-BOM), 4 (UTF16), 5 (UTF16-BE), 6 (UTF16-LE) "
+
 
 if sep != chr(92):
     from termios import TCSADRAIN, tcsetattr, tcgetattr
@@ -49,12 +51,10 @@ def codec_menu(app_state):
     global fd, old_settings, thr
 
     menu_state = SimpleNamespace(text="", wrtptr=1, run=False, kill=False)
-    app_state.status_st = True
+    app_state.status_st = True    
     app_state.status = "ASCII" if app_state.codec == "latin_1" else app_state.codec
-    menu_state.text = "1 (ASCII), 2 (UTF8), "
-    menu_state.text += "3 (UTF8-BOM), 4 (UTF16), "
-    menu_state.text += "5 (UTF16-BE), 6 (UTF16-LE) "
-    menu_state.text, menu_state.wrtptr = f" Codec: " + menu_state.text, 1
+    menu_state.text = f" Codec: {menu_text}"
+    menu_state.wrtptr = 1
 
     thr = Thread(target=updscr_thr, args=(app_state, menu_state))
     menu_state.run, menu_state.kill = False, False

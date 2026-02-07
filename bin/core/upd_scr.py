@@ -6,12 +6,12 @@ from os import sep
 
 def update_scr(state, rrw=False, hlg_str=""):
     pos    = f" {state.line + state.offset - state.banoff}  "
-    stat   = (" " + state.banner[1]) if not state.status_st else ("  " + state.status)
-    header = pos + " " + state.banner[0] + stat + "    "
+    stat   = f" {state.banner[1]}" if not state.status_st else f"  {state.status}"
+    header = f"{pos} {state.banner[0]}{stat}    "
 
     avail = state.columns - len(header)
     if avail < 24:
-        header,pad = "",1
+        header, pad = "", 1
         filename = fixfilename(state.filename, state.columns).replace(sep, "/")
         filename += " " * (state.columns - len(filename))
     else:
@@ -23,19 +23,17 @@ def update_scr(state, rrw=False, hlg_str=""):
         screen_lines = text_selection(state, screen_lines)
     elif hlg_str:
         screen_lines = [
-            ln.replace(hlg_str, state.black + hlg_str + state.reset)
+            ln.replace(hlg_str, f"{state.black}{hlg_str}{state.reset}")
             for ln in screen_lines
         ]
 
     screen_lines += [" "] * max(0, state.rows - len(screen_lines) + 1)
-    menu_body = clr + state.bnc+header + " "*pad + filename + " " + state.reset
-    menu_text = menu_body + "\n" + clr + ("\n" + clr).join(screen_lines)
+    menu_body = f"{clr}{state.bnc}{header}{' ' * pad}{filename} {state.reset}"
+    menu_text = f"{menu_body}\n{clr}" + (f"\n{clr}").join(screen_lines)
 
     if rrw: return menu_text
-    print(
-        hcr + movtl + menu_text + scr +
-        movcr%(state.line + state.banoff, cursor+1)
-    )
+    pos = (state.line + state.banoff, cursor + 1)
+    print(f"{hcr}{movtl}{menu_text}{scr}{movcr % pos}")
     if hlg_str: return cursor
 
 
@@ -61,19 +59,16 @@ def menu_updsrc(app_state, mode=None, redraw=False):
     menu = "\n".join(lines)
 
     wrtptr, content = fix_cursor_pos(
-        content, wrtptr-1, app_state.columns, app_state.slc, app_state.reset + app_state.bnc
+        content, wrtptr - 1, app_state.columns, app_state.slc, app_state.reset + app_state.bnc
     )
     curr_len = str_len(
         content.replace(app_state.slc, "")
         .replace(app_state.reset + app_state.bnc, "")
     )
     if not curr_len==app_state.columns: 
-        content += " "*(app_state.columns - curr_len + 2)
-
-    print(
-        hcr + movtl + menu + "\n" +
-        app_state.bnc + content + scr +
-        movcr % (app_state.rows + 2, wrtptr + 1)
-    )
+        content += " " * (app_state.columns - curr_len + 2)
+    
+    pos = (app_state.rows + 2, wrtptr + 1)
+    print(f"{hcr}{movtl}{menu}\n{app_state.bnc}{content}{scr}{movcr % pos}")
 
  

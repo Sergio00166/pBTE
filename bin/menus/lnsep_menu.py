@@ -10,6 +10,8 @@ from threading import Thread
 from inputs import getch
 from os import sep
 
+menu_text = "1 (LF), 2 (CRLF), 3 (CR), 4 (None) "
+
 
 if sep != chr(92):
     from termios import TCSADRAIN, tcsetattr, tcgetattr
@@ -56,9 +58,8 @@ def lnsep_menu(app_state):
     elif app_state.lnsep == "\r\n": app_state.status = "CRLF"
     elif app_state.lnsep == "":     app_state.status = "None"
 
-    menu_state.text = "1 (LF), 2 (CRLF),"
-    menu_state.text += " 3 (CR), 4 (None) "
-    menu_state.text, menu_state.wrtptr = f" LineSep: " + menu_state.text, 1
+    menu_state.text = f" LineSep: {menu_text}"
+    menu_state.wrtptr = 1
 
     thr = Thread(target=updscr_thr, args=(app_state, menu_state))
     menu_state.run, menu_state.kill = False, False

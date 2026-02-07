@@ -25,19 +25,19 @@ def text_selection(state, all_file):
     start, out = max(0, start - delta), []
 
     p0, p1, p2 = all_file[:start], all_file[start:end], all_file[end:]
-    ctrl_len = len(state.black + "*" + state.reset)
+    ctrl_len = len(f"{state.black}*{state.reset}")
 
     for x in p1:
         ctrl_len = str_len(x.replace(state.black, "").replace(state.reset, ""))
         x = rscp(x, [state.black, state.reset, state.slc])
 
-        if x.endswith(state.black + ">" + state.reset):
-            x = x[:-ctrl_len] + state.reset + ">" + state.black
+        if x.endswith(f"{state.black}>{state.reset}"):
+            x = f"{x[:-ctrl_len]}{state.reset}>{state.black}"
 
-        elif x.startswith(state.black + "<" + state.reset):
-            x = x[:-ctrl_len] + state.reset + "<" + state.black
+        elif x.startswith(f"{state.black}<{state.reset}"):
+            x = f"{x[:-ctrl_len]}{state.reset}<{state.black}"
 
-        out.append(state.black + x + state.reset)
+        out.append(f"{state.black}{x}{state.reset}")
     return p0 + out + p2
 
 
@@ -75,10 +75,10 @@ def sscp(arg,color):
 
     for x in arg:
         if ord(x) in ascii_map:
-            ext.append(b+ascii_map[ord(x)]+r)
+            ext.append(f"{b}{ascii_map[ord(x)]}{r}")
 
         elif str_len(x)>0: ext.append(x)
-        else: ext.append(b+"�"+r)
+        else: ext.append(f"{b}�{r}")
 
     return "".join(ext)
 
@@ -95,7 +95,7 @@ def rscp(arg,color):
         b1, r1 = b, r
 
     for x in ascii_replaced:
-        arg = arg.replace(b + x + r, r1 + x + b1)
+        arg = arg.replace(f"{b}{x}{r}", f"{r1}{x}{b1}")
     return arg
 
  

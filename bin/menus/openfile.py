@@ -189,7 +189,7 @@ def open_file(app_state):
                     out = decode(key)
                     p1 = menu_state.openfile[: menu_state.wrtptr - menu_state.lenght]
                     p2 = menu_state.openfile[menu_state.wrtptr - menu_state.lenght :]
-                    menu_state.openfile = p1 + out + p2
+                    menu_state.openfile = f"{p1}{out}{p2}"
                     menu_state.wrtptr += len(out)
                     menu_state.complete = False
 

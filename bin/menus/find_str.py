@@ -64,9 +64,9 @@ def exit(menu_state):
 
 def chg_hlg(rel_cursor, find_str, app_state):
     pos = rel_cursor - str_len(find_str)
-    mov = movcr % (app_state.line + app_state.banoff, pos + 1)
     if pos >= 0:
-        print(mov + app_state.slc + find_str + app_state.reset + hcr)
+        mov = movcr % (app_state.line + app_state.banoff, pos + 1)
+        print(f"{mov}{app_state.slc}{find_str}{app_state.reset}{hcr}")
 
 
 def isin_arr(arr, string):

@@ -11,6 +11,8 @@ from threading import Thread
 from inputs import getch
 from os import sep
 
+menu_text = "S (CharSet), L (LineSep),TAB (Tab/Sp), C (Chg cmnt), E (Chg end cmnt), I (Chg indent) "
+
 
 if sep != chr(92):
     from termios import TCSADRAIN, tcsetattr, tcgetattr
@@ -50,10 +52,8 @@ def opt_menu(app_state):
     global fd, old_settings, thr
 
     menu_state = SimpleNamespace(text="", wrtptr=1, run=False, kill=False)
-    menu_state.text = "S (CharSet), L (LineSep), "
-    menu_state.text += "TAB (Tab/Sp), C (Chg cmnt), "
-    menu_state.text += "E (Chg end cmnt), I (Chg indent)"
-    menu_state.text, menu_state.wrtptr = " Options: " + menu_state.text, 1
+    menu_state.text = f" Options: {menu_text}"
+    menu_state.wrtptr = 1
 
     thr = Thread(target=updscr_thr, args=(app_state, menu_state))
     menu_state.run, menu_state.kill = False, False

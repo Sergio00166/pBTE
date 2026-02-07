@@ -137,7 +137,7 @@ def comment_func(state):
 
     if not state.select_mode or len(state.select) == 0:
         indent_part, content_part = cmt_w_ind(state.arr[pos], state.indent)
-        state.arr[pos] = indent_part + state.comment[0] + content_part + state.comment[1]
+        state.arr[pos] = f"{indent_part}{state.comment[0]}{content_part}{state.comment[1]}"
     else:
         select_add_start_str(state, state.comment)
 

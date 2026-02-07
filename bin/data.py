@@ -38,9 +38,9 @@ ascii_map = {
     0x7F: "␡"   # Delete
 }
 # Create a map with all the graphical symbols
-ascii_replaced = [ascii_map[x] for x in ascii_map]+[">","<","�"]
+ascii_replaced = [ascii_map[x] for x in ascii_map] + [">","<","�"]
 # Create a map without LF and CR
-ascii_no_lfcr = [x for x in ascii_map if chr(x) not in ["\n", "\r"]]
+ascii_no_lfcr = (x for x in ascii_map if chr(x) not in ["\n", "\r"])
 
 # Here we have all the mapped scape codes for the keys
 if sep == chr(92):  # Windows

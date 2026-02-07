@@ -60,7 +60,7 @@ def fix_arr_line_len(state, sub_arr):
 
         text = sscp(text, [state.black, state.reset])
         if (len(wrapped_text) - fix) > 1:
-            text += state.black + ">" + state.reset
+            text += f"{state.black}>{state.reset}"
 
         out.append(text)
     return out
@@ -73,15 +73,15 @@ def fix_cursor_pos(text,cursor,columns,black,reset):
     if not len(wrapped_text) == 0:
         if pos > len(wrapped_text) - 1: pos =- 1
         text = wrapped_text[pos]
-        text = sscp(text, [black, reset])
+        text = sscp(text, (black, reset))
 
         if pos > 0:
-            text = black + "<" + reset + text
+            text = f"{black}<{reset}{text}"
             if not pos == len(wrapped_text) - 1:
-                text += black + ">" + reset
+                text += f"{black}>{reset}"
 
         elif len(wrapped_text) > 1:
-            text += black + ">" + reset
+            text += f"{black}>{reset}"
 
     else: text = ""
     return cursor, text
@@ -105,12 +105,12 @@ def fixfilename(path, lenght):
     if len(path) <= lenght: return path
     available_lenght = lenght - len(basename) - 1
 
-    if available_lenght <= 0: return basename[:lenght - 1]+"*"
+    if available_lenght <= 0: return basename[:lenght - 1] + "*"
     parts = dirname.split(sep)
 
     while len(parts) > 0 and len(sep.join(parts)) > available_lenght: parts.pop(0)
     if len(parts) == 0: compacted_path = basename
-    else: compacted_path = sep.join(parts) + sep + basename
+    else: compacted_path = f"{sep.join(parts)}{sep}{basename}"
     return compacted_path
 
  

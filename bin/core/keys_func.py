@@ -16,10 +16,10 @@ from opt_menu import opt_menu
 
 def keys_func(state, key):
     action_map = {
+        state.keys["tab"]: indent,
         state.keys["ctrl+x"]: cut,
         state.keys["ctrl+c"]: copy,
         state.keys["ctrl+p"]: paste,
-        state.keys["backspace"]: backspace,
         state.keys["delete"]: supr,
         state.keys["return"]: newline,
         state.keys["ctrl+a"]: save_as,
@@ -30,7 +30,7 @@ def keys_func(state, key):
         state.keys["ctrl+k"]: comment_func,
         state.keys["ctrl+u"]: uncomment_func,
         state.keys["ctrl+t"]: opt_menu,
-        state.keys["tab"]: indent
+        state.keys["backspace"]: backspace
     }   
     if key in action_map: action_map[key](state)
 
