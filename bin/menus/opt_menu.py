@@ -11,7 +11,7 @@ from threading import Thread
 from inputs import getch
 from os import sep
 
-menu_text = "S (CharSet), L (LineSep),TAB (Tab/Sp), C (Chg cmnt), E (Chg end cmnt), I (Chg indent) "
+menu_text = "S (CharSet), L (LineSep), TAB (Tab/Sp), C (Chg cmnt), E (Chg end cmnt), I (Chg indent) "
 
 
 if sep != chr(92):

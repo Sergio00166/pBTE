@@ -1,17 +1,15 @@
 # Code by Sergio00166
 
-VERSION = "v0.8.1.1"
+VERSION = "v0.8.1.2"
 
 if not __name__ == "__main__":
     from os import getcwd, sep, environ
     from sys import argv, path
 
     root = path[0] + sep + "bin" + sep
-    path.append(sep.join([path[0], "bin", "lib.zip"]))
     path.append(root + "core")
     path.append(root + "menus")
 
-    from colorama import init, Fore, Back, Style, deinit
     from os.path import abspath, isdir, join
     from types import SimpleNamespace
     from functions import read_UTF8
@@ -24,6 +22,8 @@ if not __name__ == "__main__":
     from glob import glob
     from data import keys
 
+    rows, columns = get_size()
+
     if sep != chr(92):  # If OS is LINUX
         from termios import TCSADRAIN, tcsetattr, tcgetattr
         from sys import stdin
@@ -32,14 +32,11 @@ if not __name__ == "__main__":
         fd = stdin.fileno()
         old_settings = tcgetattr(fd)
 
-    init(autoreset=False, convert=True)
-    rows, columns = get_size()
-
     app_state = SimpleNamespace(
-        black = Back.LIGHTCYAN_EX + Fore.BLACK,
-        bnc = Back.GREEN + Fore.BLACK,
-        slc = Back.LIGHTYELLOW_EX + Fore.BLACK,
-        reset = Style.RESET_ALL,
+        black = "\x1b[106m\x1b[30m",
+        bnc = "\x1b[42m\x1b[30m",
+        slc = "\x1b[103m\x1b[30m",
+        reset = "\x1b[0m",
         banner = ["pBTE", VERSION],
         filename = join(getcwd(), "NewFile"),
         arr = [""],
@@ -61,8 +58,6 @@ if not __name__ == "__main__":
         status_st = False,
         keys = keys
     )
-    deinit()
-
     if len(argv) > 1:
         files = [glob(x, recursive=False) for x in argv[1:]]
         files = [abspath(i) for x in files for i in x if not isdir(i)]
