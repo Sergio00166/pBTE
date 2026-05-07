@@ -5,45 +5,63 @@ from functions import calc_displacement
 from re import split as resplit
 from data import ascii_no_lfcr
 from os import sep, read
-
-
-if sep == chr(92):  # Windows
-    from ctypes import windll
-    kbdenc = "cp" + str(windll.kernel32.GetConsoleCP())
-else:  # Linux or POSIX
-    from sys import stdin
-    kbdenc = stdin.encoding
+from data import keys_raw
 
 
 if sep == chr(92):  # Windows
     from msvcrt import getch as gch, kbhit
+    from ctypes import windll
 
-    def getch():
-        out = gch()
-        while kbhit():
-            out += gch()
-        return out
+    kbdenc = f"cp{windll.kernel32.GetConsoleCP()}"
+
+    def tty_read_stdin():
+        out = [gch()]
+        while kbhit(): out.append(gch())
+        return b''.join(out)
+
 
 else:  # Linux or POSIX
     from termios import TCSADRAIN, tcsetattr, tcgetattr
+    from select import select as slsl
     from sys import stdin
     from tty import setraw
-    from select import select as slsl
+    from sys import stdin
 
     fd = stdin.fileno()
     old_settings = tcgetattr(fd)
+    kbdenc = stdin.encoding
 
-    def getch():
+    def tty_read_stdin():
         old = (fd, TCSADRAIN, old_settings)
         setraw(fd, when=TCSADRAIN)
-        out, rlist = b"", True
 
+        out, rlist = [], True
         while rlist:
-            out += read(fd, 8)
+            out.append(read(fd, 4))
             rlist = slsl([fd], [], [], 0)[0]
 
         tcsetattr(*old)
-        return out
+        return b''.join(out)
+
+
+# Avoid merging two control keys as an
+# single one, keeps the rest unchanged
+input_buffer = b""
+def getch():
+    global input_buffer
+
+    if input_buffer:
+        data = input_buffer
+        input_buffer = b""
+    else:
+        data = tty_read_stdin()
+
+    for k in keys_raw:
+        if data.startswith(k):
+            seq_len = len(k)
+            input_buffer = data[seq_len:]
+            return data[:seq_len]
+    return data
 
 
 def decode(key):
@@ -62,7 +80,8 @@ def handle_text_input(state, key):
 
     pos = state.line + state.offset - state.banoff
     text = state.arr[pos]
-    before_cursor, after_cursor = text[:state.cursor], text[state.cursor:]
+    before_cursor = text[:state.cursor]
+    after_cursor  = text[state.cursor:]
 
     out = out.replace("\t", state.indent)
     out_lines = resplit(r"[\n\r]", out)
@@ -86,5 +105,6 @@ def handle_text_input(state, key):
     state.status_st = False
     state.select_mode = False
     state.select = []
+
 
  

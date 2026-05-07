@@ -119,4 +119,12 @@ else:  # Linux
         "insert": b"2",
     }
 
+# Create an list with all keyboard byte scape codes
+keys_raw = sorted(
+    [item for k in keys.values() if k not in [b"\t", b"\r"]
+          for item in (k if isinstance(k, list) else [k])],
+    key=len, reverse=True
+)
+
+
  

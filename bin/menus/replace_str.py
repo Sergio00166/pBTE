@@ -10,6 +10,7 @@ from time import sleep as delay
 from upd_scr import update_scr
 from threading import Thread
 from inputs import getch
+from data import keys
 from os import sep
 
 
@@ -27,47 +28,37 @@ def updscr_thr(app_state, menu_state):
 
     while not menu_state.kill:
         delay(0.01)
-        if menu_state.run:
-            if sep != chr(92):
-                old = (fd, TCSADRAIN, old_settings)
-                tcsetattr(fd, TCSADRAIN, old_settings)
+        if not menu_state.run: continue
 
-            old_rows = app_state.rows
-            old_columns = app_state.columns
-            app_state.rows, app_state.columns = get_size()
+        if sep != chr(92):
+            old = (fd, TCSADRAIN, old_settings)
+            tcsetattr(fd, TCSADRAIN, old_settings)
 
-            if app_state.rows < 4 or app_state.columns < 24:
-                print("\r\033cTerminal too small")
+        old_rows = app_state.rows
+        old_columns = app_state.columns
+        app_state.rows, app_state.columns = get_size()
 
-            elif not (old_rows == app_state.rows and old_columns == app_state.columns):
-                if app_state.line > app_state.rows:
-                    app_state.offset = app_state.offset + (
-                        app_state.line - app_state.rows
-                    )
-                    app_state.line = app_state.rows
+        if app_state.rows < 4 or app_state.columns < 24:
+            print("\r\033cTerminal too small")
 
-                if sep != chr(92): tcsetattr(fd, TCSADRAIN, old_settings)
+        elif not (old_rows == app_state.rows and old_columns == app_state.columns):
+            if app_state.line > app_state.rows:
+                app_state.offset = app_state.offset + (
+                    app_state.line - app_state.rows
+                )
+                app_state.line = app_state.rows
 
-                rel_cursor = update_scr(app_state, False, menu_state.find_str)
-                if menu_state.active:
-                    chg_hlg(rel_cursor, menu_state.find_str, app_state)
+            if sep != chr(92): tcsetattr(fd, TCSADRAIN, old_settings)
 
-            if sep != chr(92): setraw(fd, when=TCSADRAIN)
+            rel_cursor = update_scr(app_state, False, menu_state.find_str)
+            if menu_state.active: chg_hlg(rel_cursor, menu_state.find_str, app_state)
 
-
-def exit(menu_state):
-    global fd, old_settings
-    menu_state.run = False
-    menu_state.kill = True
-    thr.join()
-    print(scr)
-    if sep != chr(92): tcsetattr(fd, TCSADRAIN, old_settings)
+        if sep != chr(92): setraw(fd, when=TCSADRAIN)
 
 
 def isin_arr(arr, string):
     for x in arr:
-        if string in x:
-            return True
+        if string in x: return True
     return False
 
 
@@ -78,33 +69,33 @@ def chg_hlg(rel_cursor, string, app_state):
         print(f"{mov}{app_state.slc}{string}{app_state.reset}{hcr}")
 
 
-def replace(app_state):
-    global fd, old_settings, thr
+def init(app_state):
     try:
-        find_str = chg_var_str(app_state, "", " [R] Find: ", True)
-        if find_str == "":
-            raise KeyboardInterrupt
+        find_str = chg_var_str(app_state, "", " [R] Find: ")
+        if find_str == "": raise KeyboardInterrupt
     except KeyboardInterrupt: return
-    try:
-        replace_str = chg_var_str(app_state, "", " Replace with: ", True)
+
+    try: replace_str = chg_var_str(app_state, "", " Replace with: ")
     except KeyboardInterrupt: return 
 
     if not isin_arr(app_state.arr, find_str): return
+    pos = app_state.line + app_state.offset - app_state.banoff
 
-    menu_state = SimpleNamespace(
-        find_str=find_str, replace_str=replace_str, active=False, run=False, kill=False
-    )
+    menu_state = SimpleNamespace(find_str=find_str, replace_str=replace_str, active=False, run=False, kill=False, pos=pos)
     thr = Thread(target=updscr_thr, args=(app_state, menu_state))
-    menu_state.run, menu_state.kill = False, False
-    thr.daemon = True
-    thr.start()
+    thr.daemon = True; thr.start()
 
-    pos, menu_state.active = app_state.line + app_state.offset - app_state.banoff, False
     cl_line, app_state.cursor = search_substring(
         app_state.arr, menu_state.find_str, pos, app_state.cursor
     )
     calc_rel_line(app_state, cl_line)
     app_state.cursor -= len(menu_state.find_str)
+    return menu_state
+
+
+def replace(app_state):
+    global fd, old_settings
+    menu_state = init(app_state)
 
     while True:
         try:
@@ -122,63 +113,65 @@ def replace(app_state):
             if sep != chr(92): setraw(fd, when=TCSADRAIN)
 
             menu_state.run = True
-            key = getch()
+            kbd_input = getch()
             menu_state.run = False
-            pos = app_state.line + app_state.offset - app_state.banoff
 
-            if key == app_state.keys["ctrl+c"] or not isin_arr(
-                app_state.arr, menu_state.find_str
-            ):  break
-
-            elif key == app_state.keys["arr_right"]:
-
-                cl_line, app_state.cursor = search_substring(
-                    app_state.arr, menu_state.find_str, pos, app_state.cursor
-                )
-                p1 = app_state.arr[cl_line][
-                    : app_state.cursor - len(menu_state.find_str)
-                ]
-                p2 = app_state.arr[cl_line][app_state.cursor :]
-                app_state.arr[cl_line] = p1 + menu_state.replace_str + p2
-
-                app_state.cursor = (
-                    app_state.cursor
-                    + len(menu_state.replace_str)
-                    - len(menu_state.find_str)
-                )
-                calc_rel_line(app_state, cl_line)
-                app_state.status_st, menu_state.active = False, True
-
-            elif key == app_state.keys["arr_left"]:
-                cl_line, app_state.cursor = search_substring_rev(
-                    app_state.arr, menu_state.find_str, pos, app_state.cursor
-                )
-                p1 = app_state.arr[cl_line][
-                    : app_state.cursor - len(menu_state.find_str)
-                ]
-                p1 = app_state.arr[cl_line][
-                    : app_state.cursor - len(menu_state.find_str)
-                ]
-                p2 = app_state.arr[cl_line][app_state.cursor :]
-                app_state.arr[cl_line] = p1 + menu_state.replace_str + p2
-                app_state.cursor = (
-                    app_state.cursor
-                    + len(menu_state.replace_str)
-                    - len(menu_state.find_str)
-                )
-                calc_rel_line(app_state, cl_line)
-                app_state.status_st, menu_state.active = False, True
-
-            elif key == app_state.keys["ctrl+a"]:
-                for p, x in enumerate(app_state.arr):
-                    app_state.arr[p] = x.replace(
-                        menu_state.find_str, menu_state.replace_str
-                    )
-                app_state.status_st = False
-                break
-
+            menu_actions(app_state, menu_state, kbd_input)
+            menu_state.pos = app_state.line + app_state.offset - app_state.banoff
         except: pass
 
-    exit(menu_state)
+    menu_state.run, menu_state.kill = False, True
+    thr.join(); print(scr) # Wait and show cursor
+    if sep != chr(92): tcsetattr(fd, TCSADRAIN, old_settings)
+
+
+def menu_actions(app_state, menu_state, kbd_input):
+
+    if not isin_arr(app_state.arr, menu_state.find_str): raise KeyboardInterrupt
+    elif kbd_input == keys["ctrl+c"]:                    raise KeyboardInterrupt
+
+    elif kbd_input == keys["arr_right"]:
+
+        cl_line, app_state.cursor = search_substring(
+            app_state.arr, menu_state.find_str, menu_state.pos, app_state.cursor
+        )
+        idx = app_state.cursor - len(menu_state.find_str)
+        p1 = app_state.arr[cl_line][:idx]
+        p2 = app_state.arr[cl_line][app_state.cursor:]
+        app_state.arr[cl_line] = p1 + menu_state.replace_str + p2
+
+        app_state.cursor = (
+            app_state.cursor
+            + len(menu_state.replace_str)
+            - len(menu_state.find_str)
+        )
+        calc_rel_line(app_state, cl_line)
+        app_state.status_st, menu_state.active = False, True
+
+
+    elif kbd_input == keys["arr_left"]:
+        cl_line, app_state.cursor = search_substring_rev(
+            app_state.arr, menu_state.find_str, menu_state.pos, app_state.cursor
+        )
+        idx = app_state.cursor - len(menu_state.find_str)
+        p1 = app_state.arr[cl_line][:idx]
+        p2 = app_state.arr[cl_line][app_state.cursor:]
+
+        app_state.arr[cl_line] = p1 + menu_state.replace_str + p2
+        app_state.cursor = (
+            app_state.cursor
+            + len(menu_state.replace_str)
+            - len(menu_state.find_str)
+        )
+        calc_rel_line(app_state, cl_line)
+        app_state.status_st, menu_state.active = False, True
+
+
+    elif kbd_input == keys["ctrl+a"]:
+        for p, x in enumerate(app_state.arr):
+            app_state.arr[p] = x.replace(menu_state.find_str, menu_state.replace_str)
+        app_state.status_st = False
+        raise KeyboardInterrupt
+
 
  

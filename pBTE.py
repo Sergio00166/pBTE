@@ -45,17 +45,15 @@ if __name__ == "__main__":
 
     while True:
         try:
-            if len(app_state.arr) == 0:
-                app_state.arr = [""]
-
+            if len(app_state.arr) == 0: app_state.arr = [""]
             app_state.rows, app_state.columns = get_size()
             update_scr(app_state)
 
             run_thread = True
-            key = getch()
+            kbd_input = getch()
             run_thread = False
 
-            if key == app_state.keys["ctrl+q"]:
+            if kbd_input == keys["ctrl+q"]:
                 if len(files) > 0:
                     # Try to open next file from queue
                     for _ in range(len(files)):
@@ -72,7 +70,7 @@ if __name__ == "__main__":
                     update_thread.join()
                     break
 
-            keys_func(app_state, key)
+            keys_func(app_state, kbd_input)
         except: pass
 
     # Restore TTY buffer and exit

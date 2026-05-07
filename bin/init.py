@@ -1,6 +1,6 @@
 # Code by Sergio00166
 
-VERSION = "v0.8.1.2"
+VERSION = "v0.8.2.1"
 
 if not __name__ == "__main__":
     from os import getcwd, sep, environ
@@ -12,6 +12,7 @@ if not __name__ == "__main__":
 
     from os.path import abspath, isdir, join
     from types import SimpleNamespace
+    from data import keys, keys_raw
     from functions import read_UTF8
     from keys_func import keys_func
     from time import sleep as delay
@@ -20,7 +21,7 @@ if not __name__ == "__main__":
     from threading import Thread
     from inputs import getch
     from glob import glob
-    from data import keys
+    
 
     rows, columns = get_size()
 
@@ -56,8 +57,8 @@ if not __name__ == "__main__":
         copy_buffer = "",
         status = "",
         status_st = False,
-        keys = keys
     )
+
     if len(argv) > 1:
         files = [glob(x, recursive=False) for x in argv[1:]]
         files = [abspath(i) for x in files for i in x if not isdir(i)]
@@ -72,5 +73,6 @@ if not __name__ == "__main__":
 
     # Change TTY buffer
     print("\x1b[?1049h", end="")
+
 
  

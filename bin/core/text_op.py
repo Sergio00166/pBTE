@@ -73,11 +73,12 @@ def search_substring_rev(lst, substring, start_list_pos=0, start_string_pos=None
         start = start_string_pos if i == start_list_pos else len(lst[i])
 
         if start_string_pos is None: start = len(lst[i])
-        else: start = start_string_pos - len(find_str)
+        else: start = start_string_pos - len(substring)
 
         for j in range(start, -1, -1):
             if lst[i][j - len(substring) : j] == substring: return i, j
 
         i, start_string_pos = (i - 1) % list_lenght, None
+
 
  
