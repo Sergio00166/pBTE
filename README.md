@@ -7,8 +7,6 @@
 ## Table of Contents
 - [Features](#features)
 - [Supported Encodings](#supported-encodings)
-- [Dependencies](#dependencies)
-- [Compatibility](#compatibility)
 - [Usage](#usage)
 - [Configuration](#configuration)
 - [Keybindings](#keybindings)
@@ -42,26 +40,6 @@
 Line endings: LF (default), CRLF, CR
 
 ---
-
-## Dependencies
-- Python 3.6+
-- colorama (bundled in `lib.zip`)
-- wcwidth (bundled in `lib.zip`)
-
-Licenses for bundled libraries are included in `lib.zip`.
-
----
-
-## Compatibility
-Tested on:
-- Windows
-- Linux
-- macOS
-
-#### Key mapping can be configured in `bin/data.py` if needed.
-
----
-
 
 ## Usage
 ```
@@ -100,7 +78,7 @@ bin/data.py
 - `^R`: Replace
 - `^J`: Insert newline without moving cursor
 - `^Y`: Toggle line selection mode
-- `Ctrl + Arrow Keys`: Move in steps of 4 characters
+- `Ctrl + Arrow Keys`: Move in steps of 4
 - `^T` then `S` or `L`: Change output charset or line ending
 
 ### Open File Menu
