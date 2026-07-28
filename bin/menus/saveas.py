@@ -134,19 +134,17 @@ def menu_actions(app_state, menu_state, kbd_input):
     elif kbd_input in (keys["ctrl+s"], keys["ctrl+b"]):
         suffix = ".bak" if kbd_input == keys["ctrl+b"] else ""
         save_file = menu_state.filewrite + suffix
-        try:
-            write_UTF8(app_state, save_file)
 
-            if kbd_input == keys["ctrl+b"]:
-                app_state.status = "BCKPd"
-            else:
-                app_state.status = "SAVED"
-                app_state.filename = menu_state.filewrite
+        write_UTF8(app_state, save_file)
 
-            app_state.status_st = True
-            raise KeyboardInterrupt
-        except:
-            app_state.status, app_state.status_st = "ERROR", True
+        if kbd_input == keys["ctrl+b"]:
+            app_state.status = "BCKPd"
+        else:
+            app_state.status = "SAVED"
+            app_state.filename = menu_state.filewrite
+
+        app_state.status_st = True
+        raise KeyboardInterrupt
 
 
     elif kbd_input == keys["backspace"]:

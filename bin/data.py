@@ -116,7 +116,7 @@ else:  # Linux
         "pageup": b"\x1b[5~",
         "pagedown": b"\x1b[6~",
         "tab": b"\t",
-        "insert": b"2",
+        "insert": b"\x1b[2~",
     }
 
 # Create an list with all keyboard byte scape codes
