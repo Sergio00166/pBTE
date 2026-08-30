@@ -118,7 +118,8 @@ def replace(app_state):
 
             menu_actions(app_state, menu_state, kbd_input)
             menu_state.pos = app_state.line + app_state.offset - app_state.banoff
-        except: pass
+
+        except: break
 
     menu_state.run, menu_state.kill = False, True
     thr.join(); print(scr) # Wait and show cursor
